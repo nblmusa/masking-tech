@@ -1,15 +1,15 @@
 import * as tf from '@tensorflow/tfjs-node';
 import { Detection } from './image-processing';
 
-export async function detectFaces(
+export async function detectPlates(
   tensor: tf.Tensor4D,
   paddingX: number,
   paddingY: number,
   xRatio: number,
   yRatio: number
 ): Promise<Detection[]> {
-  // Load face detection model
-  const model = await tf.loadGraphModel('file://./models/face_model/model.json');
+  // Load license plate detection model
+  const model = await tf.loadGraphModel('file://./models/license_plate_model/model.json');
   
   // Get predictions
   const predictions = await model.predict(tensor) as tf.Tensor2D;
@@ -51,7 +51,7 @@ export async function detectFaces(
   const nms = await tf.image.nonMaxSuppressionAsync(
     boxes,
     scores,
-    100,  // maxOutputSize
+    500,  // maxOutputSize
     0.3,  // iouThreshold
     0.1   // scoreThreshold
   );
