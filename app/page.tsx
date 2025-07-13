@@ -103,7 +103,7 @@ export default function Home() {
             <div className="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-blue-100/80 via-blue-50/80 to-indigo-50/80 dark:from-blue-950 dark:via-blue-900 dark:to-indigo-950 border border-blue-100/30 dark:border-blue-800/30 group order-2 md:order-1">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/3 to-indigo-500/2 group-hover:scale-110 transition-transform duration-500" />
               <Image
-                src="/images/blur-description.webp"
+                src="/images/highlight1.jpg"
                 alt="License plate masking demo"
                 fill
                 className="object-cover"

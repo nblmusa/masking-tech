@@ -21,6 +21,7 @@ interface EditorState {
   detectionTypes: {
     faces: boolean
     licensePlates: boolean
+    cars: boolean
   }
   maskingStyle: 'blur' | 'solid' | 'logo'
   blurRadius: number
@@ -42,6 +43,12 @@ interface EditorState {
     opacity: number
     color: string
   }
+  backgroundRemoval: {
+    enabled: boolean
+    refinementLevel: 'fast' | 'balanced' | 'detailed'
+    keepShadows: boolean
+    backgroundColor: string | null
+  }
   preview: {
     splitView: boolean
     showDetectionAreas: boolean
@@ -57,7 +64,8 @@ export default function StudioPage() {
   const [editorState, setEditorState] = useState<EditorState>({
     detectionTypes: {
       faces: true,
-      licensePlates: true
+      licensePlates: true,
+      cars: false
     },
     maskingStyle: 'blur',
     blurRadius: 20,
@@ -78,6 +86,12 @@ export default function StudioPage() {
       size: 14,
       opacity: 70,
       color: '#ffffff'
+    },
+    backgroundRemoval: {
+      enabled: false,
+      refinementLevel: 'balanced',
+      keepShadows: true,
+      backgroundColor: null
     },
     preview: {
       splitView: false,
@@ -110,7 +124,8 @@ export default function StudioPage() {
         setEditorState({
           detectionTypes: {
             faces: true,
-            licensePlates: true
+            licensePlates: true,
+            cars: false
           },
           maskingStyle: 'blur',
           blurRadius: 20,
@@ -131,6 +146,12 @@ export default function StudioPage() {
             size: 14,
             opacity: 70,
             color: '#ffffff'
+          },
+          backgroundRemoval: {
+            enabled: false,
+            refinementLevel: 'balanced',
+            keepShadows: true,
+            backgroundColor: null
           },
           preview: {
             splitView: false,
@@ -169,35 +190,23 @@ export default function StudioPage() {
       const requestBody = {
         image: base64Data,
         contentType,
-        processingOptions: {
-          detection: {
-            faces: editorState.detectionTypes.faces,
-            licensePlates: editorState.detectionTypes.licensePlates
-          },
-          maskingStyle: editorState.maskingStyle,
-          blur: {
-            radius: editorState.blurRadius,
-            opacity: editorState.blurOpacity / 100
-          },
-          solid: {
-            color: editorState.solidColor,
-            opacity: editorState.solidOpacity / 100
-          },
-          logo: editorState.maskingStyle === 'logo' ? {
-            url: editorState.logo.url,
-            position: editorState.logo.position,
-            size: editorState.logo.size,
-            opacity: editorState.logo.opacity / 100
-          } : null,
-          watermark: editorState.watermark.enabled ? {
-            text: editorState.watermark.text,
-            position: editorState.watermark.position,
-            size: editorState.watermark.size,
-            opacity: editorState.watermark.opacity / 100,
-            color: editorState.watermark.color
-          } : null
-        },
-        isAuthenticated
+        logoSettings: editorState.maskingStyle === 'logo' ? {
+          url: editorState.logo.url,
+          position: editorState.logo.position,
+          size: editorState.logo.size,
+          opacity: editorState.logo.opacity / 100
+        } : null,
+        watermarkSettings: editorState.watermark.enabled ? {
+          text: editorState.watermark.text,
+          position: editorState.watermark.position,
+          size: editorState.watermark.size,
+          opacity: editorState.watermark.opacity / 100,
+          color: editorState.watermark.color
+        } : null,
+        backgroundRemovalEnabled: editorState.detectionTypes.cars && editorState.backgroundRemoval.enabled,
+        refinementLevel: editorState.backgroundRemoval.refinementLevel,
+        keepShadows: editorState.backgroundRemoval.keepShadows,
+        backgroundColor: editorState.backgroundRemoval.backgroundColor
       }
 
       // Make API request
@@ -235,7 +244,8 @@ export default function StudioPage() {
         description: `Successfully processed image with ${
           [
             editorState.detectionTypes.faces && 'face',
-            editorState.detectionTypes.licensePlates && 'license plate'
+            editorState.detectionTypes.licensePlates && 'license plate',
+            editorState.detectionTypes.cars && 'car'
           ].filter(Boolean).join(' and ')
         } detection.`,
       })
@@ -274,7 +284,8 @@ export default function StudioPage() {
     setEditorState({
       detectionTypes: {
         faces: true,
-        licensePlates: true
+        licensePlates: true,
+        cars: false
       },
       maskingStyle: 'blur',
       blurRadius: 20,
@@ -295,6 +306,12 @@ export default function StudioPage() {
         size: 14,
         opacity: 70,
         color: '#ffffff'
+      },
+      backgroundRemoval: {
+        enabled: false,
+        refinementLevel: 'balanced',
+        keepShadows: true,
+        backgroundColor: null
       },
       preview: {
         splitView: false,
@@ -676,6 +693,124 @@ export default function StudioPage() {
                               className="data-[state=checked]:bg-primary"
                             />
                           </div>
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <Label className="font-medium">Detect Cars</Label>
+                              <p className="text-sm text-muted-foreground">Detect and process cars in the image</p>
+                            </div>
+                            <Switch
+                              checked={editorState.detectionTypes.cars}
+                              onCheckedChange={(checked) => {
+                                setEditorState(prev => ({
+                                  ...prev,
+                                  detectionTypes: { ...prev.detectionTypes, cars: checked },
+                                  backgroundRemoval: {
+                                    ...prev.backgroundRemoval,
+                                    enabled: checked ? prev.backgroundRemoval.enabled : false
+                                  }
+                                }))
+                              }}
+                              className="data-[state=checked]:bg-primary"
+                            />
+                          </div>
+                          
+                          {editorState.detectionTypes.cars && (
+                            <div className="mt-2 pt-4 border-t">
+                              <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="space-y-1">
+                                    <Label className="font-medium">Remove Background</Label>
+                                    <p className="text-sm text-muted-foreground">Remove the background from detected cars</p>
+                                  </div>
+                                  <Switch
+                                    checked={editorState.backgroundRemoval.enabled}
+                                    onCheckedChange={(checked) => 
+                                      setEditorState(prev => ({
+                                        ...prev,
+                                        backgroundRemoval: { ...prev.backgroundRemoval, enabled: checked }
+                                      }))
+                                    }
+                                    className="data-[state=checked]:bg-primary"
+                                  />
+                                </div>
+
+                                {editorState.backgroundRemoval.enabled && (
+                                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                                    <div className="space-y-2">
+                                      <Label className="text-sm font-medium">Refinement Level</Label>
+                                      <Select
+                                        value={editorState.backgroundRemoval.refinementLevel}
+                                        onValueChange={(value: 'fast' | 'balanced' | 'detailed') => 
+                                          setEditorState(prev => ({
+                                            ...prev,
+                                            backgroundRemoval: { ...prev.backgroundRemoval, refinementLevel: value }
+                                          }))
+                                        }
+                                      >
+                                        <SelectTrigger>
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="fast">Fast</SelectItem>
+                                          <SelectItem value="balanced">Balanced</SelectItem>
+                                          <SelectItem value="detailed">Detailed</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                      <div className="space-y-1">
+                                        <Label className="text-sm font-medium">Keep Shadows</Label>
+                                        <p className="text-xs text-muted-foreground">Preserve natural shadows</p>
+                                      </div>
+                                      <Switch
+                                        checked={editorState.backgroundRemoval.keepShadows}
+                                        onCheckedChange={(checked) => 
+                                          setEditorState(prev => ({
+                                            ...prev,
+                                            backgroundRemoval: { ...prev.backgroundRemoval, keepShadows: checked }
+                                          }))
+                                        }
+                                        className="data-[state=checked]:bg-primary"
+                                      />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                      <Label className="text-sm font-medium">Background Color</Label>
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => setEditorState(prev => ({
+                                            ...prev,
+                                            backgroundRemoval: { ...prev.backgroundRemoval, backgroundColor: null }
+                                          }))}
+                                          className={`flex-1 ${!editorState.backgroundRemoval.backgroundColor ? 'border-primary' : ''}`}
+                                        >
+                                          Transparent
+                                        </Button>
+                                        <div className="relative flex-1">
+                                          <Input
+                                            type="color"
+                                            value={editorState.backgroundRemoval.backgroundColor || '#ffffff'}
+                                            onChange={(e) => setEditorState(prev => ({
+                                              ...prev,
+                                              backgroundRemoval: { ...prev.backgroundRemoval, backgroundColor: e.target.value }
+                                            }))}
+                                            className="w-full p-1 h-9 cursor-pointer"
+                                          />
+                                          <div 
+                                            className="absolute inset-0 rounded-md pointer-events-none"
+                                            style={{ backgroundColor: editorState.backgroundRemoval.backgroundColor || 'transparent' }}
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
