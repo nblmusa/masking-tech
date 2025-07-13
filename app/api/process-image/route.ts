@@ -3,8 +3,17 @@ import sharp, { Blend } from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { detectAndMask } from '@/app/lib/image-processing'
+import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
+
+// Add schema for background removal settings
+const BackgroundRemovalSettingsSchema = z.object({
+  enabled: z.boolean(),
+  refinementLevel: z.enum(['fast', 'balanced', 'detailed']).default('balanced'),
+  keepShadows: z.boolean().default(false),
+  backgroundColor: z.string().nullable().default(null)
+})
 
 async function uploadToStorage(
   supabase: any,
@@ -29,83 +38,91 @@ async function uploadToStorage(
 
 export async function POST(request: Request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    
-    // Check authentication
-    const { data: { session } } = await supabase.auth.getSession()
-    const isAuthenticated = !!session
+    const supabase = createRouteHandlerClient({ cookies });
+    const { data: { session } } = await supabase.auth.getSession();
+    const isAuthenticated = !!session;
 
-    let file: File | null = null
-    let logo: File | null = null
-    let logoSettings: string | null = null
-    let watermarkSettings: any = null
+    let imageBuffer: Buffer | undefined;
+    let imageMetadata: { name: string; type: string; } | undefined;
+    let logoBuffer: Buffer | undefined;
+    let logoSettings: any;
+    let watermarkSettings: any;
+    let backgroundRemovalSettings: any;
 
-    const contentType = request.headers.get('content-type')
+    const contentType = request.headers.get('content-type');
 
-    // Try to parse as FormData first
     if (contentType?.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      
+      // Get image file
+      const imageFile = formData.get('image') as File;
+      if (!imageFile) {
+        return new Response('No image file provided', { status: 400 });
+      }
+      imageBuffer = Buffer.from(await imageFile.arrayBuffer());
+      imageMetadata = {
+        name: imageFile.name,
+        type: imageFile.type || 'image/jpeg'
+      };
+
+      // Get logo file if provided
+      const logoFile = formData.get('logo') as File;
+      if (logoFile) {
+        logoBuffer = Buffer.from(await logoFile.arrayBuffer());
+      }
+
+      // Parse settings
       try {
-        const formData = await request.formData()
-        const entries = Array.from(formData.entries())
-        console.log('FormData entries:', entries.map(([key, value]) => ({
-          key,
-          type: value instanceof File ? 'File' : 'string',
-          fileDetails: value instanceof File ? {
-            name: value.name,
-            type: value.type,
-            size: value.size
-          } : null
-        })))
-        
-        file = formData.get('file') as File
-        logo = formData.get('logo') as File | null
-        logoSettings = formData.get('logoSettings') as string | null
+        logoSettings = formData.get('logoSettings') ? 
+          JSON.parse(formData.get('logoSettings') as string) : 
+          null;
+
         watermarkSettings = formData.get('watermarkSettings') ? 
           JSON.parse(formData.get('watermarkSettings') as string) : 
-          null
+          null;
+
+        // Parse and validate background removal settings
+        backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
+          enabled: formData.get('backgroundRemovalEnabled') === 'true',
+          refinementLevel: formData.get('refinementLevel') || 'balanced',
+          keepShadows: formData.get('keepShadows') === 'true',
+          backgroundColor: formData.get('backgroundColor') || null
+        });
       } catch (error) {
-        console.error('FormData parsing error:', error)
-        return NextResponse.json({
-          error: 'Failed to parse form data',
-          details: error instanceof Error ? error.message : 'Unknown error'
-        }, { status: 400 })
+        console.error('Settings parsing error:', error);
+        return new Response('Invalid settings format', { status: 400 });
       }
-    } 
-    // Try JSON if not FormData
-    else if (contentType?.includes('application/json')) {
+    } else if (contentType?.includes('application/json')) {
       try {
-        const body = await request.json()
+        const body = await request.json();
         
         if (body.image) {
-          const base64Data = body.image.split(',')[1] || body.image // Handle both with and without data URL prefix
-          const binaryData = Buffer.from(base64Data, 'base64')
-          const filename = body.filename || 'image.jpg'
-          file = new File([binaryData], filename, { type: 'image/jpeg' })
+          const base64Data = body.image.split(',')[1] || body.image;
+          imageBuffer = Buffer.from(base64Data, 'base64');
+          imageMetadata = {
+            name: body.filename || 'image.jpg',
+            type: 'image/jpeg'
+          };
         }
         
         if (body.logo) {
-          const logoBase64 = body.logo.split(',')[1] || body.logo
-          logo = new File([Buffer.from(logoBase64, 'base64')], 'logo.png', { type: 'image/png' })
+          const logoBase64 = body.logo.split(',')[1] || body.logo;
+          logoBuffer = Buffer.from(logoBase64, 'base64');
         }
         
-        // Handle processing options
-        if (body.processingOptions) {
-          logoSettings = JSON.stringify(body.processingOptions.logo)
-          watermarkSettings = body.processingOptions.watermark
-        }
+        logoSettings = body.logoSettings;
+        watermarkSettings = body.watermarkSettings;
 
-        // Store watermark settings
-        if (body.watermarkSettings) {
-          watermarkSettings = body.watermarkSettings
-        }
-
-        console.log('watermarkSettings1', watermarkSettings)
-      } catch (jsonError) {
-        console.error('JSON parsing error:', jsonError)
-        return NextResponse.json({
-          error: 'Failed to parse JSON body',
-          details: jsonError instanceof Error ? jsonError.message : 'Unknown error'
-        }, { status: 400 })
+        // Parse and validate background removal settings
+        backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
+          enabled: body.backgroundRemovalEnabled || false,
+          refinementLevel: body.refinementLevel || 'balanced',
+          keepShadows: body.keepShadows || false,
+          backgroundColor: body.backgroundColor || null
+        });
+      } catch (error) {
+        console.error('Settings parsing error:', error);
+        return new Response('Invalid settings format', { status: 400 });
       }
     } else {
       console.error('Unsupported content type:', contentType)
@@ -116,44 +133,20 @@ export async function POST(request: Request) {
       }, { status: 400 })
     }
 
-    if (!file) {
-      console.error('No file found in request')
-      return NextResponse.json({
-        error: 'No file provided or invalid format',
-        contentType,
-        isFormData: contentType?.includes('multipart/form-data'),
-        isJson: contentType?.includes('application/json')
-      }, { status: 400 })
-    }
-
-    // Convert File to Buffer
-    const buffer = Buffer.from(await file.arrayBuffer())
-
-    // Convert logo to Buffer if provided
-    let logoBuffer: Buffer | undefined
-    let parsedLogoSettings: any | undefined
-
-    if (logo) {
-      const logoArrayBuffer = await logo.arrayBuffer()
-      logoBuffer = Buffer.from(logoArrayBuffer)
-    }
-
-    if (logoSettings) {
-      try {
-        parsedLogoSettings = JSON.parse(logoSettings)
-      } catch (error) {
-        console.error('Error parsing logo settings:', error)
-      }
+    if (!imageBuffer || !imageMetadata) {
+      console.error('No image file found in request');
+      return new Response('No image file provided or invalid format', { status: 400 });
     }
 
     // Process the image
-    console.log('Starting image processing with buffer size:', buffer.length)
+    console.log('Starting image processing with buffer size:', imageBuffer.length);
     const result = await detectAndMask(
-      buffer,
+      imageBuffer,
       logoBuffer,
-      parsedLogoSettings,
-      watermarkSettings
-    )
+      logoSettings,
+      watermarkSettings,
+      backgroundRemovalSettings
+    );
     console.log('Processing result:', {
       hasProcessedImage: !!result.processedImage,
       processedImageSize: result.processedImage?.length,
@@ -181,7 +174,7 @@ export async function POST(request: Request) {
       console.log('User is authenticated, uploading to storage')
       const userId = session.user.id
       const timestamp = Date.now()
-      const filename = file.name.replace(/\.[^/.]+$/, '')
+      const filename = imageMetadata.name.replace(/\.[^/.]+$/, '')
       
       try {
         // Upload processed image
@@ -205,12 +198,12 @@ export async function POST(request: Request) {
           .from('processed_images')
           .insert([{
             user_id: userId,
-            filename: file.name,
+            filename: imageMetadata.name,
             license_plates_detected: result.detectedPlates,
             processed_url: processedImageUrl,
             thumbnail_url: thumbnailUrl,
             metadata: {
-              originalSize: buffer.length,
+              originalSize: imageBuffer.length,
               processedSize: processedImage.length,
               logoApplied: !!logoBuffer
             }
@@ -242,18 +235,17 @@ export async function POST(request: Request) {
 
     // Convert Buffer to base64 string for response
     console.log('Converting processed image to base64, size:', processedImage.length)
-    const imageContentType = file.type || 'image/jpeg'
-    const base64Image = `data:${imageContentType};base64,${processedImage.toString('base64')}`
+    const base64Image = `data:${imageMetadata.type};base64,${processedImage.toString('base64')}`
 
     return NextResponse.json({
       success: true,
       maskedImage: base64Image,
       metadata: {
         licensePlatesDetected: result.detectedPlates,
-        originalSize: buffer.length,
+        originalSize: imageBuffer.length,
         processedSize: processedImage.length,
         logoApplied: !!logoBuffer,
-        contentType: imageContentType
+        contentType: imageMetadata.type
       },
       processedImageUrl,
       thumbnailUrl

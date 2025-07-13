@@ -3,12 +3,15 @@ import sharp, { Blend } from 'sharp';
 import { LogoSettings, DEFAULT_SETTINGS } from './config';
 import { detectFaces } from './face-detection';
 import { detectPlates } from './plate-detection';
+import { detectCars } from './car-detection';
+import { removeBackground } from './background-removal';
 
 export interface ProcessingResult {
   processedImage: Buffer;
   thumbnail: Buffer;
   detectedPlates: number;
   detectedFaces: number;
+  detectedCars: number;
   error?: Error;
 }
 
@@ -27,6 +30,13 @@ export interface WatermarkSettings {
   opacity: number;
   color: string;
   font: string;
+}
+
+export interface BackgroundRemovalSettings {
+  enabled: boolean;
+  refinementLevel: 'fast' | 'balanced' | 'detailed';
+  keepShadows: boolean;
+  backgroundColor: string | null;
 }
 
 export const MASK_TYPES = ['blur', 'solid'] as const;
@@ -122,13 +132,15 @@ export async function detectAndMask(
   imageBuffer: Buffer,
   logoBuffer?: Buffer,
   logoSettings: LogoSettings = DEFAULT_SETTINGS,
-  watermarkSettings?: Partial<WatermarkSettings>
+  watermarkSettings?: Partial<WatermarkSettings>,
+  backgroundRemovalSettings?: BackgroundRemovalSettings
 ): Promise<ProcessingResult> {
   try {
     tf.engine().startScope();
 
     // Initialize result
     let processedImage = imageBuffer;
+    let detectedCars = 0;
 
     // Load and preprocess the image
     const image = await sharp(imageBuffer);
@@ -196,6 +208,46 @@ export async function detectAndMask(
       faceDetections = await detectFaces(normalized as tf.Tensor4D, paddingX, paddingY, xRatio, yRatio);
     } catch (error) {
       console.error('Face detection error:', error);
+    }
+
+    // Detect cars if enabled
+    let carDetections: Detection[] = [];
+    if (backgroundRemovalSettings?.enabled) {
+      try {
+        carDetections = await detectCars(normalized as tf.Tensor4D, paddingX, paddingY, xRatio, yRatio);
+        detectedCars = carDetections.length;
+
+        // Process each detected car
+        for (const detection of carDetections) {
+          const carRegion = await sharp(processedImage)
+            .extract({
+              left: Math.round(detection.x1),
+              top: Math.round(detection.y1),
+              width: Math.round(detection.x2 - detection.x1),
+              height: Math.round(detection.y2 - detection.y1)
+            })
+            .toBuffer();
+
+          // Remove background from car region
+          const processedCarRegion = await removeBackground(carRegion, {
+            refinementLevel: backgroundRemovalSettings.refinementLevel,
+            keepShadows: backgroundRemovalSettings.keepShadows,
+            backgroundColor: backgroundRemovalSettings.backgroundColor
+          });
+
+          // Composite the processed car region back onto the image
+          processedImage = await sharp(processedImage)
+            .composite([{
+              input: processedCarRegion,
+              left: Math.round(detection.x1),
+              top: Math.round(detection.y1),
+              blend: 'over' as Blend
+            }])
+            .toBuffer();
+        }
+      } catch (error) {
+        console.error('Car detection/background removal error:', error);
+      }
     }
 
     tf.dispose(normalized);
@@ -301,8 +353,11 @@ export async function detectAndMask(
     }
 
     // Create thumbnail
-    const thumbnail = await sharp(imageBuffer)
-      .resize(320, 240, { fit: 'contain' })
+    const thumbnail = await sharp(processedImage)
+      .resize(320, 240, {
+        fit: 'contain',
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      })
       .toBuffer();
 
     return {
@@ -310,16 +365,17 @@ export async function detectAndMask(
       thumbnail,
       detectedPlates: plateDetections.length,
       detectedFaces: faceDetections.length,
-      error: undefined
+      detectedCars
     };
 
   } catch (error) {
-    console.error('Image processing error:', error);
+    console.error('Processing error:', error);
     return {
       processedImage: imageBuffer,
       thumbnail: imageBuffer,
       detectedPlates: 0,
       detectedFaces: 0,
+      detectedCars: 0,
       error: error as Error
     };
   } finally {
@@ -337,7 +393,7 @@ async function createBlurredRegion(
   isRounded: boolean = false
 ) {
   if (width <= 0 || height <= 0) return [];
-
+console.log('Creating blurred region', { width, height, x1, y1 });
   try {
     const maskType = settings?.maskType || 'blur';
     const opacity = settings?.blur?.opacity ?? 1;
