@@ -12,7 +12,9 @@ const BackgroundRemovalSettingsSchema = z.object({
   enabled: z.boolean(),
   refinementLevel: z.enum(['fast', 'balanced', 'detailed']).default('balanced'),
   keepShadows: z.boolean().default(false),
-  backgroundColor: z.string().nullable().default(null)
+  backgroundColor: z.string().nullable().default(null),
+  licensePlateBlurring: z.boolean().default(false),
+  shadowEffect: z.boolean().default(false)
 })
 
 async function uploadToStorage(
@@ -83,11 +85,14 @@ export async function POST(request: Request) {
 
         // Parse and validate background removal settings
         backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
-          enabled: formData.get('backgroundRemovalEnabled') === 'true',
+          enabled: true, // formData.get('backgroundRemovalEnabled') === 'true',
           refinementLevel: formData.get('refinementLevel') || 'balanced',
-          keepShadows: formData.get('keepShadows') === 'true',
-          backgroundColor: formData.get('backgroundColor') || null
+          keepShadows: true, // formData.get('keepShadows') === 'true',
+          backgroundColor: formData.get('backgroundColor') || null,
+          licensePlateBlurring: formData.get('licensePlateBlurring') === 'true',
+          shadowEffect: formData.get('shadowEffect') === 'true'
         });
+        console.log('Background removal settings1:', backgroundRemovalSettings);
       } catch (error) {
         console.error('Settings parsing error:', error);
         return new Response('Invalid settings format', { status: 400 });
@@ -115,10 +120,12 @@ export async function POST(request: Request) {
 
         // Parse and validate background removal settings
         backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
-          enabled: body.backgroundRemovalEnabled || false,
+          enabled: true, // body.backgroundRemovalEnabled || false,
           refinementLevel: body.refinementLevel || 'balanced',
-          keepShadows: body.keepShadows || false,
-          backgroundColor: body.backgroundColor || null
+          keepShadows: true, // body.keepShadows || false,
+          backgroundColor: body.backgroundColor || null,
+          licensePlateBlurring: body.licensePlateBlurring || false,
+          shadowEffect: body.shadowEffect || false
         });
       } catch (error) {
         console.error('Settings parsing error:', error);
