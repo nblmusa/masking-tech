@@ -67,7 +67,7 @@ export class RapidAPIService {
         throw new Error(`RapidAPI request failed: ${response.status} ${response.statusText}`);
       }
 
-      const result = await response.json() as RapidAPIResponse;
+      const result: any = await response.json() as RapidAPIResponse;
       console.log('RapidAPI response:', result?.results?.[0]['status']);
 
       if (!result.success || !result.result?.image) {
