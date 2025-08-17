@@ -36,7 +36,9 @@ export interface BackgroundRemovalSettings {
   enabled: boolean;
   refinementLevel: 'fast' | 'balanced' | 'detailed';
   keepShadows: boolean;
-  backgroundColor: string | null;
+  backgroundColor: string | null; 
+  licensePlateBlurring?: boolean;
+  shadowEffect?: boolean;
 }
 
 export const MASK_TYPES = ['blur', 'solid'] as const;
@@ -212,7 +214,9 @@ export async function detectAndMask(
 
     // Detect cars if enabled
     let carDetections: Detection[] = [];
+    console.log('Background removal settings:', backgroundRemovalSettings);
     if (backgroundRemovalSettings?.enabled) {
+      console.log('Detecting cars with background removal settings:', backgroundRemovalSettings);
       try {
         carDetections = await detectCars(normalized as tf.Tensor4D, paddingX, paddingY, xRatio, yRatio);
         detectedCars = carDetections.length;
@@ -232,7 +236,9 @@ export async function detectAndMask(
           const processedCarRegion = await removeBackground(carRegion, {
             refinementLevel: backgroundRemovalSettings.refinementLevel,
             keepShadows: backgroundRemovalSettings.keepShadows,
-            backgroundColor: backgroundRemovalSettings.backgroundColor
+            backgroundColor: backgroundRemovalSettings.backgroundColor,
+            licensePlateBlurring: backgroundRemovalSettings.licensePlateBlurring,
+            shadowEffect: backgroundRemovalSettings.shadowEffect
           });
 
           // Composite the processed car region back onto the image
@@ -393,7 +399,7 @@ async function createBlurredRegion(
   isRounded: boolean = false
 ) {
   if (width <= 0 || height <= 0) return [];
-console.log('Creating blurred region', { width, height, x1, y1 });
+
   try {
     const maskType = settings?.maskType || 'blur';
     const opacity = settings?.blur?.opacity ?? 1;
