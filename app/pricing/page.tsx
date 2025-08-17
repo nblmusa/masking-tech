@@ -392,8 +392,8 @@ export default function PricingPage() {
     <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-white to-blue-50 dark:from-background dark:to-blue-950 min-h-screen">
       {/* Overview Info Box */}
       <div className="max-w-3xl mx-auto mt-12 mb-10 p-6 rounded-2xl bg-muted/30 border border-muted shadow text-center">
-        <h1 className="text-2xl font-bold mb-2">MaskingTech.com Pricing Details (Final Savings)</h1>
-        <p className="text-base text-muted-foreground">MaskingTech offers advanced AI-powered image processing services tailored for the automotive industry and privacy protection. Pricing is based on a credit system, so you only pay for what you use.</p>
+        <h1 className="text-2xl font-bold mb-2">MaskingTech.com Pricing</h1>
+        <p className="text-base text-muted-foreground">MaskingTech offers advanced AI-powered image processing services tailored for the automotive industry and privacy protection.</p>
       </div>
 
       {/* Pricing Cards Row */}
@@ -447,33 +447,8 @@ export default function PricingPage() {
         ))}
       </div>
 
-      {/* Services & Credit Costs Section */}
-      <div className="max-w-4xl mx-auto mb-12">
-        <h2 className="text-xl font-bold mb-4">Services &amp; Credit Costs</h2>
-        <div className="overflow-x-auto rounded-lg border border-muted bg-white dark:bg-background/80">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left px-4 py-2">Service</th>
-                <th className="text-left px-4 py-2">Credits</th>
-                <th className="text-left px-4 py-2">Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              {serviceCredits.map((svc) => (
-                <tr key={svc.name} className="border-t border-muted">
-                  <td className="px-4 py-2 font-medium">{svc.name}</td>
-                  <td className="px-4 py-2">{svc.credits}</td>
-                  <td className="px-4 py-2">{svc.description}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* Credit Bundles Table */}
-      <div className="max-w-2xl mx-auto mb-12">
+      <div className="max-w-6xl mx-auto mb-12">
         <h2 className="text-xl font-bold mb-4">Credit Bundles</h2>
         <div className="overflow-x-auto rounded-lg border border-muted bg-white dark:bg-background/80">
           <table className="min-w-full text-sm">
@@ -499,7 +474,7 @@ export default function PricingPage() {
       </div>
 
       {/* Free Trial & Overage Pricing Banners */}
-      <div className="max-w-3xl mx-auto mb-8 flex flex-col gap-4">
+      <div className="max-w-6xl mx-auto mb-8 flex flex-col gap-4">
         <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-2xl shadow-sm">
           <span className="font-semibold">Free Trial:</span> All new users receive 20 free credits to try our services risk-free.
         </div>
@@ -508,26 +483,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Example Cost Calculations */}
-      <div className="max-w-3xl mx-auto mb-12">
-        <h2 className="text-xl font-semibold mb-3">Example Cost Calculations</h2>
-        <div className="bg-muted/30 rounded-xl p-6 text-base shadow flex flex-col gap-3 items-center">
-          <div>- 50 face blurs: 50 credits &rarr; Starter equivalent ($5).</div>
-          <div>- 300 plate blurs with logo: 300 credits &rarr; Growth equivalent ($22).</div>
-          <div>- 100 background replacements: 300 credits &rarr; Growth equivalent ($22).</div>
-        </div>
-      </div>
-
-      {/* Why Choose MaskingTech? */}
-      <div className="max-w-3xl mx-auto mb-16">
-        <h2 className="text-xl font-semibold mb-3">Why Choose MaskingTech?</h2>
-        <ul className="list-disc pl-6 text-base text-muted-foreground">
-          <li>More affordable than remove.bg (~$0.25-0.40/image) or platerecognizer.com&apos;s monthly limits.</li>
-          <li>Services tailored specifically for automotive and privacy needs.</li>
-          <li>API &amp; web UI for flexible workflows.</li>
-          <li>Credits usable across all services.</li>
-        </ul>
-      </div>
     </div>
   );
 }
