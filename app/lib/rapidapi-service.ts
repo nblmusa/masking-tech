@@ -1,4 +1,3 @@
-import sharp from 'sharp';
 import { RAPIDAPI_CONFIG, RapidAPISettings, RapidAPIResponse, validateImageFormat, validateImageSize, getAPIKey } from './rapidapi-config';
 
 interface RapidAPIOptions extends RapidAPISettings {}
