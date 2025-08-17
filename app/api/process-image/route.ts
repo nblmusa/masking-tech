@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import sharp, { Blend } from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import { detectAndMask } from '@/app/lib/image-processing'
+// import { detectAndMask } from '@/app/lib/image-processing'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -147,13 +147,18 @@ export async function POST(request: Request) {
 
     // Process the image
     console.log('Starting image processing with buffer size:', imageBuffer.length);
-    const result = await detectAndMask(
-      imageBuffer,
-      logoBuffer,
-      logoSettings,
-      watermarkSettings,
-      backgroundRemovalSettings
-    );
+    const result: any = {
+      processedImage: imageBuffer,
+      detectedPlates: 0,
+      error: {}
+    };
+    // const result = await detectAndMask(
+    //   imageBuffer,
+    //   logoBuffer,
+    //   logoSettings,
+    //   watermarkSettings,
+    //   backgroundRemovalSettings
+    // );
     console.log('Processing result:', {
       hasProcessedImage: !!result.processedImage,
       processedImageSize: result.processedImage?.length,
