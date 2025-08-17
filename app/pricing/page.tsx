@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Check, Car, Shield, Gauge, Lock, Sparkles, ImageIcon, Zap, Users, Loader2 } from "lucide-react"
+import { Check, Car, Shield, Gauge, Lock, Sparkles, ImageIcon, Zap, Users, Loader2, Star, CreditCard, BadgeDollarSign, UserCheck, Image as ImageIcon2 } from "lucide-react"
 import Link from "next/link"
 import { PLANS } from "@/lib/stripe"
 import { useEffect, useState } from "react"
@@ -24,6 +24,54 @@ interface SubscriptionData {
   subscription: Subscription | null;
 }
 
+// Update credit bundles to match screenshot
+const CREDIT_BUNDLES = [
+  { credits: 500, price: 29, pricePerCredit: 0.058, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_500_PRICE_ID },
+  { credits: 2000, price: 79, pricePerCredit: 0.0395, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_2000_PRICE_ID },
+  { credits: 5000, price: 159, pricePerCredit: 0.0318, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_5000_PRICE_ID },
+  { credits: 10000, price: 299, pricePerCredit: 0.0299, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_10000_PRICE_ID },
+];
+
+// Subscription plans (monthly/yearly)
+const SUBSCRIPTION_PLANS = [
+  {
+    name: 'Basic',
+    monthly: 49,
+    yearly: 499,
+    credits: 1000,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_BASIC_MONTHLY,
+    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_BASIC_YEARLY,
+    savings: 'save vs. buying bundles',
+  },
+  {
+    name: 'Advanced',
+    monthly: 139,
+    yearly: 1399,
+    credits: 5000,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_ADVANCED_MONTHLY,
+    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_ADVANCED_YEARLY,
+    savings: 'save vs. buying bundles',
+  },
+  {
+    name: 'Growth',
+    monthly: 269,
+    yearly: 2699,
+    credits: 10000,
+    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_GROWTH_MONTHLY,
+    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_GROWTH_YEARLY,
+    savings: 'save vs. buying bundles',
+  },
+];
+
+// Service credit costs
+const SERVICE_CREDITS = [
+  { name: 'Face Blur', credits: 1, description: 'Automatically detects and blurs faces.' },
+  { name: 'Number Plate Blur/Replacement + Logo', credits: 1, description: 'Blurs or replaces license plates, optionally adds your logo.' },
+  { name: 'Make/Model Detection', credits: 1, description: "Identifies the vehicle's make and model." },
+  { name: 'Number Plate Detection', credits: 1, description: 'Locates and reads license plate text (OCR).' },
+  { name: 'Background Replacement', credits: 3, description: 'Replaces the entire background behind the car.' },
+];
+
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -32,6 +80,123 @@ export default function PricingPage() {
   const { toast } = useToast();
   const router = useRouter();
   const analytics = useAnalytics();
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [paygAmount, setPaygAmount] = useState(3);
+  const [volumeAmount, setVolumeAmount] = useState(500);
+
+  // Example options for dropdowns
+  const paygOptions = [3, 10, 50, 100, 500];
+  const volumeOptions = [500, 1000, 5000, 10000];
+
+  // Credit bundles for table
+  const creditBundles = [
+    { credits: 500, price: 29, perCredit: 0.058 },
+    { credits: 2000, price: 79, perCredit: 0.0395 },
+    { credits: 5000, price: 159, perCredit: 0.0318 },
+    { credits: 10000, price: 299, perCredit: 0.0299 },
+  ];
+
+  // Services & credit costs
+  const serviceCredits = [
+    { name: 'Face Blur', credits: 1, description: 'Automatically detects and blurs faces.' },
+    { name: 'Number Plate Blur/Replacement + Logo', credits: 1, description: 'Blurs or replaces license plates, optionally adds your logo.' },
+    { name: 'Make/Model Detection', credits: 1, description: "Identifies the vehicle's make and model." },
+    { name: 'Number Plate Detection', credits: 1, description: 'Locates and reads license plate text (OCR).' },
+    { name: 'Background Replacement', credits: 3, description: 'Replaces the entire background behind the car.' },
+  ];
+
+  // MaskingTech-specific features for each plan
+  const plans = [
+    {
+      key: 'payg',
+      name: 'Pay-as-you-go',
+      price: `$${paygAmount}`,
+      credits: `${paygAmount} credits`,
+      cta: 'Buy now',
+      features: [
+        'One-off credit purchase',
+        'No subscription required',
+        'Use for any service: plate masking, face blur, background replacement',
+        'Credits never expire',
+        'Upgrade or top up anytime',
+      ],
+      select: {
+        value: paygAmount,
+        options: paygOptions,
+        onChange: (e: any) => setPaygAmount(Number(e.target.value)),
+        label: 'Select credits for Pay-as-you-go',
+      },
+      perCredit: `$${(paygAmount / paygAmount).toFixed(2)}`,
+      savings: null,
+      button: () => handleBuyCredits('PAYG_PRICE_ID'),
+      highlight: false,
+      badge: null,
+      accent: false,
+    },
+    {
+      key: 'lite',
+      name: 'Basic',
+      price: billingPeriod === 'monthly' ? '$49' : '$499',
+      credits: '1,000 credits/month',
+      cta: 'Subscribe',
+      features: [
+        'License plate masking',
+        'Face blur',
+        'Background replacement',
+        'Web UI access',
+        'Basic API access',
+        'Email support',
+      ],
+      perCredit: '$0.049',
+      savings: 'Save vs. buying bundles',
+      button: () => handleUpgrade('BASIC_PRICE_ID'),
+      highlight: false,
+      badge: null,
+      accent: false,
+    },
+    {
+      key: 'pro',
+      name: 'Advanced',
+      price: billingPeriod === 'monthly' ? '$139' : '$1,399',
+      credits: '5,000 credits/month',
+      cta: 'Subscribe',
+      features: [
+        'All Basic features',
+        'Bulk image processing',
+        'Priority API access',
+        'Team management',
+        'Priority support',
+        'Custom watermark/logo',
+      ],
+      perCredit: '$0.0278',
+      savings: 'Save vs. buying bundles',
+      button: () => handleUpgrade('ADVANCED_PRICE_ID'),
+      highlight: false,
+      badge: null,
+      accent: false,
+    },
+    {
+      key: 'growth',
+      name: 'Growth',
+      price: billingPeriod === 'monthly' ? '$269' : '$2,699',
+      credits: '10,000 credits/month',
+      cta: 'Subscribe',
+      features: [
+        'Everything in Advanced, plus',
+        'Custom credit volume',
+        'Unlimited team members',
+        'Dedicated account manager',
+        'Custom integrations',
+        'SLA & compliance',
+      ],
+      perCredit: '$0.0269',
+      savings: 'Save vs. buying bundles',
+      button: () => handleUpgrade('GROWTH_PRICE_ID'),
+      highlight: true,
+      badge: 'Best Value',
+      accent: true,
+    },
+  ];
 
   useEffect(() => {
     checkUser();
@@ -95,12 +260,44 @@ export default function PricingPage() {
     }
   }
 
+  // Add handler for credit bundle purchase
+  async function handleBuyCredits(priceId: string) {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/credits/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      router.push(data.url);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start credit purchase",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   // Track plan view on component mount
   useEffect(() => {
     Object.values(PLANS).forEach(plan => {
       analytics.trackSubscriptionView(plan.name.toLowerCase());
     });
   }, [analytics]);
+
+  // Helper for plan price
+  function getPlanPrice(plan: typeof SUBSCRIPTION_PLANS[number]) {
+    return billingPeriod === 'monthly' ? plan.monthly : plan.yearly;
+  }
+
+  function getPlanPriceLabel() {
+    return billingPeriod === 'monthly' ? '/mo' : '/yr';
+  }
 
   function getPlanAction(planKey: string, plan: typeof PLANS[keyof typeof PLANS]) {
     if (isLoading) {
@@ -192,187 +389,145 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="flex-1 relative overflow-hidden">
-      {/* Enhanced Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.15),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(60deg,rgba(59,130,246,0.05)_0%,rgba(59,130,246,0)_100%)]" />
-      
-      {/* Floating elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-        <div className="absolute top-1/4 left-10 animate-float-slow">
-          <Car className="h-12 w-12 text-blue-400/20 dark:text-blue-300/20 transform -rotate-12" />
-        </div>
-        <div className="absolute top-2/3 right-12 animate-float-slower">
-          <Shield className="h-10 w-10 text-indigo-400/20 dark:text-indigo-300/20" />
-        </div>
-        <div className="absolute bottom-1/4 left-1/4 animate-float">
-          <Lock className="h-8 w-8 text-blue-400/20 dark:text-blue-300/20 transform rotate-12" />
-        </div>
+    <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-white to-blue-50 dark:from-background dark:to-blue-950 min-h-screen">
+      {/* Overview Info Box */}
+      <div className="max-w-3xl mx-auto mt-12 mb-10 p-6 rounded-2xl bg-muted/30 border border-muted shadow text-center">
+        <h1 className="text-2xl font-bold mb-2">MaskingTech.com Pricing Details (Final Savings)</h1>
+        <p className="text-base text-muted-foreground">MaskingTech offers advanced AI-powered image processing services tailored for the automotive industry and privacy protection. Pricing is based on a credit system, so you only pay for what you use.</p>
       </div>
 
-      <div className="mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Enhanced Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500/5 via-blue-400/5 to-indigo-500/5 px-6 py-3 rounded-full mb-6">
-              <Car className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <span className="font-medium text-blue-700 dark:text-blue-300">
-                {user ? 'Upgrade Your Plan' : 'Choose Your Plan'}
-              </span>
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
-              Simple, Transparent Pricing
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {user 
-                ? subscriptionData?.subscription
-                  ? `You're currently on the ${subscriptionData.plan.name} plan. ${subscriptionData.subscription.cancelAtPeriodEnd ? 'Your plan will be cancelled at the end of the billing period.' : ''}`
-                  : 'Choose a plan to get started with our advanced license plate detection and masking technology.'
-                : 'Choose the plan that best fits your needs. All plans include our advanced license plate detection and masking technology.'
-              }
-            </p>
-          </div>
-
-          {/* Enhanced Pricing Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 lg:gap-6 mb-16">
-            {Object.entries(PLANS).map(([key, plan]) => (
-              <Card 
-                key={key} 
-                className={`group h-full flex flex-col overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl
-                  ${key === 'PRO' ? 'border-primary/50 shadow-lg relative bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 dark:from-blue-900/50 dark:via-gray-900 dark:to-blue-900/30' : 'bg-background/60 backdrop-blur-sm'}
-                  ${subscriptionData?.plan.id === plan.id.toLowerCase() ? 'ring-2 ring-primary' : ''}`}
+      {/* Pricing Cards Row */}
+      <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-6xl mx-auto px-4 mb-16">
+        {plans.map((plan, idx) => (
+          <div
+            key={plan.key}
+            className={`flex-1 flex flex-col bg-white dark:bg-background rounded-3xl shadow-xl p-8 min-w-[270px] max-w-[320px] mx-auto md:mx-0 mb-8 md:mb-0 border-2 ${plan.highlight ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10' : 'border-transparent'} ${plan.accent ? 'scale-105 shadow-2xl' : ''}`}
+            style={{ position: 'relative' }}
+          >
+            {plan.badge && (
+              <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow -rotate-6">
+                {plan.badge}
+              </div>
+            )}
+            <div className="flex flex-col items-center mb-4">
+              <div className="text-2xl font-bold mb-1">{plan.name}</div>
+              {plan.select ? (
+                <select
+                  title={plan.select.label}
+                  aria-label={plan.select.label}
+                  className="mb-2 px-3 py-1 rounded border border-muted text-lg font-semibold text-center focus:outline-none"
+                  value={plan.select.value}
+                  onChange={plan.select.onChange}
+                >
+                  {plan.select.options.map((opt: number) => (
+                    <option key={opt} value={opt}>{opt} credits</option>
+                  ))}
+                </select>
+              ) : (
+                <div className="text-base text-muted-foreground mb-2 font-semibold">{plan.credits}</div>
+              )}
+              <div className="text-4xl font-extrabold mb-2">{plan.price} <span className="text-base font-normal text-muted-foreground">{billingPeriod === 'monthly' ? '/month' : plan.key === 'payg' ? '' : 'billed yearly'}</span></div>
+              <div className="text-xs text-muted-foreground mb-2">{plan.perCredit} per credit</div>
+              {plan.savings && <div className="text-xs text-green-700 font-semibold mb-2">{plan.savings}</div>}
+              <button
+                className="w-full mt-2 mb-4 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
+                onClick={plan.button}
               >
-                {key === 'PRO' && (
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-1 rounded-full">
-                    <div className="flex items-center gap-1">
-                      <Sparkles className="h-3.5 w-3.5 text-white animate-pulse" />
-                      <span className="text-xs font-semibold text-white">Recommended</span>
-                    </div>
-                  </div>
-                )}
-                {subscriptionData?.plan.id === plan.id.toLowerCase() && (
-                  <div className="absolute top-2 right-2 bg-primary/10 text-primary px-2 py-1 rounded text-xs font-medium">
-                    Current Plan
-                  </div>
-                )}
-                <div className="p-6 sm:p-8 flex flex-col flex-1">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">{plan.name}</h3>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-bold">${plan.price}</span>
-                      <span className="text-muted-foreground">/month</span>
-                    </div>
-                  </div>
-                  <div className="flex-1 flex flex-col">
-                    <div className="space-y-4 flex-1 mb-6">
-                      {plan.features.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3 group">
-                          <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                            <Check className="h-4 w-4 text-primary" />
-                          </div>
-                          <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    {getPlanAction(key, plan)}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Enhanced Features Section */}
-          <div className="mb-24">
-            <h2 className="text-3xl font-bold text-center mb-12 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
-              Why Choose MaskingTech?
-            </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card className="group p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/10 to-indigo-500/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Shield className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">Privacy First</h3>
-                <p className="text-sm text-muted-foreground">
-                  Advanced AI technology ensures complete privacy for all license plates in your images.
-                </p>
-              </Card>
-              <Card className="group p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/10 to-indigo-500/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Gauge className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">Lightning Fast</h3>
-                <p className="text-sm text-muted-foreground">
-                  Process images in seconds with our optimized detection algorithms.
-                </p>
-              </Card>
-              <Card className="group p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500/10 to-indigo-500/10 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">Enterprise Ready</h3>
-                <p className="text-sm text-muted-foreground">
-                  Scalable solutions for businesses of any size with dedicated support.
-                </p>
-              </Card>
+                {plan.cta}
+              </button>
             </div>
+            <ul className="flex-1 flex flex-col gap-2 text-sm text-muted-foreground">
+              {plan.features.map((feature, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-blue-400" /> {feature}
+                </li>
+              ))}
+            </ul>
           </div>
+        ))}
+      </div>
 
-          {/* Enhanced FAQ Section */}
-          <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Have more questions? <Link href="/docs" className="text-primary hover:text-primary/90 transition-colors">Check our documentation</Link>
-            </p>
-            <div className="grid md:grid-cols-2 gap-8 text-left max-w-4xl mx-auto">
-              <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">How does the image limit work?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Image limits reset monthly. Unused images don&apos;t roll over to the next month. You can upgrade your plan at any time to increase your limit.
-                </p>
-              </Card>
-              <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">What payment methods do you accept?</h3>
-                <p className="text-sm text-muted-foreground">
-                  We accept all major credit cards and debit cards. Payment is processed securely through Stripe.
-                </p>
-              </Card>
-              <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">Can I cancel my subscription?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes, you can cancel your subscription at any time. You&apos;ll continue to have access until the end of your billing period.
-                </p>
-              </Card>
-              <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-                <h3 className="font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">Do you offer custom plans?</h3>
-                <p className="text-sm text-muted-foreground">
-                  Yes, we offer custom enterprise plans for businesses with specific needs. Contact us to discuss your requirements.
-                </p>
-              </Card>
-            </div>
-          </div>
+      {/* Services & Credit Costs Section */}
+      <div className="max-w-4xl mx-auto mb-12">
+        <h2 className="text-xl font-bold mb-4">Services &amp; Credit Costs</h2>
+        <div className="overflow-x-auto rounded-lg border border-muted bg-white dark:bg-background/80">
+          <table className="min-w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-2">Service</th>
+                <th className="text-left px-4 py-2">Credits</th>
+                <th className="text-left px-4 py-2">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {serviceCredits.map((svc) => (
+                <tr key={svc.name} className="border-t border-muted">
+                  <td className="px-4 py-2 font-medium">{svc.name}</td>
+                  <td className="px-4 py-2">{svc.credits}</td>
+                  <td className="px-4 py-2">{svc.description}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(5deg); }
-          50% { transform: translateY(-30px) rotate(-5deg); }
-        }
-        @keyframes float-slower {
-          0%, 100% { transform: translateY(0px) rotate(-5deg); }
-          50% { transform: translateY(-40px) rotate(5deg); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
-        .animate-float-slower { animation: float-slower 10s ease-in-out infinite; }
-      `}</style>
+      {/* Credit Bundles Table */}
+      <div className="max-w-2xl mx-auto mb-12">
+        <h2 className="text-xl font-bold mb-4">Credit Bundles</h2>
+        <div className="overflow-x-auto rounded-lg border border-muted bg-white dark:bg-background/80">
+          <table className="min-w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left px-4 py-2">Bundle</th>
+                <th className="text-left px-4 py-2">Price</th>
+                <th className="text-left px-4 py-2">Per Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {creditBundles.map((bundle) => (
+                <tr key={bundle.credits} className="border-t border-muted">
+                  <td className="px-4 py-2 font-medium">{bundle.credits.toLocaleString()} credits</td>
+                  <td className="px-4 py-2">${bundle.price}</td>
+                  <td className="px-4 py-2">${bundle.perCredit.toFixed(4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="text-xs text-muted-foreground mt-2 px-2 pb-2">Credits never expire - buy once, use anytime.</div>
+        </div>
+      </div>
+
+      {/* Free Trial & Overage Pricing Banners */}
+      <div className="max-w-3xl mx-auto mb-8 flex flex-col gap-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-2xl shadow-sm">
+          <span className="font-semibold">Free Trial:</span> All new users receive 20 free credits to try our services risk-free.
+        </div>
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-2xl shadow-sm">
+          <span className="font-semibold">Overage Pricing:</span> If you exceed your subscription&apos;s credits, additional usage is billed at your discounted rate.
+        </div>
+      </div>
+
+      {/* Example Cost Calculations */}
+      <div className="max-w-3xl mx-auto mb-12">
+        <h2 className="text-xl font-semibold mb-3">Example Cost Calculations</h2>
+        <div className="bg-muted/30 rounded-xl p-6 text-base shadow flex flex-col gap-3 items-center">
+          <div>- 50 face blurs: 50 credits &rarr; Starter equivalent ($5).</div>
+          <div>- 300 plate blurs with logo: 300 credits &rarr; Growth equivalent ($22).</div>
+          <div>- 100 background replacements: 300 credits &rarr; Growth equivalent ($22).</div>
+        </div>
+      </div>
+
+      {/* Why Choose MaskingTech? */}
+      <div className="max-w-3xl mx-auto mb-16">
+        <h2 className="text-xl font-semibold mb-3">Why Choose MaskingTech?</h2>
+        <ul className="list-disc pl-6 text-base text-muted-foreground">
+          <li>More affordable than remove.bg (~$0.25-0.40/image) or platerecognizer.com&apos;s monthly limits.</li>
+          <li>Services tailored specifically for automotive and privacy needs.</li>
+          <li>API &amp; web UI for flexible workflows.</li>
+          <li>Credits usable across all services.</li>
+        </ul>
+      </div>
     </div>
-  )
+  );
 }
