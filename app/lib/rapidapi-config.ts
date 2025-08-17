@@ -45,7 +45,7 @@ export const RAPIDAPI_CONFIG = {
 
 // Helper functions
 export function validateImageFormat(mimeType: string): boolean {
-  return RAPIDAPI_CONFIG.SUPPORTED_FORMATS.includes(mimeType);
+  return RAPIDAPI_CONFIG.SUPPORTED_FORMATS.includes(mimeType as any);
 }
 
 export function validateImageSize(size: number): boolean {
