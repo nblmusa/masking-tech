@@ -1,16 +1,22 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient, createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 // TODO: Adjust the import path if needed for your project structure
-import { getUserIdFromSession } from "@/lib/auth";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function POST(req: Request) {
-  const supabase = createClientComponentClient();
+  const supabase = createRouteHandlerClient({ cookies })
   const { service, credits } = await req.json();
-  const userId = await getUserIdFromSession();
+    
+    // Check authentication
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    if (authError || !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const { data: userCredits, error } = await supabase
     .from('user_credits')
     .select('credits_balance')
-    .eq('user_id', userId)
+    .eq('user_id', session.user.id)
     .single();
 
   if (error || !userCredits) return new Response("Not found", { status: 404 });
@@ -21,10 +27,10 @@ export async function POST(req: Request) {
   await supabase
     .from('user_credits')
     .update({ credits_balance: userCredits.credits_balance - credits })
-    .eq('user_id', userId);
+    .eq('user_id', session.user.id);
 
   await supabase.from('usage_logs').insert({
-    user_id: userId,
+    user_id: session.user.id,
     service,
     credits_used: credits,
   });
