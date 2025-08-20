@@ -106,46 +106,68 @@ export default function PricingPage() {
   ];
 
   // MaskingTech-specific features for each plan
-  const plans = [
-    {
-      key: 'payg',
-      name: 'Pay-as-you-go',
-      price: `$${paygAmount}`,
-      credits: `${paygAmount} credits`,
-      cta: 'Buy now',
-      features: [
-        'One-off credit purchase',
-        'No subscription required',
-        'Use for any service: plate masking, face blur, background replacement',
-        'Credits never expire',
-        'Upgrade or top up anytime',
-      ],
-      select: {
-        value: paygAmount,
-        options: paygOptions,
-        onChange: (e: any) => setPaygAmount(Number(e.target.value)),
-        label: 'Select credits for Pay-as-you-go',
-      },
-      perCredit: `$${(paygAmount / paygAmount).toFixed(2)}`,
-      savings: null,
-      button: () => handleBuyCredits('PAYG_PRICE_ID'),
-      highlight: false,
-      badge: null,
-      accent: false,
-    },
+  type PlanCard = {
+    key: string;
+    name: string;
+    price: string;
+    credits: string;
+    cta: string;
+    features: string[];
+    perCredit: string;
+    savings: string | null;
+    button: () => void | Promise<void>;
+    highlight: boolean;
+    badge: string | null;
+    accent: boolean;
+    select?: {
+      value: number;
+      options: number[];
+      onChange: (e: any) => void;
+      label: string;
+    };
+  };
+
+  const plans: PlanCard[] = [
+    // {
+    //   key: 'payg',
+    //   name: 'Pay-as-you-go',
+    //   price: `$${paygAmount}`,
+    //   credits: `${paygAmount} credits`,
+    //   cta: 'Buy now',
+    //   features: [
+    //     'One-off credit purchase',
+    //     'No subscription required',
+    //     'Use for any service: plate masking, face blur, background replacement',
+    //     'Credits never expire',
+    //     'Upgrade or top up anytime',
+    //   ],
+    //   select: {
+    //     value: paygAmount,
+    //     options: paygOptions,
+    //     onChange: (e: any) => setPaygAmount(Number(e.target.value)),
+    //     label: 'Select credits for Pay-as-you-go',
+    //   },
+    //   perCredit: `$${(paygAmount / paygAmount).toFixed(2)}`,
+    //   savings: null,
+    //   button: () => handleBuyCredits('PAYG_PRICE_ID'),
+    //   highlight: false,
+    //   badge: null,
+    //   accent: false,
+    // },
     {
       key: 'lite',
       name: 'Basic',
-      price: billingPeriod === 'monthly' ? '$49' : '$499',
+      price: billingPeriod === 'monthly' ? '$99' : '$499',
       credits: '1,000 credits/month',
       cta: 'Subscribe',
       features: [
-        'License plate masking',
-        'Face blur',
         'Background replacement',
-        'Web UI access',
-        'Basic API access',
-        'Email support',
+        'Number plate masking',
+        'Custom number plate logo',
+        'Face blur',
+        'Watermark',
+        'Web portal access',
+        'API access',
       ],
       perCredit: '$0.049',
       savings: 'Save vs. buying bundles',
@@ -157,16 +179,13 @@ export default function PricingPage() {
     {
       key: 'pro',
       name: 'Advanced',
-      price: billingPeriod === 'monthly' ? '$139' : '$1,399',
+      price: billingPeriod === 'monthly' ? '$399' : '$3,999',
       credits: '5,000 credits/month',
       cta: 'Subscribe',
       features: [
-        'All Basic features',
-        'Bulk image processing',
-        'Priority API access',
-        'Team management',
+        'Everything in Basic',
+        'Save 20% compared to Basic',
         'Priority support',
-        'Custom watermark/logo',
       ],
       perCredit: '$0.0278',
       savings: 'Save vs. buying bundles',
@@ -178,16 +197,12 @@ export default function PricingPage() {
     {
       key: 'growth',
       name: 'Growth',
-      price: billingPeriod === 'monthly' ? '$269' : '$2,699',
+      price: billingPeriod === 'monthly' ? '$699' : '$6,999',
       credits: '10,000 credits/month',
       cta: 'Subscribe',
       features: [
-        'Everything in Advanced, plus',
-        'Custom credit volume',
-        'Unlimited team members',
-        'Dedicated account manager',
-        'Custom integrations',
-        'SLA & compliance',
+        'Everything in Advanced',
+        'Save 30% compared to Basic',
       ],
       perCredit: '$0.0269',
       savings: 'Save vs. buying bundles',
@@ -195,6 +210,23 @@ export default function PricingPage() {
       highlight: true,
       badge: 'Best Value',
       accent: true,
+    },
+    {
+      key: 'enterprise',
+      name: 'Enterprise',
+      price: 'Custom',
+      credits: '> 10,000 credits/month',
+      cta: 'Contact Sales',
+      features: [
+        // 'Everything in Growth',
+        'Custom credit volume',
+      ],
+      perCredit: '-',
+      savings: null,
+      button: () => router.push('/contact'),
+      highlight: false,
+      badge: null,
+      accent: false,
     },
   ];
 
@@ -426,9 +458,7 @@ export default function PricingPage() {
               ) : (
                 <div className="text-base text-muted-foreground mb-2 font-semibold">{plan.credits}</div>
               )}
-              <div className="text-4xl font-extrabold mb-2">{plan.price} <span className="text-base font-normal text-muted-foreground">{billingPeriod === 'monthly' ? '/month' : plan.key === 'payg' ? '' : 'billed yearly'}</span></div>
-              <div className="text-xs text-muted-foreground mb-2">{plan.perCredit} per credit</div>
-              {plan.savings && <div className="text-xs text-green-700 font-semibold mb-2">{plan.savings}</div>}
+              <div className="text-4xl font-extrabold mb-2">{plan.price}<span className="text-base font-normal text-muted-foreground">{billingPeriod === 'monthly' ? '/month' : (plan.key === 'payg' || plan.key === 'enterprise') ? '' : 'billed yearly'}</span></div>
               <button
                 className="w-full mt-2 mb-4 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
                 onClick={plan.button}
@@ -447,31 +477,6 @@ export default function PricingPage() {
         ))}
       </div>
 
-      {/* Credit Bundles Table */}
-      <div className="max-w-6xl mx-auto mb-12">
-        <h2 className="text-xl font-bold mb-4">Credit Bundles</h2>
-        <div className="overflow-x-auto rounded-lg border border-muted bg-white dark:bg-background/80">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left px-4 py-2">Bundle</th>
-                <th className="text-left px-4 py-2">Price</th>
-                <th className="text-left px-4 py-2">Per Credit</th>
-              </tr>
-            </thead>
-            <tbody>
-              {creditBundles.map((bundle) => (
-                <tr key={bundle.credits} className="border-t border-muted">
-                  <td className="px-4 py-2 font-medium">{bundle.credits.toLocaleString()} credits</td>
-                  <td className="px-4 py-2">${bundle.price}</td>
-                  <td className="px-4 py-2">${bundle.perCredit.toFixed(4)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="text-xs text-muted-foreground mt-2 px-2 pb-2">Credits never expire - buy once, use anytime.</div>
-        </div>
-      </div>
 
       {/* Free Trial & Overage Pricing Banners */}
       <div className="max-w-6xl mx-auto mb-8 flex flex-col gap-4">
