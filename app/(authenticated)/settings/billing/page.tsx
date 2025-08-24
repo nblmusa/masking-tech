@@ -394,7 +394,7 @@ export default function BillingPage() {
           </Button>
           {subscription.tier === 'free' && (
             <Button 
-              onClick={() => handleUpgradeSubscription('pro')}
+              onClick={() => handleUpgradeSubscription('basic')}
               disabled={loadingStates.billing}
               className="w-full md:w-auto bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700"
             >
@@ -428,10 +428,14 @@ export default function BillingPage() {
                   <h3 className="text-lg font-medium">Current Plan</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      subscription.tier === 'pro' 
+                      subscription.tier === 'basic' 
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                        : subscription.tier === 'enterprise'
+                        : subscription.tier === 'starter'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        : subscription.tier === 'advanced'
                         ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                        : subscription.tier === 'growth'
+                        ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
                     }`}>
                       {subscription.tier === 'free' ? 'Free Plan' : `${subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} Plan`}
@@ -691,7 +695,7 @@ export default function BillingPage() {
                 {subscription.tier === 'free' && (
                   <Button 
                     className="w-full justify-start bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700"
-                    onClick={() => handleUpgradeSubscription('pro')}
+                    onClick={() => handleUpgradeSubscription('basic')}
                     disabled={loadingStates.billing}
                   >
                     {loadingStates.billing ? (
@@ -713,7 +717,7 @@ export default function BillingPage() {
         </div>
 
         {/* Available Plans */}
-        {subscription.tier !== 'enterprise' && (
+        {subscription.tier !== 'growth' && (
           <div className="pt-4">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -730,16 +734,16 @@ export default function BillingPage() {
                   <Card 
                     key={key} 
                     className={`relative group transition-all duration-300 hover:scale-[1.01] ${
-                      key === 'PRO' 
+                      key === 'ADVANCED' 
                         ? 'border-primary/50 shadow-lg bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 dark:from-blue-900/50 dark:via-gray-900 dark:to-blue-900/30' 
                         : 'bg-background/60 backdrop-blur-sm hover:shadow-lg'
                     }`}
                   >
-                    {key === 'PRO' && (
+                    {key === 'ADVANCED' && (
                       <div className="absolute -top-2 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 px-2 py-0.5 rounded-full">
                         <div className="flex items-center gap-1">
                           <Zap className="h-3.5 w-3.5 text-white animate-pulse" />
-                          <span className="text-xs font-semibold text-white">Recommended</span>
+                          <span className="text-xs font-semibold text-white">Best Value</span>
                         </div>
                       </div>
                     )}
@@ -747,7 +751,7 @@ export default function BillingPage() {
                       <div className="space-y-4">
                         <div>
                           <h4 className={`text-lg font-semibold ${
-                            key === 'PRO' 
+                            key === 'ADVANCED' 
                               ? 'bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400'
                               : ''
                           }`}>{plan.name}</h4>
@@ -761,7 +765,7 @@ export default function BillingPage() {
                           {plan.features.map((feature, i) => (
                             <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                               <div className={`mt-1 h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${
-                                key === 'PRO'
+                                key === 'ADVANCED'
                                   ? 'text-blue-700 dark:text-blue-400'
                                   : 'text-primary'
                               }`}>
@@ -773,13 +777,11 @@ export default function BillingPage() {
                         </ul>
                         <Button 
                           className={`w-full ${
-                            key === 'PRO' 
+                            key === 'ADVANCED' 
                               ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700' 
-                              : key === 'ENTERPRISE'
-                              ? 'border-blue-200/50 dark:border-blue-800/50'
-                              : ''
+                              : 'border-blue-200/50 dark:border-blue-800/50'
                           }`}
-                          variant={key === 'ENTERPRISE' ? 'outline' : 'default'}
+                          variant="default"
                           onClick={() => handleUpgradeSubscription(plan.id.toLowerCase())}
                           disabled={loadingStates.billing}
                         >
@@ -790,7 +792,7 @@ export default function BillingPage() {
                             </>
                           ) : (
                             <>
-                              {key === 'ENTERPRISE' ? (
+                              {key === 'GROWTH' ? (
                                 <>Contact Sales</>
                               ) : (
                                 <>

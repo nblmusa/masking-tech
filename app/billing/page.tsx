@@ -195,9 +195,9 @@ export default function BillingPage() {
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
                 <span className="font-medium">{subscriptionData?.plan?.name}</span>
-                {subscriptionData?.plan?.id === 'pro' && (
+                {subscriptionData?.plan?.id !== 'free' && (
                   <div className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-medium">
-                    Pro Plan
+                    {subscriptionData?.plan?.name} Plan
                   </div>
                 )}
               </div>

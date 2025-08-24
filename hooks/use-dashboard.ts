@@ -47,7 +47,7 @@ export function useDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [stats, setStats] = useState<DashboardStats>({
     imagesProcessed: 0,
-    monthlyQuota: 100,
+    monthlyQuota: 0,
     lastUploadTime: null,
     detectedPlates: 0
   })
@@ -70,7 +70,7 @@ export function useDashboard() {
 
       setStats({
         imagesProcessed: data.stats?.images_processed || 0,
-        monthlyQuota: data.stats?.monthly_quota || 100,
+        monthlyQuota: data.stats?.monthly_quota || 0,
         lastUploadTime: data.stats?.last_upload_time,
         detectedPlates: data.stats?.detected_plates || 0
       })

@@ -377,7 +377,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                           </ul>
                         </Card>
                         <Card className="p-4 border-blue-100/30 dark:border-blue-800/30">
-                          <Badge variant="secondary" className="mb-2">Enterprise</Badge>
+                          <Badge variant="secondary" className="mb-2">Growth</Badge>
                           <ul className="space-y-2 text-sm">
                             <li>• Unlimited requests</li>
                             <li>• 100MB max file size</li>

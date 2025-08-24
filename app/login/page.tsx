@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Shield } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useAnalytics } from "@/hooks/useAnalytics"
 
@@ -17,8 +17,30 @@ export default function LoginPage() {
   const [verificationCode, setVerificationCode] = useState('')
   const [tempSession, setTempSession] = useState<any>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const analytics = useAnalytics()
+
+  // Check for success/error messages from URL params
+  useEffect(() => {
+    const message = searchParams.get('message')
+    const error = searchParams.get('error')
+    
+    if (message) {
+      toast({
+        title: "Success",
+        description: message,
+      })
+    }
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: error,
+        variant: "destructive"
+      })
+    }
+  }, [searchParams, toast])
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -84,6 +106,18 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to verify 2FA')
       }
 
+      if (data.requiresEmailConfirmation) {
+        toast({
+          title: "2FA Verified",
+          description: data.message,
+        })
+        // User needs to check email for final authentication
+        setRequires2FA(false)
+        setVerificationCode('')
+        setTempSession(null)
+        return
+      }
+
       analytics.trackLogin('2fa')
       analytics.trackFeatureUsage('2fa_verification', true)
       
@@ -146,6 +180,14 @@ export default function LoginPage() {
                     className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
+                  <div className="text-right">
+                    <Link 
+                      href="/forgot-password" 
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                 </div>
                 <Button 
                   type="submit" 

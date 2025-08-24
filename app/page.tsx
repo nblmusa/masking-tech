@@ -360,7 +360,7 @@ export default function Home() {
                 </Link>
               </Button>
               <Button variant="outline" size="lg" className="border-blue-200/30 dark:border-blue-800/30 hover:bg-blue-50/30 dark:hover:bg-blue-950/30" asChild>
-                <Link href="/pricing">View Enterprise Plans</Link>
+                <Link href="/pricing">View All Plans</Link>
               </Button>
             </div>
           </div>

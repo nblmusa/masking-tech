@@ -4,10 +4,9 @@ import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { SettingsProvider } from "@/contexts/settings-context"
-import Header from '@/components/header'
-import Footer from '@/components/footer'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import { PageViewTracker } from '@/components/PageViewTracker'
+import ConditionalLayout from '@/components/conditional-layout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -51,13 +50,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SettingsProvider>
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1 bg-background">
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
             <Toaster />
           </SettingsProvider>
         </ThemeProvider>

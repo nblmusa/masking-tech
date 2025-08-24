@@ -33,7 +33,7 @@ export async function GET() {
           .insert([{
             user_id: userId,
             images_processed: 0,
-            monthly_quota: 100,
+            monthly_quota: 20,
             detected_plates: 0
           }])
           .select()

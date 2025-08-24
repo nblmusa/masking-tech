@@ -1,6 +1,12 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'crypto';
+
+// Generate secure session token for 2FA
+function generateSecureToken(): string {
+  return randomBytes(32).toString('hex');
+}
 
 export async function POST(request: Request) {
   try {
@@ -30,21 +36,34 @@ export async function POST(request: Request) {
     }
 
     // Check if user has 2FA enabled
+    // Note: User settings should now be created during signup, but we keep this as a fallback
+    // for users who signed up before this fix was implemented
     let { data: settings, error: settingsError } = await supabase
       .from('user_settings')
       .select('two_factor_enabled, two_factor_secret')
       .eq('user_id', data.user.id)
       .single();
 
-    // If no settings exist, create default settings
+    // If no settings exist (fallback for users who signed up before this fix)
     if (settingsError && settingsError.code === 'PGRST116') {
+      console.log('Creating user settings for existing user (fallback):', data.user.id);
+      
       const { data: newSettings, error: createError } = await supabase
         .from('user_settings')
         .insert([{
           user_id: data.user.id,
           two_factor_enabled: false,
           two_factor_secret: null,
-          settings: {},
+          settings: {
+            notifications: {
+              email: true,
+              push: false
+            },
+            preferences: {
+              theme: 'system',
+              language: 'en'
+            }
+          },
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }])
@@ -74,12 +93,20 @@ export async function POST(request: Request) {
       // Sign out immediately - we'll sign in after 2FA verification
       await supabase.auth.signOut();
       
+      // Generate secure session token instead of storing password
+      const sessionToken = generateSecureToken();
+      
+      // Store session token in temporary storage (you might want to use Redis in production)
+      // For now, we'll use a simple approach with the token in the response
+      // In production, store this in Redis with expiration
+      
       return NextResponse.json({
         requires2FA: true,
         tempSession: {
           email,
           userId: data.user.id,
-          hashedPassword: password
+          sessionToken: sessionToken,
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString() // 5 minutes expiry
         }
       });
     }

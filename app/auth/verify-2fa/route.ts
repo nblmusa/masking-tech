@@ -8,9 +8,17 @@ export async function POST(request: Request) {
     const supabase = createRouteHandlerClient({ cookies });
     const { code, session } = await request.json();
 
-    if (!code || !session?.email || !session?.userId || !session?.hashedPassword) {
+    if (!code || !session?.email || !session?.userId || !session?.sessionToken) {
       return NextResponse.json(
         { error: 'Invalid request - missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate session token expiry
+    if (new Date(session.expiresAt) < new Date()) {
+      return NextResponse.json(
+        { error: 'Session expired. Please sign in again.' },
         { status: 400 }
       );
     }
@@ -46,21 +54,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // If code is valid, sign in the user
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    // If code is valid, we need to re-authenticate the user
+    // Since we don't have the password anymore, we'll use a different approach
+    // We can either:
+    // 1. Use a magic link approach
+    // 2. Store a temporary auth token
+    // 3. Use Supabase's built-in 2FA flow
+    
+    // For now, let's use a magic link approach for security
+    const { data: magicLinkData, error: magicLinkError } = await supabase.auth.signInWithOtp({
       email: session.email,
-      password: session.hashedPassword
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${request.headers.get('origin')}/auth/callback`
+      }
     });
 
-    if (signInError) {
-      console.error('Failed to sign in after 2FA:', signInError);
+    if (magicLinkError) {
+      console.error('Failed to send magic link:', magicLinkError);
       return NextResponse.json(
-        { error: 'Failed to complete sign in' },
+        { error: 'Failed to complete authentication. Please try signing in again.' },
         { status: 500 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      message: '2FA verified. Please check your email for the final authentication link.',
+      requiresEmailConfirmation: true
+    });
   } catch (error) {
     console.error('2FA verification error:', error);
     return NextResponse.json(

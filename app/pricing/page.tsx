@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Check, Car, Shield, Gauge, Lock, Sparkles, ImageIcon, Zap, Users, Loader2, Star, CreditCard, BadgeDollarSign, UserCheck, Image as ImageIcon2 } from "lucide-react"
+import { Check, Zap, Loader2, Shield, Clock, Users, CreditCard, ArrowRight, Star, Award, Eye, Car, Lock, Camera } from "lucide-react"
 import Link from "next/link"
 import { PLANS } from "@/lib/stripe"
 import { useEffect, useState } from "react"
@@ -24,54 +23,6 @@ interface SubscriptionData {
   subscription: Subscription | null;
 }
 
-// Update credit bundles to match screenshot
-const CREDIT_BUNDLES = [
-  { credits: 500, price: 29, pricePerCredit: 0.058, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_500_PRICE_ID },
-  { credits: 2000, price: 79, pricePerCredit: 0.0395, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_2000_PRICE_ID },
-  { credits: 5000, price: 159, pricePerCredit: 0.0318, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_5000_PRICE_ID },
-  { credits: 10000, price: 299, pricePerCredit: 0.0299, priceId: process.env.NEXT_PUBLIC_STRIPE_BUNDLE_10000_PRICE_ID },
-];
-
-// Subscription plans (monthly/yearly)
-const SUBSCRIPTION_PLANS = [
-  {
-    name: 'Basic',
-    monthly: 49,
-    yearly: 499,
-    credits: 1000,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_BASIC_MONTHLY,
-    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_BASIC_YEARLY,
-    savings: 'save vs. buying bundles',
-  },
-  {
-    name: 'Advanced',
-    monthly: 139,
-    yearly: 1399,
-    credits: 5000,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_ADVANCED_MONTHLY,
-    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_ADVANCED_YEARLY,
-    savings: 'save vs. buying bundles',
-  },
-  {
-    name: 'Growth',
-    monthly: 269,
-    yearly: 2699,
-    credits: 10000,
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SUB_GROWTH_MONTHLY,
-    yearlyPriceId: process.env.NEXT_PUBLIC_STRIPE_SUB_GROWTH_YEARLY,
-    savings: 'save vs. buying bundles',
-  },
-];
-
-// Service credit costs
-const SERVICE_CREDITS = [
-  { name: 'Face Blur', credits: 1, description: 'Automatically detects and blurs faces.' },
-  { name: 'Number Plate Blur/Replacement + Logo', credits: 1, description: 'Blurs or replaces license plates, optionally adds your logo.' },
-  { name: 'Make/Model Detection', credits: 1, description: "Identifies the vehicle's make and model." },
-  { name: 'Number Plate Detection', credits: 1, description: 'Locates and reads license plate text (OCR).' },
-  { name: 'Background Replacement', credits: 3, description: 'Replaces the entire background behind the car.' },
-];
-
 export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -80,30 +31,6 @@ export default function PricingPage() {
   const { toast } = useToast();
   const router = useRouter();
   const analytics = useAnalytics();
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [paygAmount, setPaygAmount] = useState(3);
-  const [volumeAmount, setVolumeAmount] = useState(500);
-
-  // Example options for dropdowns
-  const paygOptions = [3, 10, 50, 100, 500];
-  const volumeOptions = [500, 1000, 5000, 10000];
-
-  // Credit bundles for table
-  const creditBundles = [
-    { credits: 500, price: 29, perCredit: 0.058 },
-    { credits: 2000, price: 79, perCredit: 0.0395 },
-    { credits: 5000, price: 159, perCredit: 0.0318 },
-    { credits: 10000, price: 299, perCredit: 0.0299 },
-  ];
-
-  // Services & credit costs
-  const serviceCredits = [
-    { name: 'Face Blur', credits: 1, description: 'Automatically detects and blurs faces.' },
-    { name: 'Number Plate Blur/Replacement + Logo', credits: 1, description: 'Blurs or replaces license plates, optionally adds your logo.' },
-    { name: 'Make/Model Detection', credits: 1, description: "Identifies the vehicle's make and model." },
-    { name: 'Number Plate Detection', credits: 1, description: 'Locates and reads license plate text (OCR).' },
-    { name: 'Background Replacement', credits: 3, description: 'Replaces the entire background behind the car.' },
-  ];
 
   // MaskingTech-specific features for each plan
   type PlanCard = {
@@ -114,116 +41,57 @@ export default function PricingPage() {
     cta: string;
     features: string[];
     perCredit: string;
-    savings: string | null;
-    button: () => void | Promise<void>;
     highlight: boolean;
     badge: string | null;
     accent: boolean;
-    select?: {
-      value: number;
-      options: number[];
-      onChange: (e: any) => void;
-      label: string;
-    };
   };
 
+  // Convert PLANS from stripe.ts to PlanCard format (monthly only)
   const plans: PlanCard[] = [
-    // {
-    //   key: 'payg',
-    //   name: 'Pay-as-you-go',
-    //   price: `$${paygAmount}`,
-    //   credits: `${paygAmount} credits`,
-    //   cta: 'Buy now',
-    //   features: [
-    //     'One-off credit purchase',
-    //     'No subscription required',
-    //     'Use for any service: plate masking, face blur, background replacement',
-    //     'Credits never expire',
-    //     'Upgrade or top up anytime',
-    //   ],
-    //   select: {
-    //     value: paygAmount,
-    //     options: paygOptions,
-    //     onChange: (e: any) => setPaygAmount(Number(e.target.value)),
-    //     label: 'Select credits for Pay-as-you-go',
-    //   },
-    //   perCredit: `$${(paygAmount / paygAmount).toFixed(2)}`,
-    //   savings: null,
-    //   button: () => handleBuyCredits('PAYG_PRICE_ID'),
-    //   highlight: false,
-    //   badge: null,
-    //   accent: false,
-    // },
     {
-      key: 'lite',
-      name: 'Basic',
-      price: billingPeriod === 'monthly' ? '$99' : '$499',
-      credits: '1,000 credits/month',
+      key: 'basic',
+      name: PLANS.BASIC.name,
+      price: `$${PLANS.BASIC.price}`,
+      credits: `${PLANS.BASIC.limits.imagesPerMonth} credits/month`,
       cta: 'Subscribe',
-      features: [
-        'Background replacement',
-        'Number plate masking',
-        'Custom number plate logo',
-        'Face blur',
-        'Watermark',
-        'Web portal access',
-        'API access',
-      ],
-      perCredit: '$0.049',
-      savings: 'Save vs. buying bundles',
-      button: () => handleUpgrade('BASIC_PRICE_ID'),
+      features: PLANS.BASIC.features,
+      perCredit: `$${(PLANS.BASIC.price / PLANS.BASIC.limits.imagesPerMonth).toFixed(4)}`,
       highlight: false,
       badge: null,
       accent: false,
     },
     {
-      key: 'pro',
-      name: 'Advanced',
-      price: billingPeriod === 'monthly' ? '$399' : '$3,999',
-      credits: '5,000 credits/month',
+      key: 'starter',
+      name: PLANS.STARTER.name,
+      price: `$${PLANS.STARTER.price}`,
+      credits: `${PLANS.STARTER.limits.imagesPerMonth} credits/month`,
       cta: 'Subscribe',
-      features: [
-        'Everything in Basic',
-        'Save 20% compared to Basic',
-        'Priority support',
-      ],
-      perCredit: '$0.0278',
-      savings: 'Save vs. buying bundles',
-      button: () => handleUpgrade('ADVANCED_PRICE_ID'),
+      features: PLANS.STARTER.features,
+      perCredit: `$${(PLANS.STARTER.price / PLANS.STARTER.limits.imagesPerMonth).toFixed(4)}`,
       highlight: false,
       badge: null,
       accent: false,
     },
     {
-      key: 'growth',
-      name: 'Growth',
-      price: billingPeriod === 'monthly' ? '$699' : '$6,999',
-      credits: '10,000 credits/month',
+      key: 'advanced',
+      name: PLANS.ADVANCED.name,
+      price: `$${PLANS.ADVANCED.price}`,
+      credits: `${PLANS.ADVANCED.limits.imagesPerMonth} credits/month`,
       cta: 'Subscribe',
-      features: [
-        'Everything in Advanced',
-        'Save 30% compared to Basic',
-      ],
-      perCredit: '$0.0269',
-      savings: 'Save vs. buying bundles',
-      button: () => handleUpgrade('GROWTH_PRICE_ID'),
+      features: PLANS.ADVANCED.features,
+      perCredit: `$${(PLANS.ADVANCED.price / PLANS.ADVANCED.limits.imagesPerMonth).toFixed(4)}`,
       highlight: true,
       badge: 'Best Value',
       accent: true,
     },
     {
-      key: 'enterprise',
-      name: 'Enterprise',
-      price: 'Custom',
-      credits: '> 10,000 credits/month',
-      cta: 'Contact Sales',
-      features: [
-        // 'Everything in Growth',
-        'Custom credit volume',
-      ],
-      perCredit: '-',
-      savings: null,
-      button: () => router.push('/contact'),
+      key: 'growth',
+      name: PLANS.GROWTH.name,
+      price: `$${PLANS.GROWTH.price}`,
+      credits: `${PLANS.GROWTH.limits.imagesPerMonth} credits/month`,
+      cta: 'Subscribe',
+      features: PLANS.GROWTH.features,
+      perCredit: `$${(PLANS.GROWTH.price / PLANS.GROWTH.limits.imagesPerMonth).toFixed(4)}`,
       highlight: false,
       badge: null,
       accent: false,
@@ -260,6 +128,13 @@ export default function PricingPage() {
 
   async function handleUpgrade(planId: string) {
     try {
+      // Check if user is logged in
+      if (!user) {
+        // Redirect to signup if not logged in
+        router.push('/signup');
+        return;
+      }
+
       setIsLoading(true);
       
       // Track subscription start
@@ -292,44 +167,12 @@ export default function PricingPage() {
     }
   }
 
-  // Add handler for credit bundle purchase
-  async function handleBuyCredits(priceId: string) {
-    try {
-      setIsLoading(true);
-      const response = await fetch('/api/credits/purchase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      router.push(data.url);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to start credit purchase",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   // Track plan view on component mount
   useEffect(() => {
     Object.values(PLANS).forEach(plan => {
       analytics.trackSubscriptionView(plan.name.toLowerCase());
     });
   }, [analytics]);
-
-  // Helper for plan price
-  function getPlanPrice(plan: typeof SUBSCRIPTION_PLANS[number]) {
-    return billingPeriod === 'monthly' ? plan.monthly : plan.yearly;
-  }
-
-  function getPlanPriceLabel() {
-    return billingPeriod === 'monthly' ? '/mo' : '/yr';
-  }
 
   function getPlanAction(planKey: string, plan: typeof PLANS[keyof typeof PLANS]) {
     if (isLoading) {
@@ -346,10 +189,8 @@ export default function PricingPage() {
       return (
         <Button 
           className={`w-full group ${
-            planKey === 'PRO' 
+            planKey === 'ADVANCED' 
               ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
-              : planKey === 'ENTERPRISE' 
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 shadow-lg hover:shadow-xl'
               : 'border-blue-200/50 dark:border-blue-800/50'
           }`}
           variant={planKey === 'BASIC' ? 'outline' : 'default'}
@@ -381,23 +222,11 @@ export default function PricingPage() {
       );
     }
 
-    // Enterprise plan - contact sales
-    if (planKey === 'ENTERPRISE') {
-      return (
-        <Button 
-          className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800"
-          asChild
-        >
-          <Link href="/contact">Contact Sales</Link>
-        </Button>
-      );
-    }
-
     // Upgrade button
     return (
       <Button
         className={`w-full group ${
-          planKey === 'PRO' 
+          planKey === 'ADVANCED' 
             ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
             : 'border-blue-200/50 dark:border-blue-800/50'
         }`}
@@ -422,54 +251,115 @@ export default function PricingPage() {
 
   return (
     <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-white to-blue-50 dark:from-background dark:to-blue-950 min-h-screen">
-      {/* Overview Info Box */}
-      <div className="max-w-3xl mx-auto mt-12 mb-10 p-6 rounded-2xl bg-muted/30 border border-muted shadow text-center">
-        <h1 className="text-2xl font-bold mb-2">MaskingTech.com Pricing</h1>
-        <p className="text-base text-muted-foreground">MaskingTech offers advanced AI-powered image processing services tailored for the automotive industry and privacy protection.</p>
+      {/* Hero Section */}
+      <div className="max-w-4xl mx-auto mt-12 mb-16 p-8 rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 text-white text-center shadow-2xl">
+        <div className="flex items-center justify-center mb-4">
+          <Shield className="h-8 w-8 mr-3" />
+          <h1 className="text-4xl font-bold">Professional Privacy Protection</h1>
+        </div>
+        <p className="text-xl text-blue-100 mb-6 max-w-2xl mx-auto">
+          Advanced AI-powered license plate masking and privacy protection for automotive professionals, real estate agents, and privacy-conscious individuals.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-6 text-blue-100">
+          <div className="flex items-center gap-2">
+            <Check className="h-5 w-5 text-green-300" />
+            <span>Instant processing</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-5 w-5 text-green-300" />
+            <span>99.9% accuracy</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="h-5 w-5 text-green-300" />
+            <span>GDPR compliant</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Use Cases Section */}
+      <div className="max-w-6xl mx-auto mb-16 px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Perfect for Privacy-Conscious Professionals</h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Whether you're a real estate agent, automotive dealer, delivery service, or just want to protect privacy in your photos
+          </p>
+        </div>
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Car className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Automotive Dealers</h3>
+            <p className="text-muted-foreground text-sm">
+              Protect customer privacy in vehicle photos and marketing materials
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Camera className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Real Estate</h3>
+            <p className="text-muted-foreground text-sm">
+              Mask license plates and personal info in property photos
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="h-8 w-8 text-purple-600" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Delivery Services</h3>
+            <p className="text-muted-foreground text-sm">
+              Protect driver and customer privacy in delivery photos
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Eye className="h-8 w-8 text-orange-600" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Personal Privacy</h3>
+            <p className="text-muted-foreground text-sm">
+              Keep your personal information private in social media and photos
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Pricing Cards Row */}
-      <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-6xl mx-auto px-4 mb-16">
+      <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8 max-w-7xl mx-auto px-4 mb-20">
         {plans.map((plan, idx) => (
           <div
             key={plan.key}
-            className={`flex-1 flex flex-col bg-white dark:bg-background rounded-3xl shadow-xl p-8 min-w-[270px] max-w-[320px] mx-auto md:mx-0 mb-8 md:mb-0 border-2 ${plan.highlight ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10' : 'border-transparent'} ${plan.accent ? 'scale-105 shadow-2xl' : ''}`}
+            className={`flex-1 flex flex-col bg-white dark:bg-background rounded-3xl shadow-xl p-8 min-w-[280px] max-w-[340px] mx-auto lg:mx-0 mb-8 lg:mb-0 border-2 ${plan.highlight ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10' : 'border-transparent'} ${plan.accent ? 'scale-105 shadow-2xl' : ''}`}
             style={{ position: 'relative' }}
           >
             {plan.badge && (
               <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow -rotate-6">
+                <Star className="h-3 w-3" />
                 {plan.badge}
               </div>
             )}
-            <div className="flex flex-col items-center mb-4">
-              <div className="text-2xl font-bold mb-1">{plan.name}</div>
-              {plan.select ? (
-                <select
-                  title={plan.select.label}
-                  aria-label={plan.select.label}
-                  className="mb-2 px-3 py-1 rounded border border-muted text-lg font-semibold text-center focus:outline-none"
-                  value={plan.select.value}
-                  onChange={plan.select.onChange}
-                >
-                  {plan.select.options.map((opt: number) => (
-                    <option key={opt} value={opt}>{opt} credits</option>
-                  ))}
-                </select>
-              ) : (
-                <div className="text-base text-muted-foreground mb-2 font-semibold">{plan.credits}</div>
-              )}
-              <div className="text-4xl font-extrabold mb-2">{plan.price}<span className="text-base font-normal text-muted-foreground">{billingPeriod === 'monthly' ? '/month' : (plan.key === 'payg' || plan.key === 'enterprise') ? '' : 'billed yearly'}</span></div>
-              <button
-                className="w-full mt-2 mb-4 px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg transition-transform hover:scale-105"
-                onClick={plan.button}
-              >
-                {plan.cta}
-              </button>
+            <div className="flex flex-col items-center mb-6">
+              <div className="text-2xl font-bold mb-2 text-center">{plan.name}</div>
+              <div className="text-base text-muted-foreground mb-3 font-semibold text-center">{plan.credits}</div>
+              <div className="text-4xl font-extrabold mb-1">{plan.price}<span className="text-base font-normal text-muted-foreground">/month</span></div>
+              {/* <div className="text-sm text-muted-foreground mb-4">${plan.perCredit} per credit</div> */}
+              
+              {/* Render button dynamically based on plan */}
+              {(() => {
+                const planKey = plan.key.toUpperCase();
+                const planObject = Object.values(PLANS).find(p => p.id === plan.key) || PLANS.BASIC;
+                return getPlanAction(planKey, planObject);
+              })()}
             </div>
-            <ul className="flex-1 flex flex-col gap-2 text-sm text-muted-foreground">
+            <ul className="flex-1 flex flex-col gap-3 text-sm text-muted-foreground">
               {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-400" /> {feature}
+                <li key={i} className="flex items-start gap-3">
+                  <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" /> 
+                  <span>{feature}</span>
                 </li>
               ))}
             </ul>
@@ -477,17 +367,196 @@ export default function PricingPage() {
         ))}
       </div>
 
-
-      {/* Free Trial & Overage Pricing Banners */}
-      <div className="max-w-6xl mx-auto mb-8 flex flex-col gap-4">
-        <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-4 rounded-2xl shadow-sm">
-          <span className="font-semibold">Free Trial:</span> All new users receive 20 free credits to try our services risk-free.
+      {/* Features Overview Section */}
+      <div className="max-w-6xl mx-auto mb-20 px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Advanced AI Technology for Privacy Protection</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Our cutting-edge machine learning algorithms provide industry-leading accuracy and speed
+          </p>
         </div>
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 rounded-2xl shadow-sm">
-          <span className="font-semibold">Overage Pricing:</span> If you exceed your subscription&apos;s credits, additional usage is billed at your discounted rate.
+        
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">License Plate Detection</h3>
+            <p className="text-muted-foreground">
+              Advanced OCR technology that identifies license plates in any orientation, lighting, or angle with 99.9% accuracy
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Real-Time Processing</h3>
+            <p className="text-muted-foreground">
+              Process images in under 5 seconds with our optimized AI infrastructure. No waiting, no delays
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Users className="h-8 w-8 text-purple-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Team Management</h3>
+            <p className="text-muted-foreground">
+              Collaborate with your team. Share projects, manage permissions, and track usage across multiple users
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="h-8 w-8 text-orange-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Flexible Plans</h3>
+            <p className="text-muted-foreground">
+              Scale up or down based on your needs. Upgrade, downgrade, or cancel anytime with no penalties
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Zap className="h-8 w-8 text-red-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">REST API</h3>
+            <p className="text-muted-foreground">
+              Integrate our services into your applications with our powerful REST API and comprehensive documentation
+            </p>
+          </div>
+          
+          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="h-8 w-8 text-indigo-600" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Enterprise Security</h3>
+            <p className="text-muted-foreground">
+              Bank-level security with SOC 2 compliance, end-to-end encryption, and automatic data deletion
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* FAQ Section */}
+      <div className="max-w-4xl mx-auto mb-20 px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-muted-foreground">
+            Everything you need to know about our license plate masking and privacy protection services
+          </p>
+        </div>
+        
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">How accurate is your license plate detection?</h3>
+            <p className="text-muted-foreground">
+              Our AI achieves 99.9% accuracy in license plate detection across various conditions including different angles, lighting, weather conditions, and vehicle types. We continuously train our models on diverse datasets to maintain this high accuracy.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">What types of images can I process?</h3>
+            <p className="text-muted-foreground">
+              We support all major image formats (JPEG, PNG, WebP, TIFF) and can process photos from any device or camera. Our system works with images containing vehicles, real estate photos, delivery photos, and any other images where privacy protection is needed.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">How do credits work for image processing?</h3>
+            <p className="text-muted-foreground">
+              Each image you process (license plate masking, face blur, background replacement, etc.) consumes 1 credit. Credits reset monthly and don't roll over. For example, with our Basic plan ($29/month), you get 300 credits to process 300 images.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">Can I change my plan anytime?</h3>
+            <p className="text-muted-foreground">
+              Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and you'll only pay the prorated difference for the current billing period. No long-term contracts or cancellation fees.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">What happens if I exceed my monthly credits?</h3>
+            <p className="text-muted-foreground">
+              When you reach your monthly credit limit, you can either upgrade to a higher plan for immediate access to more credits, or wait until your credits reset the following month. We'll notify you when you're approaching your limit.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">How secure is my data and images?</h3>
+            <p className="text-muted-foreground">
+              Your data security is our top priority. We use enterprise-grade encryption, process images in secure environments, and automatically delete processed images after 24 hours unless you specify otherwise. We're SOC 2 compliant and never store or share your personal information.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">Do you support batch processing?</h3>
+            <p className="text-muted-foreground">
+              Yes! You can upload multiple images at once for batch processing. Each image still consumes 1 credit, but you can process them all simultaneously, making it much more efficient for large projects.
+            </p>
+          </div>
+          
+          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+            <h3 className="text-lg font-semibold mb-3">Is there a free trial available?</h3>
+            <p className="text-muted-foreground">
+              Absolutely! All new users receive 20 free credits to try our services risk-free. No credit card required, no commitment. Experience the power of AI-powered license plate masking and privacy protection today.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA Section */}
+      <div className="max-w-4xl mx-auto mb-20 px-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 rounded-3xl p-12 text-center text-white shadow-2xl">
+          <h2 className="text-3xl font-bold mb-4">Ready to Protect Privacy?</h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of professionals who trust MaskingTech for their privacy protection needs. Start with 20 free credits today.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="bg-white text-blue-600 hover:bg-gray-100"
+              asChild
+            >
+              <Link href="/signup" className="flex items-center">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-white text-white hover:bg-white hover:text-blue-600"
+              asChild
+            >
+              <Link href="/contact" className="flex items-center">
+                Contact Sales
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Free Trial Banner */}
+      <div className="max-w-6xl mx-auto mb-12 px-4">
+        <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-6 rounded-2xl shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <Star className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2">Free Trial Available</h3>
+              <p className="text-muted-foreground">
+                All new users receive <strong>20 free credits</strong> to try our services risk-free. No credit card required, no commitment. Experience the power of AI-powered license plate masking and privacy protection today.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

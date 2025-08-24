@@ -1,30 +1,67 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import supabaseServer from "@/lib/supabase-server"; 
+import { supabaseApi } from "@/lib/supabase-server"; 
 
 // Generate a secure API key
 function generateApiKey() {
   return `lpm_${crypto.randomBytes(32).toString('hex')}`;
 }
 
-export async function POST() {
+// GET - Fetch all API keys for the authenticated user
+export async function GET() {
   try {
-    const supabase = supabaseServer();
+    const supabase = supabaseApi();
     
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
 
-    // Deactivate existing API keys
-    await supabase
+    // Fetch only active API keys for the user
+    const { data: apiKeys, error: fetchError } = await supabase
       .from('api_keys')
-      .update({ is_active: false })
-      .eq('user_id', userId);
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    return NextResponse.json({ apiKeys: apiKeys || [] });
+  } catch (error) {
+    console.error('API Key Fetch Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch API keys' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST - Generate a new API key
+export async function POST(request: Request) {
+  try {
+    const supabase = supabaseApi();
+    
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = user.id;
+    
+    // Parse request body
+    const { name } = await request.json();
+    
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json({ error: 'API key name is required' }, { status: 400 });
+    }
 
     // Generate and insert new API key
     const newKey = generateApiKey();
@@ -33,7 +70,7 @@ export async function POST() {
       .insert([{
         user_id: userId,
         key: newKey,
-        name: 'Default API Key',
+        name: name.trim(),
         expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year expiry
         is_active: true
       }])
@@ -54,23 +91,32 @@ export async function POST() {
   }
 }
 
-export async function DELETE() {
+// DELETE - Revoke a specific API key
+export async function DELETE(request: Request) {
   try {
-    const supabase = supabaseServer();
+    const supabase = supabaseApi();
     
     // Check authentication
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    if (authError || !session) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
+    
+    // Parse request body
+    const { keyId } = await request.json();
+    
+    if (!keyId) {
+      return NextResponse.json({ error: 'API key ID is required' }, { status: 400 });
+    }
 
-    // Deactivate all API keys
+    // Deactivate the specific API key
     const { error: keyError } = await supabase
       .from('api_keys')
       .update({ is_active: false })
-      .eq('user_id', userId);
+      .eq('id', keyId)
+      .eq('user_id', userId); // Ensure user owns the key
 
     if (keyError) {
       throw keyError;
@@ -80,7 +126,7 @@ export async function DELETE() {
   } catch (error) {
     console.error('API Key Deletion Error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete API key' },
+      { error: 'Failed to revoke API key' },
       { status: 500 }
     );
   }

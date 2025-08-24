@@ -29,9 +29,9 @@ export default function Header() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        const { data: { user }, error } = await supabase.auth.getUser()
         if (error) throw error
-        setUser(session?.user ?? null)
+        setUser(user)
       } catch (error) {
         console.error('Error checking auth status:', error)
       } finally {
@@ -90,6 +90,11 @@ export default function Header() {
     ] : []),
   ]
 
+  // Don't render header if user is logged in (dashboard layout will handle it)
+  if (user) {
+    return null
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -99,136 +104,63 @@ export default function Header() {
               href="/" 
               className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 group"
             >
-              <div className="relative p-2 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-blue-500/10 rounded-xl group-hover:from-blue-500/20 group-hover:via-indigo-500/20 group-hover:to-blue-500/20 transition-all duration-300">
-                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-pulse-subtle" />
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-75" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Shield className="h-5 w-5 text-white" />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
-                  MaskingTech
-                </span>
-                <span className="text-[10px] font-medium text-muted-foreground/80">Privacy Through Innovation</span>
-              </div>
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">
+                MaskingTech
+              </span>
             </Link>
-
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-foreground",
-                    pathname === item.href
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  )}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {item.name}
                 </Link>
               ))}
             </nav>
           </div>
-
-          <div className="flex items-center gap-3">
-            {!isLoading && (
-              <>
-                {user ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="gap-2">
-                        <User className="h-5 w-5" />
-                        <span className="hidden sm:inline-block">
-                          {user.user_metadata.full_name || user.email}
-                        </span>
-                        <ChevronDown className="h-4 w-4 opacity-50" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-[200px]">
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard" className="cursor-pointer">
-                          <User className="mr-2 h-4 w-4" />
-                          Dashboard
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href="/settings" className="cursor-pointer">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={handleSignOut}
-                        className="cursor-pointer"
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Sign Out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <>
-                    <Button 
-                      variant="ghost" 
-                      className="hidden sm:inline-flex"
-                      asChild
-                    >
-                      <Link href="/login">Sign In</Link>
-                    </Button>
-                    <Button 
-                      className="hidden sm:inline-flex"
-                      asChild
-                    >
-                      <Link href="/signup">Get Started</Link>
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
-
+          <div className="flex items-center gap-4">
             <ModeToggle />
-
-            {/* Mobile Navigation */}
+            <div className="hidden md:flex items-center gap-2">
+              <Button variant="ghost" asChild>
+                <Link href="/login">Sign In</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Get Started</Link>
+              </Button>
+            </div>
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6" />
+                <Button variant="ghost" size="sm" className="md:hidden">
+                  <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={cn(
-                        "text-sm font-medium transition-colors hover:text-foreground",
-                        pathname === item.href
-                          ? "text-foreground"
-                          : "text-muted-foreground"
-                      )}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                  {!user && (
-                    <>
+              <SheetContent side="right">
+                <div className="flex flex-col gap-4">
+                  <nav className="flex flex-col gap-2">
+                    {navigation.map((item) => (
                       <Link
-                        href="/login"
-                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                        key={item.name}
+                        href={item.href}
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
                       >
-                        Sign In
+                        {item.name}
                       </Link>
-                      <Link
-                        href="/signup"
-                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        Get Started
-                      </Link>
-                    </>
-                  )}
-                </nav>
+                    ))}
+                  </nav>
+                  <div className="flex flex-col gap-2 pt-4 border-t">
+                    <Button variant="ghost" asChild className="justify-start">
+                      <Link href="/login">Sign In</Link>
+                    </Button>
+                    <Button asChild className="justify-start">
+                      <Link href="/signup">Get Started</Link>
+                    </Button>
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>

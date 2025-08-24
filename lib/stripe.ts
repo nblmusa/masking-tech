@@ -47,24 +47,27 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',
 });
 
-// Plan definitions
+// Plan definitions - Updated to match new pricing structure
 export const PLANS: Record<string, Plan> = {
   FREE: {
     id: 'free',
     name: 'Free',
-    description: 'Perfect for trying out our service',
+    description: 'Great for testing and getting started',
     price: 0,
-    priceId: 'free',
+    priceId: '',
     features: [
-      '5 images per month',
-      'Basic processing',
-      'Watermarked output',
-      'Community support',
+      'Background replacement',
+      'Number plate masking',
+      'Custom number plate logo',
+      'Face blur',
+      'Watermark',
+      'Web portal access',
+      'API access',
     ],
     limits: {
-      imagesPerMonth: 5,
-      maxFileSize: 5 * 1024 * 1024, // 5MB
-      apiAccess: false,
+      imagesPerMonth: 20, // 20 credits by default
+      maxFileSize: 10 * 1024 * 1024, // 10MB
+      apiAccess: true,
       teamMembers: 1,
     },
     metadata: {},
@@ -73,39 +76,60 @@ export const PLANS: Record<string, Plan> = {
     id: 'basic',
     name: 'Basic',
     description: 'Great for individuals and small projects',
-    price: 9.99,
+    price: 29,
     priceId: process.env.STRIPE_BASIC_PRICE_ID || '',
     features: [
-      '100 images per month',
-      'No watermarks',
-      'Basic API access',
-      'Email support',
-      'Standard processing',
+      'Background replacement',
+      'Number plate masking',
+      'Custom number plate logo',
+      'Face blur',
+      'Watermark',
+      'Web portal access',
+      'API access',
+      '300 credits per month',
+      'Approx. 75 cars per month',
     ],
     limits: {
-      imagesPerMonth: 100,
+      imagesPerMonth: 300, // 300 credits
       maxFileSize: 10 * 1024 * 1024, // 10MB
       apiAccess: true,
       teamMembers: 1,
     },
     metadata: {},
   },
-  PRO: {
-    id: 'pro',
-    name: 'Pro',
-    description: 'Perfect for professionals and growing businesses',
-    price: 29.99,
-    priceId: process.env.STRIPE_PRO_PRICE_ID || '',
+  STARTER: {
+    id: 'starter',
+    name: 'Starter',
+    description: 'Perfect for growing businesses and professionals',
+    price: 99,
+    priceId: process.env.STRIPE_STARTER_PRICE_ID || '',
     features: [
-      '1000 images per month',
-      'Advanced API access',
+      'Everything in Basic',
+      '1200 credits per month',
+      'Approx. 300 cars per month',
       'Priority support',
-      'Faster processing',
-      'Bulk processing',
-      'Custom watermarks',
     ],
     limits: {
-      imagesPerMonth: 1000,
+      imagesPerMonth: 1200, // 1200 credits
+      maxFileSize: 25 * 1024 * 1024, // 25MB
+      apiAccess: true,
+      teamMembers: 3,
+    },
+    metadata: {},
+  },
+  ADVANCED: {
+    id: 'advanced',
+    name: 'Advanced',
+    description: 'For established businesses with high volume needs',
+    price: 199,
+    priceId: process.env.STRIPE_ADVANCED_PRICE_ID || '',
+    features: [
+      'Everything in Starter',
+      '2500 credits per month',
+      'Approx. 625 cars per month',
+    ],
+    limits: {
+      imagesPerMonth: 2500, // 2500 credits
       maxFileSize: 25 * 1024 * 1024, // 25MB
       apiAccess: true,
       teamMembers: 5,
@@ -114,26 +138,22 @@ export const PLANS: Record<string, Plan> = {
       recommended: true,
     },
   },
-  ENTERPRISE: {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'For large organizations with custom needs',
-    price: 99.99,
-    priceId: process.env.STRIPE_ENTERPRISE_PRICE_ID || '',
+  GROWTH: {
+    id: 'growth',
+    name: 'Growth',
+    description: 'For large organizations with enterprise needs',
+    price: 399,
+    priceId: process.env.STRIPE_GROWTH_PRICE_ID || '',
     features: [
-      'Unlimited images',
-      'Full API access',
-      'Dedicated support',
-      'Custom integration',
-      'Fastest processing',
-      'Team management',
-      'Custom contracts',
+      'Everything in Advanced',
+      '6000 credits per month',
+      'Approx. 1500 cars per month',
     ],
     limits: {
-      imagesPerMonth: Infinity,
+      imagesPerMonth: 6000, // 6000 credits
       maxFileSize: 100 * 1024 * 1024, // 100MB
       apiAccess: true,
-      teamMembers: Infinity,
+      teamMembers: 10,
     },
     metadata: {
       enterprise: true,

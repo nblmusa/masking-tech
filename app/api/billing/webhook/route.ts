@@ -95,15 +95,19 @@ export async function POST(request: Request) {
         }
 
         if (userId) {
-          // Calculate tier first
-          const tier = priceId === process.env.STRIPE_PRO_PRICE_ID ? 'pro' :
-                      priceId === process.env.STRIPE_ENTERPRISE_PRICE_ID ? 'enterprise' : 'basic';
+          // Calculate tier based on new plan structure
+          let tier = 'basic';
+          if (priceId === process.env.STRIPE_STARTER_PRICE_ID) {
+            tier = 'starter';
+          } else if (priceId === process.env.STRIPE_ADVANCED_PRICE_ID) {
+            tier = 'advanced';
+          } else if (priceId === process.env.STRIPE_GROWTH_PRICE_ID) {
+            tier = 'growth';
+          }
           
           console.log('Calculated tier:', {
             tier,
-            priceId,
-            STRIPE_PRO_PRICE_ID: process.env.STRIPE_PRO_PRICE_ID,
-            STRIPE_ENTERPRISE_PRICE_ID: process.env.STRIPE_ENTERPRISE_PRICE_ID
+            priceId
           });
 
           // Update subscription in database

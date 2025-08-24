@@ -97,7 +97,7 @@ export default function TermsPage() {
             <ul>
               <li>Free Plan: Limited to 100 images per month with basic features</li>
               <li>Pro Plan: Up to 1,000 images per month with advanced features</li>
-              <li>Enterprise Plan: Custom limits and features based on agreement</li>
+                              <li>Growth Plan: Advanced features for large organizations with custom needs</li>
             </ul>
             <p>
               We reserve the right to:
