@@ -24,8 +24,6 @@ interface EditorState {
   logo: {
     enabled: boolean
     position: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center'
-    size: number
-    opacity: number
     url: string
   }
   watermark: {
@@ -36,12 +34,7 @@ interface EditorState {
     opacity: number
     color: string
   }
-  backgroundRemoval: {
-    enabled: boolean
-    refinementLevel: 'fast' | 'balanced' | 'detailed'
-    keepShadows: boolean
-    backgroundColor: string | null
-  }
+
   backgroundReplacement: {
     template: 'office' | 'nature' | 'urban' | 'transparent' | null
     customImage: string | null
@@ -68,8 +61,6 @@ export default function StudioPage() {
     logo: {
       enabled: false,
       position: 'center',
-      size: 50,
-      opacity: 100,
       url: ''
     },
     watermark: {
@@ -80,12 +71,7 @@ export default function StudioPage() {
       opacity: 70,
       color: '#ffffff'
     },
-    backgroundRemoval: {
-      enabled: false,
-      refinementLevel: 'balanced',
-      keepShadows: true,
-      backgroundColor: null
-    },
+
     backgroundReplacement: {
       template: 'transparent',
       customImage: null
@@ -119,24 +105,17 @@ export default function StudioPage() {
           logo: {
             enabled: false,
             position: 'center',
-            size: 50,
-            opacity: 100,
             url: ''
           },
           watermark: {
             enabled: false,
-            text: '© Protected',
+            text: 'Test',
             position: 'bottomRight',
             size: 14,
             opacity: 70,
             color: '#ffffff'
           },
-          backgroundRemoval: {
-            enabled: false,
-            refinementLevel: 'balanced',
-            keepShadows: true,
-            backgroundColor: null
-          },
+
           backgroundReplacement: {
             template: 'transparent',
             customImage: null
@@ -172,15 +151,17 @@ export default function StudioPage() {
       const [header, base64Data] = image.split(',')
       const contentType = header.split(';')[0].split(':')[1]
 
-      // Prepare request body with all masking settings
+      // Prepare request body with simplified settings
       const requestBody = {
         image: base64Data,
         contentType,
+        detectionSettings: {
+          blurFaces: editorState.detectionTypes.faces,
+          blurLicensePlates: editorState.detectionTypes.licensePlates
+        },
         logoSettings: editorState.maskingStyle === 'logo' ? {
           url: editorState.logo.url,
-          position: editorState.logo.position,
-          size: editorState.logo.size,
-          opacity: editorState.logo.opacity / 100
+          position: editorState.logo.position
         } : null,
         watermarkSettings: editorState.watermark.enabled ? {
           text: editorState.watermark.text,
@@ -189,10 +170,6 @@ export default function StudioPage() {
           opacity: editorState.watermark.opacity / 100,
           color: editorState.watermark.color
         } : null,
-        backgroundRemovalEnabled: false,
-        refinementLevel: editorState.backgroundRemoval.refinementLevel,
-        keepShadows: editorState.backgroundRemoval.keepShadows,
-        backgroundColor: editorState.backgroundRemoval.backgroundColor,
         backgroundReplacement: editorState.backgroundReplacement.template !== 'transparent' ? {
           template: editorState.backgroundReplacement.template,
           customImage: editorState.backgroundReplacement.customImage
@@ -596,7 +573,7 @@ export default function StudioPage() {
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'blur' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'blur'
-                                  ? 'border-blue-500 shadow-lg'
+                                  ? 'border-blue-500'
                                   : 'border-muted/200 bg-muted/20 hover:border-blue-300 hover:bg-blue-50/20'
                               }`}
                             >
@@ -615,7 +592,7 @@ export default function StudioPage() {
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'logo' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'logo'
-                                  ? 'border-blue-500 shadow-lg'
+                                  ? 'border-blue-500'
                                   : 'border-muted/200 bg-muted/20 hover:border-blue-300 hover:bg-blue-50/20'
                               }`}
                             >

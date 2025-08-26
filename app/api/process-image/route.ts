@@ -1,21 +1,15 @@
 import { NextResponse } from 'next/server'
-import sharp, { Blend } from 'sharp'
+import sharp from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-// import { detectAndMask } from '@/app/lib/image-processing'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
-// Add schema for background removal settings
-const BackgroundRemovalSettingsSchema = z.object({
-  enabled: z.boolean(),
-  refinementLevel: z.enum(['fast', 'balanced', 'detailed']).default('balanced'),
-  keepShadows: z.boolean().default(false),
-  backgroundColor: z.string().nullable().default(null),
-  licensePlateBlurring: z.boolean().default(false),
-  shadowEffect: z.boolean().default(false)
-})
+// Python server configuration
+const PYTHON_SERVER_URL = process.env.PYTHON_SERVER_URL || 'http://localhost:8000'
+
+
 
 async function uploadToStorage(
   supabase: any,
@@ -38,6 +32,111 @@ async function uploadToStorage(
   return publicUrl
 }
 
+async function processImageWithPythonServer(
+  imageBuffer: Buffer,
+  backgroundReplacement: any,
+  watermarkSettings: any,
+  logoSettings: any,
+  detectionSettings: any,
+  userId?: string
+): Promise<{ processedImage: Buffer; detectedPlates: number }> {
+  
+  // Create FormData for the Python server
+  const formData = new FormData()
+  
+  // Add the image - convert Buffer to Uint8Array for Blob compatibility
+  const imageArray = new Uint8Array(imageBuffer)
+  const imageBlob = new Blob([imageArray], { type: 'image/jpeg' })
+  formData.append('image', imageBlob, 'image.jpg')
+  
+  // Add background label if using preset backgrounds
+  if (backgroundReplacement?.template && backgroundReplacement.template !== 'transparent') {
+    formData.append('background_label', backgroundReplacement.template)
+  }
+  
+  // Add logo settings if provided
+  console.log('Logo settings received:', logoSettings)
+  if (logoSettings && logoSettings.url) {
+    console.log('Adding logo to form data:', {
+      url: logoSettings.url,
+      position: logoSettings.position
+    })
+    formData.append('logo_url', logoSettings.url)
+    formData.append('logo_position', logoSettings.position)
+  } else {
+    console.log('No logo settings provided')
+  }
+  
+  // Add detection settings
+  console.log('Detection settings received:', detectionSettings)
+  if (detectionSettings) {
+    formData.append('blur_faces', detectionSettings.blurFaces ? 'true' : 'false')
+    formData.append('blur_license_plates', detectionSettings.blurLicensePlates ? 'true' : 'false')
+    console.log('Detection settings added to form data:', {
+      blurFaces: detectionSettings.blurFaces,
+      blurLicensePlates: detectionSettings.blurLicensePlates
+    })
+  }
+  
+  // Add watermark settings if provided
+  console.log('Watermark settings received:', watermarkSettings)
+  if (watermarkSettings && watermarkSettings.text) {
+    console.log('Adding watermark to form data:', {
+      text: watermarkSettings.text,
+      position: watermarkSettings.position,
+      size: watermarkSettings.size,
+      opacity: watermarkSettings.opacity,
+      color: watermarkSettings.color
+    })
+    formData.append('watermark_text', watermarkSettings.text)
+    formData.append('watermark_position', watermarkSettings.position)
+    formData.append('watermark_size', watermarkSettings.size.toString())
+    formData.append('watermark_opacity', watermarkSettings.opacity.toString())
+    formData.append('watermark_color', watermarkSettings.color)
+  } else {
+    console.log('No watermark settings or text provided')
+  }
+  
+  try {
+      // Call the Python server
+  const response = await fetch(`${PYTHON_SERVER_URL}/api/v1/generate`, {
+      method: 'POST',
+      headers: {
+        'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
+        ...(userId && { 'X-User-ID': userId })
+      },
+      body: formData
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Python server error: ${response.status} - ${errorText}`)
+    }
+    
+    // Get the processed image as buffer
+    const processedImageBuffer = Buffer.from(await response.arrayBuffer())
+    
+    // For now, we'll assume 1 license plate detected (you can enhance this later)
+    // The Python server already handles license plate blurring
+    const detectedPlates = 1
+    
+    return {
+      processedImage: processedImageBuffer,
+      detectedPlates
+    }
+    
+  } catch (error) {
+    console.error('Python server processing error:', error)
+    
+    // Fallback: return original image with basic processing
+    console.log('Falling back to basic processing')
+    return {
+      processedImage: imageBuffer,
+      detectedPlates: 0
+    }
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
@@ -46,10 +145,10 @@ export async function POST(request: Request) {
 
     let imageBuffer: Buffer | undefined;
     let imageMetadata: { name: string; type: string; } | undefined;
-    let logoBuffer: Buffer | undefined;
-    let logoSettings: any;
+    let backgroundReplacement: any;
     let watermarkSettings: any;
-    let backgroundRemovalSettings: any;
+    let logoSettings: any;
+    let detectionSettings: any;
 
     const contentType = request.headers.get('content-type');
 
@@ -67,32 +166,20 @@ export async function POST(request: Request) {
         type: imageFile.type || 'image/jpeg'
       };
 
-      // Get logo file if provided
-      const logoFile = formData.get('logo') as File;
-      if (logoFile) {
-        logoBuffer = Buffer.from(await logoFile.arrayBuffer());
-      }
-
       // Parse settings
       try {
-        logoSettings = formData.get('logoSettings') ? 
-          JSON.parse(formData.get('logoSettings') as string) : 
+        backgroundReplacement = formData.get('backgroundReplacement') ? 
+          JSON.parse(formData.get('backgroundReplacement') as string) : 
           null;
-
         watermarkSettings = formData.get('watermarkSettings') ? 
           JSON.parse(formData.get('watermarkSettings') as string) : 
           null;
-
-        // Parse and validate background removal settings
-        backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
-          enabled: true, // formData.get('backgroundRemovalEnabled') === 'true',
-          refinementLevel: formData.get('refinementLevel') || 'balanced',
-          keepShadows: true, // formData.get('keepShadows') === 'true',
-          backgroundColor: formData.get('backgroundColor') || null,
-          licensePlateBlurring: formData.get('licensePlateBlurring') === 'true',
-          shadowEffect: formData.get('shadowEffect') === 'true'
-        });
-        console.log('Background removal settings1:', backgroundRemovalSettings);
+        logoSettings = formData.get('logoSettings') ? 
+          JSON.parse(formData.get('logoSettings') as string) : 
+          null;
+        detectionSettings = formData.get('detectionSettings') ? 
+          JSON.parse(formData.get('detectionSettings') as string) : 
+          null;
       } catch (error) {
         console.error('Settings parsing error:', error);
         return new Response('Invalid settings format', { status: 400 });
@@ -110,23 +197,10 @@ export async function POST(request: Request) {
           };
         }
         
-        if (body.logo) {
-          const logoBase64 = body.logo.split(',')[1] || body.logo;
-          logoBuffer = Buffer.from(logoBase64, 'base64');
-        }
-        
-        logoSettings = body.logoSettings;
+        backgroundReplacement = body.backgroundReplacement;
         watermarkSettings = body.watermarkSettings;
-
-        // Parse and validate background removal settings
-        backgroundRemovalSettings = BackgroundRemovalSettingsSchema.parse({
-          enabled: true, // body.backgroundRemovalEnabled || false,
-          refinementLevel: body.refinementLevel || 'balanced',
-          keepShadows: true, // body.keepShadows || false,
-          backgroundColor: body.backgroundColor || null,
-          licensePlateBlurring: body.licensePlateBlurring || false,
-          shadowEffect: body.shadowEffect || false
-        });
+        logoSettings = body.logoSettings;
+        detectionSettings = body.detectionSettings;
       } catch (error) {
         console.error('Settings parsing error:', error);
         return new Response('Invalid settings format', { status: 400 });
@@ -145,26 +219,22 @@ export async function POST(request: Request) {
       return new Response('No image file provided or invalid format', { status: 400 });
     }
 
-    // Process the image
-    console.log('Starting image processing with buffer size:', imageBuffer.length);
-    const result: any = {
-      processedImage: imageBuffer,
-      detectedPlates: 0,
-      error: {}
-    };
-    // const result = await detectAndMask(
-    //   imageBuffer,
-    //   logoBuffer,
-    //   logoSettings,
-    //   watermarkSettings,
-    //   backgroundRemovalSettings
-    // );
+    // Process the image using Python server
+    console.log('Starting image processing with Python server, buffer size:', imageBuffer.length);
+    
+    const result = await processImageWithPythonServer(
+      imageBuffer,
+      backgroundReplacement,
+      watermarkSettings,
+      logoSettings,
+      detectionSettings,
+      session?.user?.id
+    );
+    
     console.log('Processing result:', {
       hasProcessedImage: !!result.processedImage,
       processedImageSize: result.processedImage?.length,
-      detectedPlates: result.detectedPlates,
-      hasError: !!result.error,
-      error: result.error?.message
+      detectedPlates: result.detectedPlates
     })
 
     let processedImage = result.processedImage
@@ -217,7 +287,8 @@ export async function POST(request: Request) {
             metadata: {
               originalSize: imageBuffer.length,
               processedSize: processedImage.length,
-              logoApplied: !!logoBuffer
+              backgroundReplaced: !!backgroundReplacement,
+              watermarkEnabled: !!watermarkSettings?.enabled
             }
           }])
 
@@ -256,7 +327,8 @@ export async function POST(request: Request) {
         licensePlatesDetected: result.detectedPlates,
         originalSize: imageBuffer.length,
         processedSize: processedImage.length,
-        logoApplied: !!logoBuffer,
+        backgroundReplaced: !!backgroundReplacement,
+        watermarkEnabled: !!watermarkSettings?.enabled,
         contentType: imageMetadata.type
       },
       processedImageUrl,

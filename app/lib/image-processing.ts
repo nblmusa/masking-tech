@@ -1,10 +1,6 @@
 // import * as tf from '@tensorflow/tfjs-node';
 import sharp, { Blend } from 'sharp';
 import { LogoSettings, DEFAULT_SETTINGS } from './config';
-// import { detectFaces } from './face-detection';
-// import { detectPlates } from './plate-detection';
-// import { detectCars } from './car-detection';
-import { removeBackground } from './background-removal';
 
 export interface ProcessingResult {
   processedImage: Buffer;
