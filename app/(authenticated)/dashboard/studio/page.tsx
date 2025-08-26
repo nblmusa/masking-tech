@@ -127,11 +127,6 @@ export default function StudioPage() {
       }
     }
     reader.readAsDataURL(file)
-
-    toast({
-      title: "Image loaded",
-      description: "Your image has been loaded into the editor.",
-    })
   }, [toast])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -213,10 +208,10 @@ export default function StudioPage() {
         editorState.backgroundReplacement.template !== 'transparent' && 'background replacement'
       ].filter(Boolean)
       
-      toast({
-        title: "Processing complete",
-        description: `Successfully processed image with ${processingFeatures.join(' and ')}.`,
-      })
+      // toast({
+      //   title: "Processing complete",
+      //   description: `Successfully processed image with ${processingFeatures.join(' and ')}.`,
+      // })
 
       // Log for debugging
       console.log('Processed image data:', processedImageData.substring(0, 100) + '...')

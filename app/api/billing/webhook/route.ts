@@ -155,6 +155,30 @@ export async function POST(request: Request) {
               } else {
                 console.log('Successfully updated profile:', profile);
               }
+
+              // Upsert user_credits with plan allowance
+              const planCredits: Record<string, number> = {
+                free: 20,
+                basic: 300,
+                starter: 1200,
+                advanced: 2500,
+                growth: 6000,
+              };
+              const credits = planCredits[tier] ?? 20;
+
+              const { error: creditsError } = await supabase
+                .from('user_credits')
+                .upsert({
+                  user_id: userId,
+                  credits_balance: credits,
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'user_id', ignoreDuplicates: false });
+
+              if (creditsError) {
+                console.error('Failed to upsert user credits:', creditsError);
+              } else {
+                console.log('Credits upserted for user:', userId);
+              }
             } else {
               console.log('Skipping profile update, subscription status:', status);
             }
