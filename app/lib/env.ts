@@ -2,11 +2,6 @@ import { z } from 'zod';
 
 export const envSchema = z.object({
   // ... other environment variables ...
-  
-  // RapidAPI Configuration
-  RAPIDAPI_KEY: z.string({
-    required_error: 'RapidAPI key is required for car background removal service',
-  }),
 });
 
 declare global {

@@ -45,16 +45,16 @@ export default function UploadPage() {
             <div className="text-center space-y-6">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
                 <Upload className="h-8 w-8 text-primary" />
-              </div>
-              
-              <div className="space-y-2">
+                        </div>
+                        
+                        <div className="space-y-2">
                 <h2 className="text-2xl font-semibold">Upload Image</h2>
                 <p className="text-muted-foreground">
                   Drag and drop your image here, or click to browse
-                </p>
-              </div>
+                      </p>
+                    </div>
 
-              <div className="space-y-4">
+                    <div className="space-y-4">
                 <input
                   type="file"
                   accept="image/*"
@@ -64,7 +64,7 @@ export default function UploadPage() {
                   disabled={isUploading}
                 />
                 <label htmlFor="file-upload">
-                  <Button 
+                          <Button 
                     size="lg" 
                     className="w-full"
                     disabled={isUploading}
@@ -75,18 +75,18 @@ export default function UploadPage() {
                         <>
                           <ImageIcon className="h-5 w-5 mr-2 animate-spin" />
                           Processing...
-                        </>
-                      ) : (
-                        <>
+                          </>
+                        ) : (
+                          <>
                           <Upload className="h-5 w-5 mr-2" />
                           Choose Image
-                        </>
-                      )}
-                    </span>
-                  </Button>
+                          </>
+                        )}
+                          </span>
+                        </Button>
                 </label>
                 
-                <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                   Supported formats: JPEG, PNG, WebP • Max size: 10MB
                 </p>
               </div>

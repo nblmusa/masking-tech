@@ -7,7 +7,7 @@ import { z } from 'zod'
 export const dynamic = 'force-dynamic'
 
 // Python server configuration
-const PYTHON_SERVER_URL = process.env.PYTHON_SERVER_URL || 'http://localhost:8000'
+const PYTHON_SERVER_URL = process.env.PYTHON_SERVER_URL || 'http://localhost:8080'
 
 
 
