@@ -1,4 +1,5 @@
 // import * as tf from '@tensorflow/tfjs-node';
+// import * as tf from '@tensorflow/tfjs-node';
 import sharp, { Blend } from 'sharp';
 import { LogoSettings, DEFAULT_SETTINGS } from './config';
 
@@ -135,7 +136,19 @@ function getBaseline(position = 'bottom-right'): string {
 // ): Promise<ProcessingResult> {
 //   try {
 //     // tf.engine().startScope();
+// export async function detectAndMask(
+//   imageBuffer: Buffer,
+//   logoBuffer?: Buffer,
+//   logoSettings: LogoSettings = DEFAULT_SETTINGS,
+//   watermarkSettings?: Partial<WatermarkSettings>,
+//   backgroundRemovalSettings?: BackgroundRemovalSettings
+// ): Promise<ProcessingResult> {
+//   try {
+//     // tf.engine().startScope();
 
+//     // Initialize result
+//     let processedImage = imageBuffer;
+//     let detectedCars = 0;
 //     // Initialize result
 //     let processedImage = imageBuffer;
 //     let detectedCars = 0;
@@ -145,7 +158,24 @@ function getBaseline(position = 'bottom-right'): string {
 //     const metadata = await image.metadata();
 //     const originalWidth = metadata.width || 640;
 //     const originalHeight = metadata.height || 640;
+//     // Load and preprocess the image
+//     const image = await sharp(imageBuffer);
+//     const metadata = await image.metadata();
+//     const originalWidth = metadata.width || 640;
+//     const originalHeight = metadata.height || 640;
 
+//     // If logo is provided, preprocess it
+//     let processedLogo: Buffer | undefined;
+//     if (logoBuffer) {
+//       try {
+//         processedLogo = await sharp(logoBuffer)
+//           .trim()
+//           .toBuffer();
+//       } catch (error) {
+//         console.error('Error preprocessing logo:', error);
+//         processedLogo = undefined;
+//       }
+//     }
 //     // If logo is provided, preprocess it
 //     let processedLogo: Buffer | undefined;
 //     if (logoBuffer) {
@@ -165,7 +195,20 @@ function getBaseline(position = 'bottom-right'): string {
 //     let resizeHeight = 640;
 //     let paddingX = 0;
 //     let paddingY = 0;
+//     // Calculate aspect ratio and padding
+//     const aspectRatio = originalWidth / originalHeight;
+//     let resizeWidth = 640;
+//     let resizeHeight = 640;
+//     let paddingX = 0;
+//     let paddingY = 0;
 
+//     if (aspectRatio > 1) {
+//       resizeHeight = Math.round(640 / aspectRatio);
+//       paddingY = Math.round((640 - resizeHeight) / 2);
+//     } else {
+//       resizeWidth = Math.round(640 * aspectRatio);
+//       paddingX = Math.round((640 - resizeWidth) / 2);
+//     }
 //     if (aspectRatio > 1) {
 //       resizeHeight = Math.round(640 / aspectRatio);
 //       paddingY = Math.round((640 - resizeHeight) / 2);
@@ -182,7 +225,18 @@ function getBaseline(position = 'bottom-right'): string {
 //       })
 //       .raw()
 //       .toBuffer();
+//     // Resize image for model input
+//     const resizedImage = await image
+//       .resize(640, 640, {
+//         fit: 'contain',
+//         background: { r: 0, g: 0, b: 0, alpha: 1 }
+//       })
+//       .raw()
+//       .toBuffer();
 
+//     // Calculate scaling ratios
+//     const xRatio = originalWidth / resizeWidth;
+//     const yRatio = originalHeight / resizeHeight;
 //     // Calculate scaling ratios
 //     const xRatio = originalWidth / resizeWidth;
 //     const yRatio = originalHeight / resizeHeight;
@@ -191,7 +245,18 @@ function getBaseline(position = 'bottom-right'): string {
 //     // const tensor = tf.tensor3d(new Uint8Array(resizedImage), [640, 640, 3]);
 //     // const normalized = tf.tidy(() => tensor.div(255.0).expandDims(0));
 //     // tf.dispose(tensor);
+//     // Convert to tensor and normalize
+//     // const tensor = tf.tensor3d(new Uint8Array(resizedImage), [640, 640, 3]);
+//     // const normalized = tf.tidy(() => tensor.div(255.0).expandDims(0));
+//     // tf.dispose(tensor);
 
+//     // Detect license plates
+//     let plateDetections: Detection[] = [];
+//     try {
+//       // plateDetections = await detectPlates(normalized as tf.Tensor4D, paddingX, paddingY, xRatio, yRatio);
+//     } catch (error) {
+//       console.error('License plate detection error:', error);
+//     }
 //     // Detect license plates
 //     let plateDetections: Detection[] = [];
 //     try {
@@ -207,7 +272,22 @@ function getBaseline(position = 'bottom-right'): string {
 //     } catch (error) {
 //       console.error('Face detection error:', error);
 //     }
+//     // Detect faces if authenticated
+//     let faceDetections: Detection[] = [];
+//     try {
+//       faceDetections = await detectFaces(normalized as any, paddingX, paddingY, xRatio, yRatio);
+//     } catch (error) {
+//       console.error('Face detection error:', error);
+//     }
 
+//     // Detect cars if enabled
+//     let carDetections: Detection[] = [];
+//     console.log('Background removal settings:', backgroundRemovalSettings);
+//     if (backgroundRemovalSettings?.enabled) {
+//       console.log('Detecting cars with background removal settings:', backgroundRemovalSettings);
+//       try {
+//         // carDetections = await detectCars(normalized as tf.Tensor4D, paddingX, paddingY, xRatio, yRatio);
+//         detectedCars = carDetections.length;
 //     // Detect cars if enabled
 //     let carDetections: Detection[] = [];
 //     console.log('Background removal settings:', backgroundRemovalSettings);
@@ -227,7 +307,25 @@ function getBaseline(position = 'bottom-right'): string {
 //               height: Math.round(detection.y2 - detection.y1)
 //             })
 //             .toBuffer();
+//         // Process each detected car
+//         for (const detection of carDetections) {
+//           const carRegion = await sharp(processedImage)
+//             .extract({
+//               left: Math.round(detection.x1),
+//               top: Math.round(detection.y1),
+//               width: Math.round(detection.x2 - detection.x1),
+//               height: Math.round(detection.y2 - detection.y1)
+//             })
+//             .toBuffer();
 
+//           // Remove background from car region
+//           const processedCarRegion = await removeBackground(carRegion, {
+//             refinementLevel: backgroundRemovalSettings.refinementLevel,
+//             keepShadows: backgroundRemovalSettings.keepShadows,
+//             backgroundColor: backgroundRemovalSettings.backgroundColor,
+//             licensePlateBlurring: backgroundRemovalSettings.licensePlateBlurring,
+//             shadowEffect: backgroundRemovalSettings.shadowEffect
+//           });
 //           // Remove background from car region
 //           const processedCarRegion = await removeBackground(carRegion, {
 //             refinementLevel: backgroundRemovalSettings.refinementLevel,
@@ -251,7 +349,22 @@ function getBaseline(position = 'bottom-right'): string {
 //         console.error('Car detection/background removal error:', error);
 //       }
 //     }
+//           // Composite the processed car region back onto the image
+//           processedImage = await sharp(processedImage)
+//             .composite([{
+//               input: processedCarRegion,
+//               left: Math.round(detection.x1),
+//               top: Math.round(detection.y1),
+//               blend: 'over' as Blend
+//             }])
+//             .toBuffer();
+//         }
+//       } catch (error) {
+//         console.error('Car detection/background removal error:', error);
+//       }
+//     }
 
+//     // tf.dispose(normalized);
 //     // tf.dispose(normalized);
 
 //     // Create composite operations for masking plates
@@ -259,7 +372,16 @@ function getBaseline(position = 'bottom-right'): string {
 //       plateDetections.map(async (detection) => {
 //         const boxWidth = detection.x2 - detection.x1;
 //         const boxHeight = detection.y2 - detection.y1;
+//     // Create composite operations for masking plates
+//     const plateOperations = await Promise.all(
+//       plateDetections.map(async (detection) => {
+//         const boxWidth = detection.x2 - detection.x1;
+//         const boxHeight = detection.y2 - detection.y1;
 
+//         if (processedLogo) {
+//           try {
+//             const logoWidth = Math.round(boxWidth * (logoSettings.size || 100) / 100);
+//             const logoHeight = Math.round(boxHeight * (logoSettings.size || 100) / 100);
 //         if (processedLogo) {
 //           try {
 //             const logoWidth = Math.round(boxWidth * (logoSettings.size || 100) / 100);
@@ -271,11 +393,37 @@ function getBaseline(position = 'bottom-right'): string {
 //                 background: { r: 0, g: 0, b: 0, alpha: 0 }
 //               })
 //               .toBuffer();
+//             const resizedLogo = await sharp(processedLogo)
+//               .resize(logoWidth, logoHeight, {
+//                 fit: 'contain',
+//                 background: { r: 0, g: 0, b: 0, alpha: 0 }
+//               })
+//               .toBuffer();
 
 //             // Calculate position based on logoSettings
 //             let left = detection.x1;
 //             let top = detection.y1;
+//             // Calculate position based on logoSettings
+//             let left = detection.x1;
+//             let top = detection.y1;
             
+//             switch (logoSettings.position) {
+//               case 'top-right':
+//                 left = detection.x2 - logoWidth;
+//                 break;
+//               case 'bottom-left':
+//                 top = detection.y2 - logoHeight;
+//                 break;
+//               case 'bottom-right':
+//                 left = detection.x2 - logoWidth;
+//                 top = detection.y2 - logoHeight;
+//                 break;
+//               case 'center':
+//               default:
+//                 left = detection.x1 + Math.round((boxWidth - logoWidth) / 2);
+//                 top = detection.y1 + Math.round((boxHeight - logoHeight) / 2);
+//                 break;
+//             }
 //             switch (logoSettings.position) {
 //               case 'top-right':
 //                 left = detection.x2 - logoWidth;
@@ -308,6 +456,20 @@ function getBaseline(position = 'bottom-right'): string {
 //               blend: 'over' as Blend
 //             }])
 //             .toBuffer();
+//             // Create a white background with the logo
+//             const logoWithBackground = await sharp({
+//               create: {
+//                 width: logoWidth,
+//                 height: logoHeight,
+//                 channels: 4,
+//                 background: { r: 255, g: 255, b: 255, alpha: 1 }
+//               }
+//             })
+//             .composite([{
+//               input: resizedLogo,
+//               blend: 'over' as Blend
+//             }])
+//             .toBuffer();
 
 //             return [{
 //               input: logoWithBackground,
@@ -319,7 +481,20 @@ function getBaseline(position = 'bottom-right'): string {
 //             return await createBlurredRegion(detection.x1, detection.y1, boxWidth, boxHeight, imageBuffer, logoSettings);
 //           }
 //         }
+//             return [{
+//               input: logoWithBackground,
+//               top: Math.round(top),
+//               left: Math.round(left)
+//             }];
+//           } catch (error) {
+//             console.error('Error applying logo:', error);
+//             return await createBlurredRegion(detection.x1, detection.y1, boxWidth, boxHeight, imageBuffer, logoSettings);
+//           }
+//         }
 
+//         return await createBlurredRegion(detection.x1, detection.y1, boxWidth, boxHeight, imageBuffer, logoSettings);
+//       })
+//     );
 //         return await createBlurredRegion(detection.x1, detection.y1, boxWidth, boxHeight, imageBuffer, logoSettings);
 //       })
 //     );
@@ -340,10 +515,32 @@ function getBaseline(position = 'bottom-right'): string {
 //         );
 //       })
 //     );
+//     // Create face blur operations
+//     const faceOperations = await Promise.all(
+//       faceDetections.map(async (detection) => {
+//         const boxWidth = detection.x2 - detection.x1;
+//         const boxHeight = detection.y2 - detection.y1;
+//         return await createBlurredRegion(
+//           detection.x1,
+//           detection.y1,
+//           boxWidth,
+//           boxHeight,
+//           imageBuffer,
+//           { ...logoSettings, maskType: 'blur', blur: { radius: 30, opacity: 1 } },
+//           true // Enable rounded mask for faces
+//         );
+//       })
+//     );
 
 //     // Filter out empty operations and combine plate and face operations
 //     const validOperations = [...plateOperations.flat(), ...faceOperations.flat()].filter(op => op);
+//     // Filter out empty operations and combine plate and face operations
+//     const validOperations = [...plateOperations.flat(), ...faceOperations.flat()].filter(op => op);
 
+//     // Create final image with masks
+//     processedImage = await sharp(processedImage)
+//       .composite(validOperations)
+//       .toBuffer();
 //     // Create final image with masks
 //     processedImage = await sharp(processedImage)
 //       .composite(validOperations)
@@ -353,7 +550,18 @@ function getBaseline(position = 'bottom-right'): string {
 //       console.log('Adding watermark to processed image');
 //       processedImage = await addWatermark(processedImage, watermarkSettings);
 //     }
+//     if (watermarkSettings?.text) {
+//       console.log('Adding watermark to processed image');
+//       processedImage = await addWatermark(processedImage, watermarkSettings);
+//     }
 
+//     // Create thumbnail
+//     const thumbnail = await sharp(processedImage)
+//       .resize(320, 240, {
+//         fit: 'contain',
+//         background: { r: 0, g: 0, b: 0, alpha: 0 }
+//       })
+//       .toBuffer();
 //     // Create thumbnail
 //     const thumbnail = await sharp(processedImage)
 //       .resize(320, 240, {
@@ -369,7 +577,28 @@ function getBaseline(position = 'bottom-right'): string {
 //       detectedFaces: faceDetections.length,
 //       detectedCars
 //     };
+//     return {
+//       processedImage,
+//       thumbnail,
+//       detectedPlates: plateDetections.length,
+//       detectedFaces: faceDetections.length,
+//       detectedCars
+//     };
 
+//   } catch (error) {
+//     console.error('Processing error:', error);
+//     return {
+//       processedImage: imageBuffer,
+//       thumbnail: imageBuffer,
+//       detectedPlates: 0,
+//       detectedFaces: 0,
+//       detectedCars: 0,
+//       error: error as Error
+//     };
+//   } finally {
+//     // tf.engine().endScope();
+//   }
+// }
 //   } catch (error) {
 //     console.error('Processing error:', error);
 //     return {
