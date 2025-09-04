@@ -6,11 +6,6 @@ import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 
-// Python server configuration
-const PYTHON_SERVER_URL = process.env.PYTHON_SERVER_URL || 'http://localhost:8080'
-
-
-
 async function uploadToStorage(
   supabase: any,
   buffer: Buffer,
@@ -99,7 +94,7 @@ async function processImageWithPythonServer(
   
   try {
       // Call the Python server
-  const response = await fetch(`${PYTHON_SERVER_URL}/api/v1/generate`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
