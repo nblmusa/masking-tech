@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase-client'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { PLANS } from "@/lib/stripe"
@@ -52,7 +52,7 @@ export default function BillingPage() {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [usage, setUsage] = useState<UsageRecord[]>([])
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const { toast } = useToast()
   const router = useRouter()
 

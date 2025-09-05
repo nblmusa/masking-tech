@@ -5,7 +5,7 @@ import { Check, Zap, Loader2, Shield, Clock, Users, CreditCard, ArrowRight, Star
 import Link from "next/link"
 import { PLANS } from "@/lib/stripe"
 import { useEffect, useState } from "react"
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase-client'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useAnalytics } from "@/hooks/useAnalytics"
@@ -27,7 +27,7 @@ export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { toast } = useToast();
   const router = useRouter();
   const analytics = useAnalytics();

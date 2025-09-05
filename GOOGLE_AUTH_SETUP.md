@@ -30,8 +30,8 @@ This guide will help you complete the Google OAuth integration with Supabase for
    - Click "Create Credentials" > "OAuth 2.0 Client IDs"
    - Choose "Web application"
    - Add authorized redirect URIs:
-     - `https://yourdomain.com/api/auth/google` (production)
-     - `http://localhost:3000/api/auth/google` (development)
+     - `https://yourdomain.com/auth/callback` (production)
+     - `http://localhost:3000/auth/callback` (development)
 
 ### 2. Supabase Dashboard Configuration
 
@@ -41,7 +41,7 @@ This guide will help you complete the Google OAuth integration with Supabase for
 4. Add your Google OAuth credentials:
    - **Client ID**: From Google Cloud Console
    - **Client Secret**: From Google Cloud Console
-5. Set the redirect URL to: `https://yourdomain.com/api/auth/google`
+5. Set the redirect URL to: `https://yourdomain.com/auth/callback`
 
 ### 3. Environment Variables (Optional)
 
@@ -58,18 +58,18 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 Make sure your redirect URLs are properly configured:
 
 **Development:**
-- Google Console: `http://localhost:3000/api/auth/google`
-- Supabase: `http://localhost:3000/api/auth/google`
+- Google Console: `http://localhost:3000/auth/callback`
+- Supabase: `http://localhost:3000/auth/callback`
 
 **Production:**
-- Google Console: `https://yourdomain.com/api/auth/google`
-- Supabase: `https://yourdomain.com/api/auth/google`
+- Google Console: `https://yourdomain.com/auth/callback`
+- Supabase: `https://yourdomain.com/auth/callback`
 
 ## 🚀 How It Works
 
 1. **User clicks "Continue with Google"** → Redirects to `/api/auth/google/signin`
 2. **OAuth initiation** → Supabase redirects to Google OAuth
-3. **User authenticates with Google** → Google redirects back to `/api/auth/google`
+3. **User authenticates with Google** → Google redirects back to `/auth/callback`
 4. **Callback handling** → Supabase exchanges code for session
 5. **User settings creation** → Automatically creates user settings for new users
 6. **Redirect to dashboard** → User is logged in and redirected

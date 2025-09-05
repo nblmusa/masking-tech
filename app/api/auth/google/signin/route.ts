@@ -8,10 +8,13 @@ export async function GET(request: NextRequest) {
   const supabase = createRouteHandlerClient({ cookies })
 
   try {
+    const redirectTo = `${requestUrl.origin}/auth/callback`
+    console.log('Redirect URI being sent to Google:', redirectTo)
+    
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${requestUrl.origin}/api/auth/google`,
+        redirectTo,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',

@@ -1,8 +1,9 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const supabase = createClientComponentClient();
+  const supabase = createRouteHandlerClient({ cookies });
 
   // Check authentication
   const { data: { session }, error: authError } = await supabase.auth.getSession();

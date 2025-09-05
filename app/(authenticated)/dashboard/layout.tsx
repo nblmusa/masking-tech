@@ -14,7 +14,7 @@ import {
   X,
   LogOut
 } from "lucide-react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClient } from "@/lib/supabase-client"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 
@@ -54,7 +54,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   const handleSignOut = async () => {
     try {

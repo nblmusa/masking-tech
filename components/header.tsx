@@ -5,7 +5,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { Shield, Menu, User, Settings, LogOut, ChevronDown, CreditCard } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase-client'
 import { useState, useEffect } from "react"
 import {
   DropdownMenu,
@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast"
 export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const router = useRouter()
   const pathname = usePathname()
   const { toast } = useToast()

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/lib/supabase-client';
 import { LogoSettings, DEFAULT_SETTINGS } from '@/app/lib/config';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,7 +16,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<LogoSettings>(DEFAULT_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { toast } = useToast();
 
   useEffect(() => {

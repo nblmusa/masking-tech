@@ -10,7 +10,7 @@ import { Settings, Trash2, Smartphone, LogOut, Shield, QrCode } from "lucide-rea
 import { useToast } from "@/hooks/use-toast"
 import { CustomAlertDialog } from "@/components/alert-dialog"
 import { useRouter } from "next/navigation"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClient } from "@/lib/supabase-client"
 
 interface Profile {
   firstName: string
@@ -39,7 +39,7 @@ export default function AccountSettingsPage() {
   const [isEnabling2FA, setIsEnabling2FA] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   useEffect(() => {
     loadUserProfile()
