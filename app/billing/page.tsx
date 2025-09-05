@@ -157,11 +157,11 @@ export default function BillingPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/5 dark:to-indigo-500/5">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 from-blue-500/5 to-indigo-500/5">
               <CreditCard className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium text-primary">Billing & Usage</span>
             </div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">Billing</h1>
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">Billing</h1>
             <p className="text-sm text-muted-foreground mt-1">
               Manage your subscription and view usage
             </p>
@@ -188,7 +188,7 @@ export default function BillingPage() {
         </div>
 
         {/* Subscription Overview */}
-        <Card className="p-6 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-1">
               <h2 className="text-xl font-semibold">Current Plan</h2>
@@ -237,8 +237,8 @@ export default function BillingPage() {
 
         {/* Usage Stats */}
         <div className="grid md:grid-cols-2 gap-6">
-          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-            <div className="p-6 border-b border-blue-100/30 dark:border-blue-800/30">
+          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
+            <div className="p-6 border-b border-blue-100/30 border-blue-800/30">
               <h2 className="text-lg font-semibold">Usage History</h2>
             </div>
             <div className="p-6">
@@ -266,8 +266,8 @@ export default function BillingPage() {
           </Card>
 
           {/* Invoice History */}
-          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-            <div className="p-6 border-b border-blue-100/30 dark:border-blue-800/30">
+          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
+            <div className="p-6 border-b border-blue-100/30 border-blue-800/30">
               <h2 className="text-lg font-semibold">Invoice History</h2>
             </div>
             <div className="p-6">

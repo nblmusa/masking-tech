@@ -77,7 +77,7 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">
             Get in Touch
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -87,58 +87,58 @@ export default function ContactPage() {
 
         <div className="grid lg:grid-cols-2 gap-8 items-start">
           {/* Contact Form */}
-          <Card className="p-6 sm:p-8 border-blue-100/50 dark:border-blue-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="p-6 sm:p-8 border-blue-100/50 border-blue-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <form ref={formRef} onSubmit={onSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-blue-700 dark:text-blue-300">First name</Label>
+                  <Label htmlFor="firstName" className="text-blue-300">First name</Label>
                   <Input
                     id="firstName"
                     name="firstName"
                     required
-                    className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                    className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-blue-700 dark:text-blue-300">Last name</Label>
+                  <Label htmlFor="lastName" className="text-blue-300">Last name</Label>
                   <Input
                     id="lastName"
                     name="lastName"
                     required
-                    className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                    className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-blue-700 dark:text-blue-300">Email</Label>
+                <Label htmlFor="email" className="text-blue-300">Email</Label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   required
-                  className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                  className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                   disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subject" className="text-blue-700 dark:text-blue-300">Subject</Label>
+                <Label htmlFor="subject" className="text-blue-300">Subject</Label>
                 <Input
                   id="subject"
                   name="subject"
                   required
-                  className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                  className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                   disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="message" className="text-blue-700 dark:text-blue-300">Message</Label>
+                <Label htmlFor="message" className="text-blue-300">Message</Label>
                 <Textarea
                   id="message"
                   name="message"
                   required
-                  className="min-h-[150px] border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                  className="min-h-[150px] border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                   disabled={isLoading}
                 />
               </div>
@@ -157,10 +157,10 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <Card className="p-6 border-blue-100/50 dark:border-blue-800/50">
+            <Card className="p-6 border-blue-100/50 border-blue-800/50">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl">
-                  <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <Shield className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
                   <h3 className="font-semibold">Security First</h3>
@@ -169,16 +169,16 @@ export default function ContactPage() {
               </div>
             </Card>
 
-            <Card className="p-6 border-blue-100/50 dark:border-blue-800/50">
+            <Card className="p-6 border-blue-100/50 border-blue-800/50">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl">
-                  <Mail className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  <Mail className="h-6 w-6 text-blue-400" />
                 </div>
                 <div>
                   <h3 className="font-semibold">Email</h3>
                   <a 
                     href="mailto:support@maskingtech.com"
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    className="text-sm text-blue-400 hover:text-blue-700 hover:text-blue-300"
                   >
                     support@maskingtech.com
                   </a>

@@ -45,7 +45,7 @@ export default function ApiDocsPage() {
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">API v1.0</Badge>
-            <Badge variant="secondary" className="bg-green-500/10 text-green-600 dark:text-green-400 text-xs">All Systems Operational</Badge>
+            <Badge variant="secondary" className="bg-green-500/10 text-green-400 text-xs">All Systems Operational</Badge>
           </div>
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function ApiDocsPage() {
           <main className="min-h-[calc(100vh-5.5rem)] lg:border-l lg:pl-8">
             {/* Hero Section */}
             <div className="mb-12">
-              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
+              <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">
                 API Documentation
               </h1>
               <p className="mt-4 text-xl text-muted-foreground max-w-2xl">
@@ -198,7 +198,7 @@ export default function ApiDocsPage() {
             <div className="space-y-16">
               {/* Quick Start Section */}
               <section id="quickstart" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Quick Start Guide</h2>
                   <p className="mb-6 text-muted-foreground">
                     Get started with the MaskingTech API in minutes. Follow these simple steps to begin masking license plates in your application.
@@ -272,7 +272,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
 
               {/* Guides Section */}
               <section id="guides" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Implementation Guides</h2>
                   <p className="mb-6 text-muted-foreground">
                     Step-by-step guides to help you implement common features and solve specific use cases.
@@ -336,7 +336,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
 
               {/* Authentication Section */}
               <section id="authentication" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Authentication</h2>
                   <p className="mb-6 text-muted-foreground">
                     Secure your API requests using API key authentication. All requests must include your API key in the Authorization header.
@@ -360,7 +360,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                     <div>
                       <h3 className="text-xl font-semibold mb-4">Rate Limits</h3>
                       <div className="grid sm:grid-cols-3 gap-4">
-                        <Card className="p-4 border-blue-100/30 dark:border-blue-800/30">
+                        <Card className="p-4 border-blue-100/30 border-blue-800/30">
                           <Badge variant="secondary" className="mb-2">Basic</Badge>
                           <ul className="space-y-2 text-sm">
                             <li>• 100 requests/month</li>
@@ -368,7 +368,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                             <li>• Standard processing</li>
                           </ul>
                         </Card>
-                        <Card className="p-4 border-blue-100/30 dark:border-blue-800/30">
+                        <Card className="p-4 border-blue-100/30 border-blue-800/30">
                           <Badge variant="secondary" className="mb-2">Pro</Badge>
                           <ul className="space-y-2 text-sm">
                             <li>• 1,000 requests/month</li>
@@ -376,7 +376,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                             <li>• Priority processing</li>
                           </ul>
                         </Card>
-                        <Card className="p-4 border-blue-100/30 dark:border-blue-800/30">
+                        <Card className="p-4 border-blue-100/30 border-blue-800/30">
                           <Badge variant="secondary" className="mb-2">Growth</Badge>
                           <ul className="space-y-2 text-sm">
                             <li>• Unlimited requests</li>
@@ -392,7 +392,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
 
               {/* Endpoints Section */}
               <section id="endpoints" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">API Endpoints</h2>
                   <p className="mb-6 text-muted-foreground">
                     Explore our API endpoints and their capabilities. All endpoints are HTTPS-only and return JSON responses.
@@ -524,7 +524,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
 
               {/* Advanced Section */}
               <section id="advanced" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Advanced Features</h2>
                   <p className="mb-6 text-muted-foreground">
                     Explore advanced capabilities and configurations to get the most out of the MaskingTech API.
@@ -605,7 +605,7 @@ images[]: file3.jpg`}</pre>
 
               {/* SDKs Section */}
               <section id="sdks" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">SDKs & Libraries</h2>
                   <p className="mb-6 text-muted-foreground">
                     Official SDKs and community libraries to integrate MaskingTech in your preferred programming language.
@@ -730,7 +730,7 @@ results = client.batch_process(
 
               {/* Recipes Section */}
               <section id="recipes" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">SDK Recipes</h2>
                   <p className="mb-6 text-muted-foreground">
                     Ready-to-use code recipes for common use cases and integrations.
@@ -801,7 +801,7 @@ async function processBatch(files) {
 
               {/* Troubleshooting Section */}
               <section id="troubleshooting" className="scroll-mt-20">
-                <Card className="p-6 border-primary/10 dark:border-primary/20">
+                <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Troubleshooting Guide</h2>
                   <p className="mb-6 text-muted-foreground">
                     Common issues and their solutions to help you debug your integration.

@@ -162,12 +162,12 @@ export default function LoginPage() {
     <div className="flex-1 relative overflow-hidden">
       <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <Card className="max-w-md mx-auto p-6 sm:p-8 border-blue-100/50 dark:border-blue-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Card className="max-w-md mx-auto p-6 sm:p-8 border-blue-100/50 border-blue-800/50 shadow-lg hover:shadow-xl transition-all duration-300">
             <div className="flex flex-col items-center space-y-2 mb-8">
               <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl group-hover:from-blue-500/20 group-hover:to-indigo-500/20 transition-colors duration-300">
-                <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-pulse-subtle" />
+                <Shield className="h-8 w-8 text-blue-400 animate-pulse-subtle" />
               </div>
-              <h1 className="text-2xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">Welcome back</h1>
+              <h1 className="text-2xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">Welcome back</h1>
               <p className="text-sm text-muted-foreground text-center">
                 {requires2FA ? "Enter your verification code" : "Enter your email to sign in to your account"}
               </p>
@@ -176,31 +176,31 @@ export default function LoginPage() {
             {!requires2FA ? (
               <form onSubmit={onSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-blue-700 dark:text-blue-300">Email</Label>
+                  <Label htmlFor="email" className="text-blue-300">Email</Label>
                   <Input 
                     id="email"
                     name="email" 
                     type="email" 
                     placeholder="m@example.com" 
                     required 
-                    className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                    className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-blue-700 dark:text-blue-300">Password</Label>
+                  <Label htmlFor="password" className="text-blue-300">Password</Label>
                   <Input 
                     id="password"
                     name="password" 
                     type="password" 
                     required 
-                    className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                    className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
                   <div className="text-right">
                     <Link 
                       href="/forgot-password" 
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                      className="text-xs text-blue-400 hover:text-blue-700 hover:text-blue-300 transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -216,17 +216,17 @@ export default function LoginPage() {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-gray-300 dark:border-gray-600" />
+                    <span className="w-full border-t border-gray-600" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white dark:bg-gray-900 px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-white bg-gray-900 px-2 text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
 
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="w-full border-gray-600 hover:bg-gray-800"
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
                 >
@@ -254,14 +254,14 @@ export default function LoginPage() {
             ) : (
               <form onSubmit={handle2FAVerification} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="verificationCode" className="text-blue-700 dark:text-blue-300">Verification Code</Label>
+                  <Label htmlFor="verificationCode" className="text-blue-300">Verification Code</Label>
                   <Input 
                     id="verificationCode"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
                     placeholder="Enter 6-digit code"
                     maxLength={6}
-                    className="border-blue-200/50 dark:border-blue-800/50 focus:border-blue-400 dark:focus:border-blue-600 transition-colors"
+                    className="border-blue-200/50 border-blue-800/50 focus:border-blue-400 focus:border-blue-600 transition-colors"
                     disabled={isLoading}
                   />
                 </div>
@@ -280,7 +280,7 @@ export default function LoginPage() {
                 Don&apos;t have an account?{" "}
                 <Link 
                   href="/signup" 
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  className="text-blue-400 hover:text-blue-700 hover:text-blue-300 transition-colors"
                 >
                   Sign up
                 </Link>

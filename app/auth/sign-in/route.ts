@@ -60,7 +60,7 @@ export async function POST(request: Request) {
               push: false
             },
             preferences: {
-              theme: 'system',
+              theme: 'dark',
               language: 'en'
             }
           },

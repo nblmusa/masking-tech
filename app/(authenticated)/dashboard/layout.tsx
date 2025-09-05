@@ -77,7 +77,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="fixed inset-0 bg-gray-50/50 dark:bg-gray-950/50">
+    <div className="fixed inset-0 bg-gray-950/50">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
@@ -88,17 +88,17 @@ export default function DashboardLayout({
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 border-r border-gray-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-full flex-col">
           {/* Logo/Brand */}
-          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
+          <div className="flex h-16 items-center justify-between px-6 border-b border-gray-800">
             <Link href="/dashboard" className="flex items-center space-x-2">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 MaskingTech
               </span>
             </Link>
@@ -125,8 +125,8 @@ export default function DashboardLayout({
                   className={cn(
                     "group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-r-2 border-blue-600"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                      ? "bg-blue-50 bg-blue-950/50 text-blue-300 border-r-2 border-blue-600"
+                      : "text-gray-700 text-gray-300 hover:bg-gray-800 hover:text-gray-900 hover:text-gray-100"
                   )}
                   onClick={() => setSidebarOpen(false)}
                 >
@@ -134,13 +134,13 @@ export default function DashboardLayout({
                     className={cn(
                       "mr-3 h-5 w-5 flex-shrink-0",
                       isActive
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-400"
+                        ? "text-blue-400"
+                        : "text-gray-400 group-hover:text-gray-500 group-hover:text-gray-400"
                     )}
                   />
                   <div className="flex-1">
                     <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 hidden lg:block">
+                    <div className="text-xs text-gray-500 text-gray-400 hidden lg:block">
                       {item.description}
                     </div>
                   </div>
@@ -150,10 +150,10 @@ export default function DashboardLayout({
           </nav>
 
           {/* User section */}
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+          <div className="border-t border-gray-800 p-4">
             <Button
               variant="ghost"
-              className="w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="w-full justify-start text-gray-700 text-gray-300 hover:bg-gray-800"
               onClick={handleSignOut}
             >
               <LogOut className="mr-3 h-4 w-4" />
@@ -166,7 +166,7 @@ export default function DashboardLayout({
       {/* Main content wrapper */}
       <div className="lg:pl-64 h-full overflow-auto">
         {/* Mobile header */}
-        <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 shadow-sm lg:hidden">
+        <div className="sticky top-0 z-30 flex h-16 items-center gap-x-4 border-b border-gray-800 bg-white bg-gray-900 px-4 shadow-sm lg:hidden">
           <Button
             variant="ghost"
             size="sm"
@@ -175,7 +175,7 @@ export default function DashboardLayout({
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <div className="flex-1 text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">
+          <div className="flex-1 text-sm font-semibold leading-6 text-gray-900 text-gray-100">
             Dashboard
           </div>
         </div>

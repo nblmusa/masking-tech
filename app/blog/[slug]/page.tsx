@@ -350,7 +350,7 @@ export default function BlogPost() {
         </div>
 
         {/* Article Content */}
-        <Card className="p-6 md:p-8 prose dark:prose-invert max-w-none">
+        <Card className="p-6 md:p-8 prose prose-invert max-w-none">
           <div dangerouslySetInnerHTML={{ __html: post.content }} />
         </Card>
 

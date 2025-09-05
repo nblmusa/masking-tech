@@ -103,7 +103,7 @@ console.log(user.id, user);
                 push: false
               },
               preferences: {
-                theme: 'system',
+                theme: 'dark',
                 language: 'en'
               }
             },

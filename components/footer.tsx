@@ -14,11 +14,11 @@ export default function Footer() {
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
                 <div className="relative p-2 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-blue-500/10 rounded-xl group-hover:from-blue-500/20 group-hover:via-indigo-500/20 group-hover:to-blue-500/20 transition-all duration-300">
-                  <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-pulse-subtle" />
+                  <Shield className="h-6 w-6 text-blue-400 animate-pulse-subtle" />
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300 opacity-75" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
+                  <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">
                     MaskingTech
                   </span>
                   <span className="text-[10px] font-medium text-muted-foreground/80">Privacy Through Innovation</span>

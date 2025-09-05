@@ -32,7 +32,7 @@ export default function TermsPage() {
         </div>
 
         <Card className="p-6">
-          <div className="prose prose-gray dark:prose-invert max-w-none">
+          <div className="prose prose-invert max-w-none">
             <div className="flex items-center gap-2 text-primary mb-4">
               <Scale className="h-5 w-5" />
               <h2 className="text-xl font-semibold m-0">Agreement to Terms</h2>

@@ -194,10 +194,10 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Usage Alert */}
         {isNearLimit && (
-          <Alert className="bg-yellow-50/50 dark:bg-yellow-950/50 border-yellow-200/50 dark:border-yellow-800/50">
-            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-            <AlertTitle className="text-yellow-600 dark:text-yellow-400">Usage Limit Approaching</AlertTitle>
-            <AlertDescription className="text-yellow-600/90 dark:text-yellow-400/90">
+          <Alert className="bg-yellow-50/50 bg-yellow-950/50 border-yellow-200/50 border-yellow-800/50">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 text-yellow-400" />
+            <AlertTitle className="text-yellow-600 text-yellow-400">Usage Limit Approaching</AlertTitle>
+            <AlertDescription className="text-yellow-600/90 text-yellow-400/90">
               You have used {Math.round(usagePercentage)}% of your monthly image processing limit. Consider upgrading to our Pro plan for unlimited processing.
             </AlertDescription>
           </Alert>
@@ -205,7 +205,7 @@ export default function DashboardPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
                 <ImageIcon className="h-4 w-4 text-primary" />
@@ -221,7 +221,7 @@ export default function DashboardPage() {
             </p>
           </Card>
 
-          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
                 <Gauge className="h-4 w-4 text-primary" />
@@ -235,7 +235,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">Reset in {new Date().getDate()} days</p>
           </Card>
 
-          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
                 <Shield className="h-4 w-4 text-primary" />
@@ -251,7 +251,7 @@ export default function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2.5 rounded-lg bg-primary/10 flex-shrink-0">
                 <History className="h-4 w-4 text-primary" />
@@ -273,8 +273,8 @@ export default function DashboardPage() {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Recent Activity */}
-          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-            <div className="p-6 border-b border-blue-100/30 dark:border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/50 dark:to-indigo-900/50">
+          <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
+            <div className="p-6 border-b border-blue-100/30 border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 from-blue-900/50 to-indigo-900/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <History className="h-5 w-5 text-primary" />
@@ -332,8 +332,8 @@ export default function DashboardPage() {
                       
                       {/* Click indicator */}
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-white/90 dark:bg-black/90 rounded-full p-1">
-                          <Eye className="h-3 w-3 text-gray-700 dark:text-gray-300" />
+                        <div className="bg-white/90 bg-black/90 rounded-full p-1">
+                          <Eye className="h-3 w-3 text-gray-700 text-gray-300" />
                         </div>
                       </div>
                     </div>
@@ -357,8 +357,8 @@ export default function DashboardPage() {
           {/* Right Column - API Access and Account Overview */}
           <div className="space-y-6">
             {/* API Access */}
-            <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-              <div className="p-6 border-b border-blue-100/30 dark:border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/50 dark:to-indigo-900/50">
+            <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
+              <div className="p-6 border-b border-blue-100/30 border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 from-blue-900/50 to-indigo-900/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Key className="h-5 w-5 text-primary" />
@@ -411,8 +411,8 @@ export default function DashboardPage() {
             </Card>
 
             {/* Account Overview */}
-            <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 dark:from-gray-800 dark:via-blue-900/3 dark:to-blue-800/5 border-blue-100/30 dark:border-blue-800/30">
-              <div className="p-6 border-b border-blue-100/30 dark:border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/50 dark:to-indigo-900/50">
+            <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50/10 to-blue-100/5 from-gray-800 via-blue-900/3 to-blue-800/5 border-blue-100/30 border-blue-800/30">
+              <div className="p-6 border-b border-blue-100/30 border-blue-800/30 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 from-blue-900/50 to-indigo-900/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Shield className="h-5 w-5 text-primary" />

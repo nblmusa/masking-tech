@@ -34,7 +34,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   // For authenticated routes (dashboard, settings, upload), don't show header/footer
   if (!isPublicRoute) {
     return (
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-gray-900">
         {children}
       </main>
     )
@@ -44,7 +44,7 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   return (
     <div className="relative flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-gray-900">
         {children}
       </main>
       <Footer />

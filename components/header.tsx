@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ModeToggle } from "@/components/mode-toggle"
-import { Shield, Menu, User, Settings, LogOut, ChevronDown, CreditCard } from "lucide-react"
+import { Shield, Menu, User, Settings, LogOut, ChevronDown, CreditCard, Gauge, Upload } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from '@/lib/supabase-client'
@@ -90,9 +89,150 @@ export default function Header() {
     ] : []),
   ]
 
-  // Don't render header if user is logged in (dashboard layout will handle it)
+  // Show different header for logged-in users on public pages
   if (user) {
-    return null
+    return (
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 max-w-7xl mx-auto items-center justify-between">
+            <div className="flex items-center gap-6">
+              <Link 
+                href="/" 
+                className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 group"
+              >
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+                  MaskingTech
+                </span>
+              </Link>
+              <nav className="hidden md:flex items-center gap-6">
+                <Link
+                  href="/about"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  About
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Pricing
+                </Link>
+                <Link
+                  href="/blog"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Blog
+                </Link>
+                <Link
+                  href="/docs"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Docs
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline">{user.email}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="flex items-center gap-2">
+                        <Gauge className="h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/upload" className="flex items-center gap-2">
+                        <Upload className="h-4 w-4" />
+                        Upload Images
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2">
+                        <Settings className="h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/billing" className="flex items-center gap-2">
+                        <CreditCard className="h-4 w-4" />
+                        Billing
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-red-400">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="sm" className="md:hidden">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-2 p-2 border-b">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm font-medium">{user.email}</span>
+                    </div>
+                    <nav className="flex flex-col gap-2">
+                      <Link
+                        href="/dashboard"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/upload"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                      >
+                        Upload Images
+                      </Link>
+                      <Link
+                        href="/settings"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                      >
+                        Settings
+                      </Link>
+                      <Link
+                        href="/billing"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                      >
+                        Billing
+                      </Link>
+                    </nav>
+                    <div className="flex flex-col gap-2 pt-4 border-t">
+                      <Button 
+                        variant="ghost" 
+                        onClick={handleSignOut}
+                        className="justify-start text-red-400"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
+      </header>
+    )
   }
 
   return (
@@ -107,7 +247,7 @@ export default function Header() {
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-400 dark:to-indigo-400">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 MaskingTech
               </span>
             </Link>
@@ -124,7 +264,6 @@ export default function Header() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <ModeToggle />
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
                 <Link href="/login">Sign In</Link>

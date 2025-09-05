@@ -191,7 +191,7 @@ export default function PricingPage() {
           className={`w-full group ${
             planKey === 'ADVANCED' 
               ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
-              : 'border-blue-200/50 dark:border-blue-800/50'
+              : 'border-blue-200/50 border-blue-800/50'
           }`}
           variant={planKey === 'BASIC' ? 'outline' : 'default'}
           asChild
@@ -228,7 +228,7 @@ export default function PricingPage() {
         className={`w-full group ${
           planKey === 'ADVANCED' 
             ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
-            : 'border-blue-200/50 dark:border-blue-800/50'
+            : 'border-blue-200/50 border-blue-800/50'
         }`}
         variant={planKey === 'BASIC' ? 'outline' : 'default'}
         onClick={() => handleUpgrade(plan.id)}
@@ -250,34 +250,10 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-white to-blue-50 dark:from-background dark:to-blue-950 min-h-screen">
-      {/* Hero Section */}
-      <div className="max-w-4xl mx-auto mt-12 mb-16 p-8 rounded-3xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 text-white text-center shadow-2xl">
-        <div className="flex items-center justify-center mb-4">
-          <Shield className="h-8 w-8 mr-3" />
-          <h1 className="text-4xl font-bold">Professional Privacy Protection</h1>
-        </div>
-        <p className="text-xl text-blue-100 mb-6 max-w-2xl mx-auto">
-          Advanced AI-powered license plate masking and privacy protection for automotive professionals, real estate agents, and privacy-conscious individuals.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-6 text-blue-100">
-          <div className="flex items-center gap-2">
-            <Check className="h-5 w-5 text-green-300" />
-            <span>Instant processing</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-5 w-5 text-green-300" />
-            <span>99.9% accuracy</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="h-5 w-5 text-green-300" />
-            <span>GDPR compliant</span>
-          </div>
-        </div>
-      </div>
+    <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-background to-blue-950 min-h-screen">
 
       {/* Use Cases Section */}
-      <div className="max-w-6xl mx-auto mb-16 px-4">
+      <div className="max-w-6xl mx-auto my-16 px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Perfect for Privacy-Conscious Professionals</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -286,8 +262,8 @@ export default function PricingPage() {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Car className="h-8 w-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Automotive Dealers</h3>
@@ -296,8 +272,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Camera className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Real Estate</h3>
@@ -306,8 +282,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Delivery Services</h3>
@@ -316,8 +292,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
+            <div className="w-16 h-16 bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Eye className="h-8 w-8 text-orange-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Personal Privacy</h3>
@@ -333,7 +309,7 @@ export default function PricingPage() {
         {plans.map((plan, idx) => (
           <div
             key={plan.key}
-            className={`flex-1 flex flex-col bg-white dark:bg-background rounded-3xl shadow-xl p-8 min-w-[280px] max-w-[340px] mx-auto lg:mx-0 mb-8 lg:mb-0 border-2 ${plan.highlight ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10' : 'border-transparent'} ${plan.accent ? 'scale-105 shadow-2xl' : ''}`}
+            className={`flex-1 flex flex-col bg-background rounded-3xl shadow-xl p-8 min-w-[280px] max-w-[340px] mx-auto lg:mx-0 mb-8 lg:mb-0 border-2 ${plan.highlight ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10' : 'border-transparent'} ${plan.accent ? 'scale-105 shadow-2xl' : ''}`}
             style={{ position: 'relative' }}
           >
             {plan.badge && (
@@ -377,8 +353,8 @@ export default function PricingPage() {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">License Plate Detection</h3>
@@ -387,8 +363,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Clock className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Real-Time Processing</h3>
@@ -397,8 +373,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="h-8 w-8 text-purple-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Team Management</h3>
@@ -407,8 +383,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <CreditCard className="h-8 w-8 text-orange-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Flexible Plans</h3>
@@ -417,8 +393,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Zap className="h-8 w-8 text-red-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">REST API</h3>
@@ -427,8 +403,8 @@ export default function PricingPage() {
             </p>
           </div>
           
-          <div className="text-center p-6 rounded-2xl bg-white dark:bg-background shadow-lg border border-muted">
-            <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted">
+            <div className="w-16 h-16 bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
               <Lock className="h-8 w-8 text-indigo-600" />
             </div>
             <h3 className="text-xl font-semibold mb-2">Enterprise Security</h3>
@@ -449,56 +425,56 @@ export default function PricingPage() {
         </div>
         
         <div className="space-y-6">
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">How accurate is your license plate detection?</h3>
             <p className="text-muted-foreground">
               Our AI achieves 99.9% accuracy in license plate detection across various conditions including different angles, lighting, weather conditions, and vehicle types. We continuously train our models on diverse datasets to maintain this high accuracy.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">What types of images can I process?</h3>
             <p className="text-muted-foreground">
               We support all major image formats (JPEG, PNG, WebP, TIFF) and can process photos from any device or camera. Our system works with images containing vehicles, real estate photos, delivery photos, and any other images where privacy protection is needed.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">How do credits work for image processing?</h3>
             <p className="text-muted-foreground">
               Each image you process (license plate masking, face blur, background replacement, etc.) consumes 1 credit. Credits reset monthly and don't roll over. For example, with our Basic plan ($29/month), you get 300 credits to process 300 images.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">Can I change my plan anytime?</h3>
             <p className="text-muted-foreground">
               Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and you'll only pay the prorated difference for the current billing period. No long-term contracts or cancellation fees.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">What happens if I exceed my monthly credits?</h3>
             <p className="text-muted-foreground">
               When you reach your monthly credit limit, you can either upgrade to a higher plan for immediate access to more credits, or wait until your credits reset the following month. We'll notify you when you're approaching your limit.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">How secure is my data and images?</h3>
             <p className="text-muted-foreground">
               Your data security is our top priority. We use enterprise-grade encryption, process images in secure environments, and automatically delete processed images after 24 hours unless you specify otherwise. We're SOC 2 compliant and never store or share your personal information.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">Do you support batch processing?</h3>
             <p className="text-muted-foreground">
               Yes! You can upload multiple images at once for batch processing. Each image still consumes 1 credit, but you can process them all simultaneously, making it much more efficient for large projects.
             </p>
           </div>
           
-          <div className="bg-white dark:bg-background rounded-2xl p-6 shadow-lg border border-muted">
+          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
             <h3 className="text-lg font-semibold mb-3">Is there a free trial available?</h3>
             <p className="text-muted-foreground">
               Absolutely! All new users receive 20 free credits to try our services risk-free. No credit card required, no commitment. Experience the power of AI-powered license plate masking and privacy protection today.
@@ -543,9 +519,9 @@ export default function PricingPage() {
 
       {/* Free Trial Banner */}
       <div className="max-w-6xl mx-auto mb-12 px-4">
-        <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-400 p-6 rounded-2xl shadow-sm">
+        <div className="bg-green-900/20 border-l-4 border-green-400 p-6 rounded-2xl shadow-sm">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
               <Star className="h-6 w-6 text-green-600" />
             </div>
             <div>

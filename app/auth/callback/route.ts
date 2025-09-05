@@ -8,6 +8,12 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code')
   const error = requestUrl.searchParams.get('error')
   const errorDescription = requestUrl.searchParams.get('error_description')
+  // if "next" is in param, use it as the redirect URL
+  let next = requestUrl.searchParams.get('next') ?? '/dashboard'
+  if (!next.startsWith('/')) {
+    // if "next" is not a relative URL, use the default
+    next = '/dashboard'
+  }
 
   if (error) {
     // Handle authentication errors
@@ -62,7 +68,7 @@ export async function GET(request: NextRequest) {
                     push: false
                   },
                   preferences: {
-                    theme: 'system',
+                    theme: 'dark',
                     language: 'en'
                   }
                 },
@@ -90,8 +96,8 @@ export async function GET(request: NextRequest) {
           )
         }
         
-        // Regular authentication, redirect to dashboard
-        return NextResponse.redirect(`${requestUrl.origin}/dashboard`)
+        // Regular authentication, redirect to intended destination
+        return NextResponse.redirect(`${requestUrl.origin}${next}`)
       }
     } catch (error) {
       console.error('Error in auth callback:', error)

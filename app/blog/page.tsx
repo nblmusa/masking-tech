@@ -87,7 +87,7 @@ export default function BlogPage() {
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">
             MaskingTech Blog
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -101,7 +101,7 @@ export default function BlogPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {featuredPosts.map(post => (
               <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] relative bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-950 dark:to-indigo-950">
+                <div className="aspect-[16/9] relative bg-gradient-to-br from-blue-950 to-indigo-950">
                 <Image
                   src={post.image || ""}
                   alt={post.title}

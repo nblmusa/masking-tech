@@ -22,14 +22,18 @@ This guide will help you complete the Google OAuth integration with Supabase for
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
-3. Enable the Google+ API:
-   - Go to "APIs & Services" > "Library"
-   - Search for "Google+ API" and enable it
-4. Create OAuth 2.0 credentials:
+3. **Configure Consent Screen** (Required):
+   - Go to "APIs & Services" > "OAuth consent screen"
+   - Choose "External" user type
+   - Fill in app information (name, user support email, developer contact)
+   - Under **Authorized domains**, add your Supabase project domain: `<PROJECT_ID>.supabase.co`
+   - Add scopes: `.../auth/userinfo.email`, `.../auth/userinfo.profile`, `openid`
+4. **Create OAuth 2.0 credentials**:
    - Go to "APIs & Services" > "Credentials"
    - Click "Create Credentials" > "OAuth 2.0 Client IDs"
    - Choose "Web application"
-   - Add authorized redirect URIs:
+   - Under **Authorized JavaScript origins**, add your site URL
+   - Under **Authorized redirect URIs**, add:
      - `https://yourdomain.com/auth/callback` (production)
      - `http://localhost:3000/auth/callback` (development)
 
@@ -41,7 +45,10 @@ This guide will help you complete the Google OAuth integration with Supabase for
 4. Add your Google OAuth credentials:
    - **Client ID**: From Google Cloud Console
    - **Client Secret**: From Google Cloud Console
-5. Set the redirect URL to: `https://yourdomain.com/auth/callback`
+5. **Important**: Add the redirect URL to the **Redirect URLs** allow list:
+   - Go to "Authentication" > "URL Configuration"
+   - Add `https://yourdomain.com/auth/callback` to the redirect URLs list
+   - Add `http://localhost:3000/auth/callback` for development
 
 ### 3. Environment Variables (Optional)
 

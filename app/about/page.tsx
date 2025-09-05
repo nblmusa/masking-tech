@@ -61,7 +61,7 @@ export default function AboutPage() {
       <div className="max-w-7xl mx-auto space-y-12">
         {/* Hero Section */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 dark:from-blue-400 dark:via-blue-300 dark:to-blue-200">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-800 from-blue-400 via-blue-300 to-blue-200">
             Protecting Privacy in Visual Data
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -75,7 +75,7 @@ export default function AboutPage() {
           {features.map((feature, index) => (
             <Card key={index} className="p-6 hover:shadow-lg transition-all duration-300">
               <div className="space-y-4">
-                <div className="p-2 w-fit rounded-lg bg-blue-50 dark:bg-blue-950">
+                <div className="p-2 w-fit rounded-lg bg-blue-50 bg-blue-950">
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-semibold">{feature.title}</h3>
@@ -101,14 +101,14 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((member, index) => (
               <Card key={index} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[4/3] relative bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-950 dark:to-indigo-950">
+                <div className="aspect-[4/3] relative bg-gradient-to-br from-blue-950 to-indigo-950">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Users className="h-20 w-20 text-blue-500/20" />
                   </div>
                 </div>
                 <div className="p-6 space-y-2">
                   <h3 className="text-xl font-semibold">{member.name}</h3>
-                  <p className="text-sm text-blue-600 dark:text-blue-400">{member.role}</p>
+                  <p className="text-sm text-blue-400">{member.role}</p>
                   <p className="text-muted-foreground">{member.bio}</p>
                 </div>
               </Card>
@@ -122,7 +122,7 @@ export default function AboutPage() {
           <p className="text-lg text-muted-foreground">
             Have questions about our technology or services? We&apos;d love to hear from you.
           </p>
-          <p className="text-blue-600 dark:text-blue-400">
+          <p className="text-blue-400">
             support@maskingtech.com
           </p>
         </div>
