@@ -14,4 +14,7 @@ export const env = {
   STRIPE_STARTER_PRICE_ID: getEnvVar('STRIPE_STARTER_PRICE_ID'),
   STRIPE_ADVANCED_PRICE_ID: getEnvVar('STRIPE_ADVANCED_PRICE_ID'),
   STRIPE_GROWTH_PRICE_ID: getEnvVar('STRIPE_GROWTH_PRICE_ID'),
+  // Google OAuth credentials (optional - will be set in Supabase dashboard)
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
 } as const;
