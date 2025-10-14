@@ -111,7 +111,7 @@ export default function RootLayout({
             "telephone": "00971558464853",
             "areaServed": "United Arab Emirates",
             "makesOffer": ["Turn raw car photos into showroom-ready visuals with MaskingTech’s smart AI tools."],
-            "founder": "",
+            "founder": "Maged Mostafa",
             "foundingDate": "June 13, 2025",
             "foundingLocation": "United Arab Emirates",
             "sameAs": ["https://www.linkedin.com/company/maskingtech-com/"]
