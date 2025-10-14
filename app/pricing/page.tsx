@@ -9,6 +9,8 @@ import { createClient } from '@/lib/supabase-client'
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useAnalytics } from "@/hooks/useAnalytics"
+import UseCase from "../components/use-case"
+import FAQSection from "../components/faqs"
 
 interface Subscription {
   id: string;
@@ -253,56 +255,7 @@ export default function PricingPage() {
     <div className="flex-1 relative overflow-hidden bg-gradient-to-b from-background to-blue-950 min-h-screen">
 
       {/* Use Cases Section */}
-      <div className="max-w-6xl mx-auto my-16 px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Perfect for Privacy-Conscious Professionals</h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Whether you're a real estate agent, automotive dealer, delivery service, or just want to protect privacy in your photos
-          </p>
-        </div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Car className="h-8 w-8 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Automotive Dealers</h3>
-            <p className="text-muted-foreground text-sm">
-              Protect customer privacy in vehicle photos and marketing materials
-            </p>
-          </div>
-          
-          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Camera className="h-8 w-8 text-green-600" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Real Estate</h3>
-            <p className="text-muted-foreground text-sm">
-              Mask license plates and personal info in property photos
-            </p>
-          </div>
-          
-          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Delivery Services</h3>
-            <p className="text-muted-foreground text-sm">
-              Protect driver and customer privacy in delivery photos
-            </p>
-          </div>
-          
-          <div className="text-center p-6 rounded-2xl bg-background shadow-lg border border-muted hover:shadow-xl transition-shadow">
-            <div className="w-16 h-16 bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Eye className="h-8 w-8 text-orange-600" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Personal Privacy</h3>
-            <p className="text-muted-foreground text-sm">
-              Keep your personal information private in social media and photos
-            </p>
-          </div>
-        </div>
-      </div>
+      <UseCase/>
 
       {/* Pricing Cards Row */}
       <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8 max-w-7xl mx-auto px-4 mb-20">
@@ -416,72 +369,7 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto mb-20 px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-          <p className="text-lg text-muted-foreground">
-            Everything you need to know about our license plate masking and privacy protection services
-          </p>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">How accurate is your license plate detection?</h3>
-            <p className="text-muted-foreground">
-              Our AI achieves 99.9% accuracy in license plate detection across various conditions including different angles, lighting, weather conditions, and vehicle types. We continuously train our models on diverse datasets to maintain this high accuracy.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">What types of images can I process?</h3>
-            <p className="text-muted-foreground">
-              We support all major image formats (JPEG, PNG, WebP, TIFF) and can process photos from any device or camera. Our system works with images containing vehicles, real estate photos, delivery photos, and any other images where privacy protection is needed.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">How do credits work for image processing?</h3>
-            <p className="text-muted-foreground">
-              Each image you process (license plate masking, face blur, background replacement, etc.) consumes 1 credit. Credits reset monthly and don't roll over. For example, with our Basic plan ($29/month), you get 300 credits to process 300 images.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">Can I change my plan anytime?</h3>
-            <p className="text-muted-foreground">
-              Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and you'll only pay the prorated difference for the current billing period. No long-term contracts or cancellation fees.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">What happens if I exceed my monthly credits?</h3>
-            <p className="text-muted-foreground">
-              When you reach your monthly credit limit, you can either upgrade to a higher plan for immediate access to more credits, or wait until your credits reset the following month. We'll notify you when you're approaching your limit.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">How secure is my data and images?</h3>
-            <p className="text-muted-foreground">
-              Your data security is our top priority. We use enterprise-grade encryption, process images in secure environments, and automatically delete processed images after 24 hours unless you specify otherwise. We're SOC 2 compliant and never store or share your personal information.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">Do you support batch processing?</h3>
-            <p className="text-muted-foreground">
-              Yes! You can upload multiple images at once for batch processing. Each image still consumes 1 credit, but you can process them all simultaneously, making it much more efficient for large projects.
-            </p>
-          </div>
-          
-          <div className="bg-background rounded-2xl p-6 shadow-lg border border-muted">
-            <h3 className="text-lg font-semibold mb-3">Is there a free trial available?</h3>
-            <p className="text-muted-foreground">
-              Absolutely! All new users receive 20 free credits to try our services risk-free. No credit card required, no commitment. Experience the power of AI-powered license plate masking and privacy protection today.
-            </p>
-          </div>
-        </div>
-      </div>
+      <FAQSection />
 
       {/* CTA Section */}
       <div className="max-w-4xl mx-auto mb-20 px-4">

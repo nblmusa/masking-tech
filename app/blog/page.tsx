@@ -15,60 +15,55 @@ interface BlogPost {
   image?: string
 }
 
-const blogPosts: BlogPost[] = [
+
+export const blogPosts: BlogPost[] = [
   {
-    id: "1",
-    title: "The Future of Privacy in Visual Data",
-    excerpt: "As visual data becomes increasingly prevalent in our digital world, protecting sensitive information has never been more crucial...",
-    date: "2024-03-20",
+    id: "why-masking-license-plates-matters-automotive-image-privacy-ai-tools",
+    title: "Why Masking License Plates Matters | Automotive Image Privacy & AI Tools",
+    excerpt: "Learn why blurring or masking license plates in car photos is essential for privacy, compliance, and customer trust — and how AI tools like MaskingTech automate it instantly.",
+    date: "2025-10-12",
     readTime: "5 min read",
     category: "Privacy",
-    slug: "future-of-privacy-visual-data",
+    slug: "why-masking-license-plates-matters-automotive-image-privacy-ai-tools",
     featured: true,
-    image: "/images/blog/future-of-privacy-visual-data.webp"
+    image: "/images/blog/why-masking-license-plates-matters-automotive-image-privacy-ai-tools.jpeg"
   },
   {
-    id: "2",
-    title: "Understanding License Plate Privacy Laws",
-    excerpt: "A comprehensive guide to international regulations and best practices for handling license plate data in visual content...",
-    date: "2024-03-18",
-    readTime: "8 min read",
-    category: "Legal",
-    slug: "license-plate-privacy-laws",
+    id: "how-to-replace-car-backgrounds-for-professional-results-ai-automotive-editing",
+    title: "How to Replace Car Backgrounds for Professional Results | AI Automotive Editing",
+    excerpt: "Learn how AI background removal transforms car photos into studio-quality shots in seconds. No Photoshop needed — just MaskingTech and a click.",
+    date: "2025-10-12",
+    readTime: "5 min read",
+    category: "Privacy",
+    slug: "how-to-replace-car-backgrounds-for-professional-results-ai-automotive-editing",
     featured: true,
-    image: "/images/blog/license-plate-privacy-laws.jpeg"
+    image: "/images/blog/how-to-replace-car-backgrounds-for-professional-results-ai-automotive-editing.jpeg"
   },
   {
-    id: "3",
-    title: "AI in Privacy Protection: A Deep Dive",
-    excerpt: "Exploring how artificial intelligence is revolutionizing the way we protect sensitive information in images and videos...",
-    date: "2024-03-15",
-    readTime: "6 min read",
-    category: "Technology",
-    slug: "ai-privacy-protection-deep-dive",
-    image: "/images/blog/ai-privacy-protection-deep-dive.jpg"
+    id: "before-after-how-ai-transforms-car-photos-automotive-image-enhancement",
+    title: "Before & After: How AI Transforms Car Photos | Automotive Image Enhancement",
+    excerpt: "Discover how AI can turn dull vehicle photos into studio-quality visuals with realistic lighting, shadows, and reflections — instantly with MaskingTech.",
+    date: "2025-10-12",
+    readTime: "5 min read",
+    category: "Privacy",
+    slug: "before-after-how-ai-transforms-car-photos-automotive-image-enhancement",
+    featured: false,
+    image: "/images/blog/before-after-how-ai-transforms-car-photos-automotive-image-enhancement.jpeg"
   },
   {
-    id: "4",
-    title: "Best Practices for Image Privacy",
-    excerpt: "Essential guidelines for maintaining privacy when working with images containing sensitive information...",
-    date: "2024-03-12",
-    readTime: "4 min read",
-    category: "Guidelines",
-    slug: "best-practices-image-privacy",
-    image: "/images/blog/best-practices-image-privacy.jpg"
+    id: "best-backgrounds-for-automotive-photography-ai-car-photo-backdrops",
+    title: "Best Backgrounds for Automotive Photography | AI Car Photo Backdrops",
+    excerpt: "Discover the best types of backgrounds for car photos and learn how to apply them automatically using AI tools like MaskingTech.",
+    date: "2025-10-12",
+    readTime: "5 min read",
+    category: "Privacy",
+    slug: "best-backgrounds-for-automotive-photography-ai-car-photo-backdrops",
+    featured: false,
+    image: "/images/blog/best-backgrounds-for-automotive-photography-ai-car-photo-backdrops.jpeg"
   },
-  {
-    id: "5",
-    title: "The Rise of Privacy-First Solutions",
-    excerpt: "How growing privacy concerns are shaping the development of new technologies and solutions...",
-    date: "2024-03-10",
-    readTime: "7 min read",
-    category: "Industry",
-    slug: "rise-of-privacy-first-solutions",
-    image: "/images/blog/rise-of-privacy-first-solutions.jpg"
-  }
-]
+];
+
+
 
 export default function BlogPage() {
   const featuredPosts = blogPosts.filter(post => post.featured)
@@ -101,12 +96,19 @@ export default function BlogPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {featuredPosts.map(post => (
               <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-all duration-300">
-                <div className="aspect-[16/9] relative bg-gradient-to-br from-blue-950 to-indigo-950">
+                <div className="relative bg-white">
                 <Image
                   src={post.image || ""}
                   alt={post.title}
-                  fill
-                  className="object-cover"
+                  width={800}
+                  height={450}
+                  className="w-full h-full object-contain rounded-t-lg"
+                  priority={true}
+                  quality={90}
+                  style={{
+                    maxHeight: "450px",
+                    maxWidth: "800px",
+                  }}
                 />
                 </div>
                 <div className="p-6 space-y-4">

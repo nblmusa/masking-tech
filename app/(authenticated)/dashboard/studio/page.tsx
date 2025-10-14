@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Image as ImageIcon, Download, Upload, Loader2, Shield } from "lucide-react"
+import { Image as ImageIcon, Download, Upload, Loader2, Shield, ShieldX } from "lucide-react"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast"
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,11 @@ interface EditorState {
   detectionTypes: {
     faces: boolean
     licensePlates: boolean
+    dentsAndScratches: boolean
+  }
+  detectionResults: {
+    dentCount: number
+    scratchCount: number
   }
   maskingStyle: 'blur' | 'solid' | 'logo'
   blurRadius: number
@@ -37,7 +42,8 @@ interface EditorState {
 
   backgroundReplacement: {
     template: 'office' | 'nature' | 'urban' | 'transparent' | null
-    customImage: string | null
+    customImage: string | null,
+    templateImage: string | null
   }
   preview: {
     showDetectionAreas: boolean
@@ -51,7 +57,12 @@ export default function StudioPage() {
   const [editorState, setEditorState] = useState<EditorState>({
     detectionTypes: {
       faces: true,
-      licensePlates: true
+      licensePlates: true,
+      dentsAndScratches: true
+    },
+    detectionResults: {
+      dentCount: 0,
+      scratchCount: 0
     },
     maskingStyle: 'blur',
     blurRadius: 20,
@@ -67,14 +78,15 @@ export default function StudioPage() {
       enabled: false,
       text: '',
       position: 'bottomRight',
-      size: 14,
+      size: 20,
       opacity: 70,
       color: '#ffffff'
     },
 
     backgroundReplacement: {
       template: 'transparent',
-      customImage: null
+      customImage: null,
+      templateImage: null
     },
     preview: {
       showDetectionAreas: true
@@ -95,7 +107,12 @@ export default function StudioPage() {
         setEditorState({
           detectionTypes: {
             faces: true,
-            licensePlates: true
+            licensePlates: true,
+            dentsAndScratches: true
+          },
+          detectionResults: {
+            dentCount: 0,
+            scratchCount: 0
           },
           maskingStyle: 'blur',
           blurRadius: 20,
@@ -109,7 +126,7 @@ export default function StudioPage() {
           },
           watermark: {
             enabled: false,
-            text: 'Test',
+            text: 'MaskingTech.com',
             position: 'bottomRight',
             size: 14,
             opacity: 70,
@@ -118,7 +135,8 @@ export default function StudioPage() {
 
           backgroundReplacement: {
             template: 'transparent',
-            customImage: null
+            customImage: null,
+            templateImage: null
           },
           preview: {
             showDetectionAreas: true
@@ -149,10 +167,12 @@ export default function StudioPage() {
       // Prepare request body with simplified settings
       const requestBody = {
         image: base64Data,
+        backgroundImage: editorState.backgroundReplacement.customImage ? editorState.backgroundReplacement.customImage?.split(',')[1] : editorState.backgroundReplacement.templateImage?.split(',')[1],
         contentType,
         detectionSettings: {
           blurFaces: editorState.detectionTypes.faces,
-          blurLicensePlates: editorState.detectionTypes.licensePlates
+          blurLicensePlates: editorState.detectionTypes.licensePlates,
+          blurDentsAndScratches: editorState.detectionTypes.dentsAndScratches
         },
         logoSettings: editorState.maskingStyle === 'logo' ? {
           url: editorState.logo.url,
@@ -167,7 +187,7 @@ export default function StudioPage() {
         } : null,
         backgroundReplacement: editorState.backgroundReplacement.template !== 'transparent' ? {
           template: editorState.backgroundReplacement.template,
-          customImage: editorState.backgroundReplacement.customImage
+          customImage: editorState.backgroundReplacement.customImage ? editorState.backgroundReplacement.customImage?.split(',')[1] : editorState.backgroundReplacement.templateImage?.split(',')[1]
         } : null
       }
 
@@ -201,10 +221,68 @@ export default function StudioPage() {
       // Update the processed image with the result
       setProcessedImage(processedImageData)
       
+      // Call the dent and scratch detection API if enabled
+      if (editorState.detectionTypes.dentsAndScratches) {
+        try {
+          // Create a FormData object for the API call
+          const formData = new FormData()
+          
+          // Convert base64 to a Blob
+          const byteCharacters = atob(base64Data)
+          const byteNumbers = new Array(byteCharacters.length)
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i)
+          }
+          const byteArray = new Uint8Array(byteNumbers)
+          const blob = new Blob([byteArray], { type: contentType })
+          
+          // Append the image file to the FormData
+          formData.append('image', blob, 'image.jpg')
+          formData.append('highlight', 'false')
+          
+          // Call the API
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/detect-damage`, {
+            method: 'POST',
+            body: formData,
+          })
+          
+          if (!response.ok) {
+            throw new Error('Failed to detect dents and scratches')
+          }
+          
+          const result = await response.json()
+
+          console.log('Dent and scratch detection result:', result)
+          console.log('Dent Count', result?.dent_count)
+          console.log('Scratch Count', result?.scratch_count)
+          
+          // Update the state with the detection results
+          setEditorState(prev => ({
+            ...prev,
+            detectionResults: {
+              dentCount: result?.dent_count,
+              scratchCount: result?.scratch_count
+            }
+          }))
+          
+          console.log('Dent and scratch detection results:', result)
+        } catch (error) {
+          console.error('Error detecting dents and scratches:', error)
+          // Fallback to default values if the API call fails
+          setEditorState(prev => ({
+            ...prev,
+            detectionResults: {
+              dentCount: 0,
+              scratchCount: 0
+            }
+          }))
+        }
+      }
+      
       const processingFeatures = [
         editorState.detectionTypes.faces && 'face detection',
         editorState.detectionTypes.licensePlates && 'license plate detection',
-
+        editorState.detectionTypes.dentsAndScratches && 'dent and scratch detection',
         editorState.backgroundReplacement.template !== 'transparent' && 'background replacement'
       ].filter(Boolean)
       
@@ -378,9 +456,9 @@ export default function StudioPage() {
                         <div className="grid grid-cols-4 gap-3">
                           {[
                             { id: 'transparent', name: 'Transparent' },
-                            { id: 'bg1', name: 'Office' },
-                            { id: 'bg2', name: 'Nature' },
-                            { id: 'bg3', name: 'Urban' }
+                            { id: 'bg6', name: 'Background 1' },
+                            { id: 'bg7', name: 'Background 2' },
+                            { id: 'bg8', name: 'Background 3' }
                           ].map((template) => (
                             <div
                               key={template.id}
@@ -389,14 +467,56 @@ export default function StudioPage() {
                                   ? `border-blue-400 ring-4 ring-blue-200/30 shadow-lg scale-105`
                                   : `border-muted/50 hover:border-blue-300 hover:scale-102 hover:shadow-md`
                               }`}
-                              onClick={() => setEditorState(prev => ({
-                                ...prev,
-                                backgroundReplacement: {
-                                  ...prev.backgroundReplacement,
-                                  template: template.id as 'transparent' | 'office' | 'nature' | 'urban',
-                                  customImage: null
+                              onClick={() => {
+                                if (template.id === 'transparent') {
+                                  setEditorState(prev => ({
+                                    ...prev,
+                                    backgroundReplacement: {
+                                      ...prev.backgroundReplacement,
+                                      template: template.id as 'transparent' | 'office' | 'nature' | 'urban',
+                                      customImage: null,
+                                      templateImage: null
+                                    }
+                                  }))
+                                } else {
+                                  // For non-transparent options, load the image as base64
+                                  const loadImageAsBase64 = async () => {
+                                    try {
+                                      const response = await fetch(`/images/backgrounds/${template.id}.jpeg`)
+                                      const blob = await response.blob()
+                                      const reader = new FileReader()
+                                      reader.onload = (e) => {
+                                        const result = e.target?.result
+                                        if (typeof result === 'string') {
+                                          setEditorState(prev => ({
+                                            ...prev,
+                                            backgroundReplacement: {
+                                              ...prev.backgroundReplacement,
+                                              template: template.id as 'transparent' | 'office' | 'nature' | 'urban',
+                                              customImage: null,
+                                              templateImage: result
+                                            }
+                                          }))
+                                        }
+                                      }
+                                      reader.readAsDataURL(blob)
+                                    } catch (error) {
+                                      console.error('Error loading background image:', error)
+                                      // Fallback to just setting the template without the base64 image
+                                      setEditorState(prev => ({
+                                        ...prev,
+                                        backgroundReplacement: {
+                                          ...prev.backgroundReplacement,
+                                          template: template.id as 'transparent' | 'office' | 'nature' | 'urban',
+                                          customImage: null
+                                        }
+                                      }))
+                                    }
+                                  }
+                                  
+                                  loadImageAsBase64()
                                 }
-                              }))}
+                              }}
                             >
                               {template.id === 'transparent' ? (
                                 <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -407,7 +527,7 @@ export default function StudioPage() {
                               ) : (
                                 <>
                                   <Image
-                                    src={`/images/backgrounds/${template.id}.jpg`}
+                                    src={`/images/backgrounds/${template.id}.jpeg`}
                                     alt={`${template.id} background`}
                                     fill
                                     className="object-cover"
@@ -548,10 +668,62 @@ export default function StudioPage() {
                               className="data-[state=checked]:bg-green-600"
                             />
                           </div>
+
+                           
+                          <div className="flex items-center justify-between p-3 rounded-lg border border-muted/200 bg-muted/30">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2 rounded-lg ${editorState.detectionTypes.dentsAndScratches ? 'bg-red-100 text-red-600' : 'bg-muted/100 text-muted-600'}`}>
+                                <ShieldX className="h-4 w-4" />
+                              </div>
+                              <div>
+                                <Label className="font-medium">Detect Dents and Scratches</Label>
+                                <p className="text-xs text-muted-foreground">Detect and mask dents and scratches</p>
+                              </div>
+                            </div>
+                            <Switch
+                              checked={editorState.detectionTypes.dentsAndScratches}
+                              onCheckedChange={(checked) => 
+                                setEditorState(prev => ({
+                                  ...prev,
+                                  detectionTypes: { ...prev.detectionTypes, dentsAndScratches: checked }
+                                }))
+                              }
+                              className="data-[state=checked]:bg-green-600"
+                            />
+                          </div>
                         </div>
                       </div>
 
 
+                      <div>
+                      {editorState.detectionTypes.dentsAndScratches && (
+                        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-muted/200">
+                          <div className="flex items-center gap-3 mb-4">
+                              <p className="text-sm text-muted-foreground">Detection Results for Dents and Scratches</p>
+                          </div>
+                          
+                          {/* Detection Results */}
+                          <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">Dents:</span>
+                                <span className="text-sm font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded">{editorState.detectionResults.dentCount}</span>
+                              </div>
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">Scratches:</span>
+                                <span className="text-sm font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{editorState.detectionResults.scratchCount}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                     
+
+                      </div>
+                      )}
+                      </div>
+                     
 
 
 
@@ -780,7 +952,7 @@ export default function StudioPage() {
                           </div>
                         )}
                       </div>
-                    </div>
+                           </div>
                   </Card>
 
                   {/* Process Buttons */}

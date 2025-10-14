@@ -1,34 +1,22 @@
-"use client"
-
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Clock, Tag, ChevronLeft, Share2 } from "lucide-react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import Image from "next/image"
+import { Metadata } from "next"
+import { blogPosts } from "../page"
 
-interface BlogPost {
-  title: string
-  date: string
-  readTime: string
-  category: string
+interface BlogPostContent {
+  content: string
   author: {
     name: string
     role: string
   }
-  content: string
-}
-
-interface BlogPosts {
-  [key: string]: BlogPost
 }
 
 // This would typically come from a CMS or database
-const blogPosts: BlogPosts = {
-  "future-of-privacy-visual-data": {
-    title: "The Future of Privacy in Visual Data",
-    date: "2024-03-20",
-    readTime: "5 min read",
-    category: "Privacy",
+const blogPostContents: { [key: string]: BlogPostContent } = {
+  "why-masking-license-plates-matters-automotive-image-privacy-ai-tools": {
     author: {
       name: "Dr. Emily Watson",
       role: "Head of Research",
@@ -66,11 +54,7 @@ const blogPosts: BlogPosts = {
       <p>As we move forward, the importance of protecting privacy in visual data will only continue to grow. Organizations and individuals must stay ahead of the curve by adopting robust privacy protection solutions and best practices. At MaskingTech, we're excited to be at the forefront of this evolution, helping to shape a future where privacy and technology work hand in hand.</p>
     `
   },
-  "license-plate-privacy-laws": {
-    title: "Understanding License Plate Privacy Laws",
-    date: "2024-03-18",
-    readTime: "8 min read",
-    category: "Legal",
+  "how-to-replace-car-backgrounds-for-professional-results-ai-automotive-editing": {
     author: {
       name: "Marcus Rodriguez",
       role: "CTO & Co-founder",
@@ -127,11 +111,7 @@ const blogPosts: BlogPosts = {
       <p>Staying compliant with license plate privacy laws requires ongoing attention and adaptation. Organizations must remain informed about legal requirements and implement appropriate technical and organizational measures to protect privacy.</p>
     `
   },
-  "ai-privacy-protection-deep-dive": {
-    title: "AI in Privacy Protection: A Deep Dive",
-    date: "2024-03-15",
-    readTime: "6 min read",
-    category: "Technology",
+  "before-after-how-ai-transforms-car-photos-automotive-image-enhancement": {
     author: {
       name: "Dr. Emily Watson",
       role: "Head of Research",
@@ -185,11 +165,7 @@ const blogPosts: BlogPosts = {
       </ul>
     `
   },
-  "best-practices-image-privacy": {
-    title: "Best Practices for Image Privacy",
-    date: "2024-03-12",
-    readTime: "4 min read",
-    category: "Guidelines",
+  "best-backgrounds-for-automotive-photography-ai-car-photo-backdrops": {
     author: {
       name: "Sarah Chen",
       role: "CEO & Co-founder",
@@ -234,11 +210,7 @@ const blogPosts: BlogPosts = {
       </ul>
     `
   },
-  "rise-of-privacy-first-solutions": {
-    title: "The Rise of Privacy-First Solutions",
-    date: "2024-03-10",
-    readTime: "7 min read",
-    category: "Industry",
+  "future-privacy-solutions": {
     author: {
       name: "Sarah Chen",
       role: "CEO & Co-founder",
@@ -294,12 +266,49 @@ const blogPosts: BlogPosts = {
   }
 }
 
-export default function BlogPost() {
-  const params = useParams()
-  const slug = params.slug as string
-  const post = blogPosts[slug]
-
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const slug = params.slug
+  const post = blogPosts.find(post => post.slug === slug)
+  
   if (!post) {
+    return {
+      title: 'Post Not Found | MaskingTech Blog',
+      description: 'The requested blog post could not be found.'
+    }
+  }
+
+  return {
+    title: `${post.title} | MaskingTech Blog`,
+    description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      images: [{
+        url: post.image || '',
+        width: 1200,
+        height: 630,
+        alt: post.title
+      }],
+      type: 'article',
+      publishedTime: post.date,
+      authors: ['MaskingTech'],
+      tags: [post.category]
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image || '']
+    }
+  }
+}
+
+export default function BlogPost({ params }: { params: { slug: string } }) {
+  const slug = params.slug
+  const post = blogPosts.find(post => post.slug === slug)
+  const postContent = post ? blogPostContents[post.id] : null
+
+  if (!post || !postContent) {
     return (
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-3xl mx-auto text-center">
@@ -328,6 +337,23 @@ export default function BlogPost() {
           </Button>
         </div>
 
+        {/* Featured Image */}
+        {post.image && (
+          <div className="relative bg-transparent rounded-lg overflow-hidden">
+            <div className="relative">
+              <Image
+                src={post.image}
+                alt={post.title}
+                width={1200}
+                height={675}
+                className="w-full h-full object-cover rounded-lg"
+                priority={true}
+                quality={95}
+              />
+            </div>
+          </div>
+        )}
+        
         {/* Article Header */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -340,8 +366,8 @@ export default function BlogPost() {
           <h1 className="text-4xl font-bold">{post.title}</h1>
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              <p>By {post.author.name}</p>
-              <p>{post.author.role}</p>
+              <p>By {postContent.author.name}</p>
+              <p>{postContent.author.role}</p>
             </div>
             <Button variant="ghost" size="icon">
               <Share2 className="h-4 w-4" />
@@ -351,7 +377,7 @@ export default function BlogPost() {
 
         {/* Article Content */}
         <Card className="p-6 md:p-8 prose prose-invert max-w-none">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          <div dangerouslySetInnerHTML={{ __html: postContent.content }} />
         </Card>
 
         {/* Article Footer */}

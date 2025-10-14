@@ -5,6 +5,8 @@ import { Shield, Upload, Download, Key, ArrowRight, Car, Lock, Gauge, CheckCircl
 import Link from "next/link"
 import Image from "next/image"
 import { ImageComparison } from "@/app/components/image-comparison"
+import UseCase from "./components/use-case"
+import FAQSection from "./components/faqs"
 
 export default function Home() {
   return (
@@ -57,7 +59,7 @@ export default function Home() {
             <div className="w-full max-w-3xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
               <ImageComparison
                 beforeImage="/images/volvo-before.webp"
-                afterImage="/images/volvo-after.webp"
+                afterImage="/images/volvo-after.jpeg"
                 beforeLabel="Original Image"
                 afterLabel="Protected Image"
                 className="hover:scale-[1.02] transition-transform duration-500"
@@ -69,7 +71,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up delay-200 w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto min-w-[150px] group bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-500/80 hover:from-blue-600 hover:via-blue-700 hover:to-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl">
-                <Link href="/upload" className="flex items-center justify-center w-full">
+                <Link href="/signup" className="flex items-center justify-center w-full">
                   Try It Now <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -80,6 +82,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+
+      {/* Use Cases Section */}
+      <UseCase pageType={'landing'}/>
+
+
+
 
       {/* Interactive Demo Section (New) */}
       <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-28 bg-gray-900">
@@ -155,6 +164,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+
 
       {/* Features Section */}
       <section className="relative w-full py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-900/90 via-gray-900/95 to-gray-800/90">
@@ -265,7 +276,7 @@ export default function Home() {
       </section>
 
       {/* Statistics Section (New) */}
-      <section className="relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-900/90 via-gray-900/95 to-gray-800/90">
+      <section className="hidden relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-900/90 via-gray-900/95 to-gray-800/90">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)]" />
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
@@ -342,6 +353,10 @@ export default function Home() {
         </div>
       </section>
 
+
+      <FAQSection />
+
+
       {/* Final CTA Section (New) */}
       <section className="relative w-full py-16 sm:py-20 bg-gray-900">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/30 to-gray-900" />
@@ -366,6 +381,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
 
       <style jsx>{`
         @keyframes float {

@@ -28,7 +28,12 @@ export default function Header() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        if(!supabase){
+          console.log('Supabase client not initialized')
+          return
+        }
+        const { data: { user }, error } = await supabase?.auth?.getUser()
+        console.log('User:', user)
         if (error) throw error
         setUser(user)
       } catch (error) {
@@ -266,7 +271,7 @@ export default function Header() {
           <div className="flex items-center gap-4">
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/login">Sign In</Link>
+                <Link href="/signup">Sign In</Link>
               </Button>
               <Button asChild>
                 <Link href="/signup">Get Started</Link>

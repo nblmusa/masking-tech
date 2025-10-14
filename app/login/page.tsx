@@ -219,7 +219,7 @@ export default function LoginPage() {
                     <span className="w-full border-t border-gray-600" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white bg-gray-900 px-2 text-muted-foreground">Or continue with</span>
+                    <span className="text-white px-2 text-muted-foreground">Or continue with</span>
                   </div>
                 </div>
 

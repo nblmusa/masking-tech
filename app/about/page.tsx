@@ -96,7 +96,7 @@ export default function AboutPage() {
         </div>
 
         {/* Team Section */}
-        <div className="space-y-8">
+        {/* <div className="space-y-8">
           <h2 className="text-3xl font-bold text-center">Meet Our Team</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {team.map((member, index) => (
@@ -114,7 +114,7 @@ export default function AboutPage() {
               </Card>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Contact Section */}
         <div className="text-center space-y-4 py-8">
@@ -122,9 +122,9 @@ export default function AboutPage() {
           <p className="text-lg text-muted-foreground">
             Have questions about our technology or services? We&apos;d love to hear from you.
           </p>
-          <p className="text-blue-400">
+          <a href="mailto:support@maskingtech.com" className="text-blue-400">
             support@maskingtech.com
-          </p>
+          </a>
         </div>
       </div>
     </div>
