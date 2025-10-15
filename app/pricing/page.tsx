@@ -232,7 +232,8 @@ export default function PricingPage() {
             ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
             : 'border-blue-200/50 border-blue-800/50'
         }`}
-        variant={planKey === 'BASIC' ? 'outline' : 'default'}
+        // variant={planKey === 'BASIC' ? 'outline' : 'default'}
+        variant="default"
         onClick={() => handleUpgrade(plan.id)}
         disabled={isLoading}
       >
@@ -274,7 +275,7 @@ export default function PricingPage() {
             <div className="flex flex-col items-center mb-6">
               <div className="text-2xl font-bold mb-2 text-center">{plan.name}</div>
               <div className="text-base text-muted-foreground mb-3 font-semibold text-center">{plan.credits}</div>
-              <div className="text-4xl font-extrabold mb-1">{plan.price}<span className="text-base font-normal text-muted-foreground">/month</span></div>
+              <div className="text-4xl font-extrabold mb-4">{plan.price}<span className="text-base font-normal text-muted-foreground">/month</span></div>
               {/* <div className="text-sm text-muted-foreground mb-4">${plan.perCredit} per credit</div> */}
               
               {/* Render button dynamically based on plan */}
@@ -288,7 +289,7 @@ export default function PricingPage() {
               {plan.features.map((feature, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" /> 
-                  <span>{feature}</span>
+                  <span className={feature.includes('Everything') ? 'font-bold text-white' : ''}>{feature}</span>
                 </li>
               ))}
             </ul>

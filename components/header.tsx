@@ -6,6 +6,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createClient } from '@/lib/supabase-client'
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,9 +106,15 @@ export default function Header() {
                 href="/" 
                 className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 group"
               >
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
+                 <div className="h-[40px] w-[40px] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Image
+                  src="/images/logo.png"
+                  alt="MaskingTech Logo"
+                  width={100}
+                  height={100}
+                  className="object-cover"
+                />
+              </div>
                 <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                   MaskingTech
                 </span>
@@ -249,8 +256,15 @@ export default function Header() {
               href="/" 
               className="flex items-center gap-2.5 transition-all duration-300 hover:opacity-90 group"
             >
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <Shield className="h-5 w-5 text-white" />
+               {/* bg-gradient-to-br from-blue-600 to-indigo-600 */}
+              <div className="h-[40px] w-[40px] rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Image
+                  src="/images/logo.png"
+                  alt="MaskingTech Logo"
+                  className="object-cover"
+                  width={100}
+                  height={100}
+                />
               </div>
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
                 MaskingTech
