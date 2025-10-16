@@ -213,7 +213,7 @@ export default function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section className="relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-800/90 via-gray-900/95 to-gray-900/90">
+      <section className="relative mb-4 w-full py-12 sm:py-16 bg-gradient-to-b from-gray-800/90 via-gray-900/95 to-gray-900/90">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(59,130,246,0.05),transparent_50%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(60deg,rgba(59,130,246,0.02)_0%,rgba(59,130,246,0)_100%)]" />
         <div className="container mx-auto px-4 sm:px-6 relative">
@@ -275,33 +275,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Statistics Section (New) */}
-      <section className="hidden relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-900/90 via-gray-900/95 to-gray-800/90">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05),transparent_70%)]" />
-        <div className="container mx-auto px-4 sm:px-6 relative">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            <div className="text-center space-y-2">
-              <div className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">99.9%</div>
-              <p className="text-sm sm:text-base text-gray-300">Detection Accuracy</p>
-            </div>
-            <div className="text-center space-y-2">
-              <div className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">2M+</div>
-              <p className="text-sm sm:text-base text-gray-300">Images Processed</p>
-            </div>
-            <div className="text-center space-y-2">
-              <div className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">&lt;1s</div>
-              <p className="text-sm sm:text-base text-gray-300">Processing Time</p>
-            </div>
-            <div className="text-center space-y-2">
-              <div className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">50k+</div>
-              <p className="text-sm sm:text-base text-gray-300">Happy Users</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+ 
       {/* Testimonials Section (New) */}
-      <section className="relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-800/90 via-gray-900/95 to-gray-900/90">
+      {/* <section className="relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-800/90 via-gray-900/95 to-gray-900/90">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.05),transparent_50%)]" />
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="text-center mb-12">
@@ -351,7 +327,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
 
       <FAQSection />
