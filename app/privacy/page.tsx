@@ -6,36 +6,19 @@ export default function PrivacyPage() {
     <LegalContent title="Privacy Policy">
       <div className="space-y-8">
         <p>
-          At MaskingTech, we take your privacy seriously. This Privacy Policy explains how we collect, use, 
-          disclose, and safeguard your information when you use our services. Please read this policy carefully. 
-          If you do not agree with the terms, please do not access or use our services.
+        MaskingTech respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our platform.
         </p>
 
         <LegalSection title="1. Information We Collect" icon={<Database className="h-5 w-5" />}>
           <p>
-            We collect the following types of information:
+            We may collect personal information such as your name, email, contact details, and payment information. We may also collect image data uploaded to our platform for processing purposes.
           </p>
-          <ul className="space-y-2">
-            <li>Account information (email, name, username)</li>
-            <li>Usage data (login times, feature usage, processing history)</li>
-            <li>Payment information for subscription services</li>
-            <li>Images uploaded for processing</li>
-            <li>Technical data (IP address, browser type, device information)</li>
-          </ul>
         </LegalSection>
 
         <LegalSection title="2. How We Use Your Information" icon={<Eye className="h-5 w-5" />}>
           <p>
-            We use your information to:
+          We use collected information to provide and improve our services, process transactions, and ensure compliance with applicable regulations. Processed images are used only for the purposes intended by the user.
           </p>
-          <ul className="space-y-2">
-            <li>Provide and maintain our services</li>
-            <li>Process payments and manage subscriptions</li>
-            <li>Send service notifications and updates</li>
-            <li>Improve our AI algorithms and service quality</li>
-            <li>Respond to support requests</li>
-            <li>Prevent fraud and abuse</li>
-          </ul>
         </LegalSection>
 
         <LegalSection title="3. Data Security" icon={<Lock className="h-5 w-5" />}>
@@ -53,48 +36,39 @@ export default function PrivacyPage() {
 
         <LegalSection title="4. Data Retention" icon={<FileText className="h-5 w-5" />}>
           <p>
-            We retain your data according to these principles:
-          </p>
-          <ul className="space-y-2">
-            <li>Account information: Retained while account is active</li>
-            <li>Original images: Deleted immediately after processing</li>
-            <li>Processed images: Stored for 30 days unless saved to your account</li>
-            <li>Payment records: Retained as required by applicable laws</li>
-            <li>Usage logs: 90 days for security and performance monitoring</li>
-          </ul>
-        </LegalSection>
-
-        <LegalSection title="5. Your Privacy Rights" icon={<Settings className="h-5 w-5" />}>
-          <p>
-            You have the right to:
-          </p>
-          <ul className="space-y-2">
-            <li>Access your personal data</li>
-            <li>Correct inaccurate information</li>
-            <li>Delete your personal data</li>
-            <li>Object to or restrict processing</li>
-            <li>Export your data in a portable format</li>
-            <li>Withdraw consent at any time</li>
-          </ul>
-        </LegalSection>
-
-        <LegalSection title="6. Updates to This Policy" icon={<Bell className="h-5 w-5" />}>
-          <p>
-            We may update this Privacy Policy periodically. We will notify you of significant changes through email 
-            or notices on our website. Your continued use of the service after such modifications constitutes 
-            acceptance of the updated Policy.
+          Uploaded images are automatically deleted from our servers after processing unless the user explicitly chooses to store them. Account information is retained as required by law or for service continuity.
           </p>
         </LegalSection>
 
-        <LegalSection title="7. Contact Information" icon={<Shield className="h-5 w-5" />}>
+        <LegalSection title="5. Data Security" icon={<Settings className="h-5 w-5" />}>
           <p>
-            If you have questions about this Privacy Policy, please contact us at:
+          We implement technical and organizational measures to protect data from unauthorized access, alteration, or disclosure. However, no online platform is completely secure, and users share data at their own risk.
           </p>
-          <ul className="space-y-2">
-            <li>Email: privacy@maskingtech.com</li>
-            <li>Support: support@maskingtech.com</li>
-          </ul>
         </LegalSection>
+
+        <LegalSection title="6. Third-Party Services" icon={<Bell className="h-5 w-5" />}>
+          <p>
+          Our platform may use third-party APIs or analytics tools to improve functionality and user experience. These third parties are bound by confidentiality and data protection obligations.
+          </p>
+        </LegalSection>
+
+          <LegalSection title="7. Cookies & Analytics" icon={<Shield className="h-5 w-5" />}>
+            <p>
+            We may use cookies and tracking tools to enhance user experience, analyze usage, and improve services. Users may disable cookies through their browser settings.
+            </p>
+          </LegalSection>
+
+          <LegalSection title="8. Your Rights" icon={<Shield className="h-5 w-5" />}>
+            <p>
+            Users have the right to access, correct, or delete their personal information. To exercise these rights, contact us at info@maskingtech.com.
+            </p>
+          </LegalSection>
+
+          <LegalSection title="9. Policy Updates" icon={<Shield className="h-5 w-5" />}>
+            <p>
+            We may update this Privacy Policy periodically. Continued use of our services after any updates constitutes acceptance of the revised policy.
+            </p>
+          </LegalSection>
       </div>
     </LegalContent>
   )
