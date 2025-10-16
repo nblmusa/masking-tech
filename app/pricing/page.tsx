@@ -192,10 +192,10 @@ export default function PricingPage() {
         <Button 
           className={`w-full group ${
             planKey === 'ADVANCED' 
-              ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
+              ? 'shadow-lg hover:shadow-xl' 
               : 'border-blue-200/50 border-blue-800/50'
           }`}
-          variant={planKey === 'BASIC' ? 'outline' : 'default'}
+          variant={'default'}
           asChild
         >
           <Link href="/signup" className="flex items-center justify-center">
