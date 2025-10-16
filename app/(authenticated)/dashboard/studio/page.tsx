@@ -41,7 +41,7 @@ interface EditorState {
   }
 
   backgroundReplacement: {
-    template: 'office' | 'nature' | 'urban' | 'transparent' | null
+    template: 'office' | 'nature' | 'urban' | 'transparent' | null | 'bg-7' | 'bg-8' | 'bg-9'
     customImage: string | null,
     templateImage: string | null
   }
@@ -84,7 +84,7 @@ export default function StudioPage() {
     },
 
     backgroundReplacement: {
-      template: 'transparent',
+      template: null,
       customImage: null,
       templateImage: null
     },
@@ -134,7 +134,7 @@ export default function StudioPage() {
           },
 
           backgroundReplacement: {
-            template: 'transparent',
+            template: null,
             customImage: null,
             templateImage: null
           },
@@ -455,10 +455,10 @@ export default function StudioPage() {
                         <Label className="font-medium text-base">Choose Background</Label>
                         <div className="grid grid-cols-4 gap-3">
                           {[
-                            { id: 'transparent', name: 'Transparent' },
-                            { id: 'bg6', name: 'Background 1' },
-                            { id: 'bg7', name: 'Background 2' },
-                            { id: 'bg8', name: 'Background 3' }
+                            // { id: 'transparent', name: 'Transparent' },
+                            { id: 'bg-7', name: 'Background 1' },
+                            { id: 'bg-8', name: 'Background 2' },
+                            { id: 'bg-9', name: 'Background 3' }
                           ].map((template) => (
                             <div
                               key={template.id}
@@ -972,7 +972,7 @@ export default function StudioPage() {
                         <Button
                           size="lg"
                           onClick={handleProcess}
-                          disabled={!image || isProcessing}
+                          disabled={!image || isProcessing || !editorState.backgroundReplacement.template}
                           className="bg-primary hover:bg-primary/90 font-medium"
                         >
                           {isProcessing ? (
