@@ -25,7 +25,7 @@ export default function Footer() {
                 </div>
               </div>
               <p className="text-sm text-muted-foreground/80">
-                Advanced license plate masking technology for your vehicle images.
+              Unlocking Your Vehicle Images' True Retail Potential.
               </p>
             </div>
 

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-import { z } from 'zod'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +29,7 @@ async function uploadToStorage(
 
 async function processImageWithPythonServer(
   imageBuffer: Buffer,
+  backgroundBuffer: Buffer,
   backgroundReplacement: any,
   watermarkSettings: any,
   logoSettings: any,
@@ -44,9 +45,17 @@ async function processImageWithPythonServer(
   const imageBlob = new Blob([imageArray], { type: 'image/jpeg' })
   formData.append('image', imageBlob, 'image.jpg')
   
+  
   // Add background label if using preset backgrounds
   if (backgroundReplacement?.template && backgroundReplacement.template !== 'transparent') {
     formData.append('background_label', backgroundReplacement.template)
+  }
+
+  if(backgroundBuffer){
+    const imageArray = new Uint8Array(backgroundBuffer)
+    const imageBlob = new Blob([imageArray], { type: 'image/jpeg' })
+    console.log('Background image blob:', imageBlob)
+    formData.append('background_image', imageBlob, 'background_image.jpg')
   }
   
   // Add logo settings if provided
@@ -94,7 +103,7 @@ async function processImageWithPythonServer(
   
   try {
       // Call the Python server
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
@@ -144,7 +153,7 @@ export async function POST(request: Request) {
     let watermarkSettings: any;
     let logoSettings: any;
     let detectionSettings: any;
-
+    let backgroundBuffer: Buffer | undefined;
     const contentType = request.headers.get('content-type');
 
     if (contentType?.includes('multipart/form-data')) {
@@ -161,6 +170,12 @@ export async function POST(request: Request) {
         type: imageFile.type || 'image/jpeg'
       };
 
+      const backgroundFile = formData.get('backgroundImage') as File;
+      if (backgroundFile) {
+        backgroundBuffer = Buffer.from(await backgroundFile.arrayBuffer());
+      }
+
+  
       // Parse settings
       try {
         backgroundReplacement = formData.get('backgroundReplacement') ? 
@@ -186,6 +201,10 @@ export async function POST(request: Request) {
         if (body.image) {
           const base64Data = body.image.split(',')[1] || body.image;
           imageBuffer = Buffer.from(base64Data, 'base64');
+          if (body.backgroundImage) {
+            const backgroundBase64Data = body.backgroundImage.split(',')[1] || body.backgroundImage;
+            backgroundBuffer = Buffer.from(backgroundBase64Data, 'base64');
+          }
           imageMetadata = {
             name: body.filename || 'image.jpg',
             type: 'image/jpeg'
@@ -214,11 +233,17 @@ export async function POST(request: Request) {
       return new Response('No image file provided or invalid format', { status: 400 });
     }
 
+    if (!backgroundBuffer) {
+      console.error('No background image file found in request');
+      return new Response('No background image file provided or invalid format', { status: 400 });
+    }
+
     // Process the image using Python server
     console.log('Starting image processing with Python server, buffer size:', imageBuffer.length);
     
     const result = await processImageWithPythonServer(
       imageBuffer,
+      backgroundBuffer,
       backgroundReplacement,
       watermarkSettings,
       logoSettings,
