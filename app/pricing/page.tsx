@@ -297,6 +297,17 @@ export default function PricingPage() {
         ))}
       </div>
 
+      {/* Enterprise/Custom Plan Section */}
+      <div className="max-w-4xl mx-auto mb-16 px-4 text-center">
+        <h3 className="text-2xl font-bold text-white mb-3">Need more credits or a custom enterprise plan?</h3>
+        <p className="text-base text-muted-foreground mb-2">
+          We offer scalable packages tailored to high-volume users and large dealerships.
+        </p>
+        <p className="text-base text-muted-foreground">
+          Contact our sales team at <span className="font-bold text-white">sales@maskingtech.com</span>
+        </p>
+      </div>
+
       {/* Features Overview Section */}
       <div className="max-w-6xl mx-auto mb-20 px-4">
         <div className="text-center mb-12">
