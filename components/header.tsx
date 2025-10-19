@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
 
@@ -202,40 +202,50 @@ export default function Header() {
                       <span className="text-sm font-medium">{user.email}</span>
                     </div>
                     <nav className="flex flex-col gap-2">
-                      <Link
-                        href="/dashboard"
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/upload"
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
-                      >
-                        Upload Images
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
-                      >
-                        Settings
-                      </Link>
-                      <Link
-                        href="/billing"
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
-                      >
-                        Billing
-                      </Link>
+                      <SheetClose asChild>
+                        <Link
+                          href="/dashboard"
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                        >
+                          Dashboard
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/upload"
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                        >
+                          Upload Images
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/settings"
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                        >
+                          Settings
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link
+                          href="/billing"
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                        >
+                          Billing
+                        </Link>
+                      </SheetClose>
                     </nav>
                     <div className="flex flex-col gap-2 pt-4 border-t">
-                      <Button 
-                        variant="ghost" 
-                        onClick={handleSignOut}
-                        className="justify-start text-red-400"
-                      >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Sign Out
-                      </Button>
+                      <SheetClose asChild>
+                        <Button 
+                          variant="ghost" 
+                          onClick={handleSignOut}
+                          className="justify-start text-red-400"
+                        >
+                          <LogOut className="h-4 w-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </SheetClose>
                     </div>
                   </div>
                 </SheetContent>
@@ -301,22 +311,27 @@ export default function Header() {
                 <div className="flex flex-col gap-4">
                   <nav className="flex flex-col gap-2">
                     {navigation.map((item) => (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
-                      >
-                        {item.name}
-                      </Link>
+                      <SheetClose key={item.name} asChild>
+                        <Link
+                          href={item.href}
+                          className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md"
+                        >
+                          {item.name}
+                        </Link>
+                      </SheetClose>
                     ))}
                   </nav>
                   <div className="flex flex-col gap-2 pt-4 border-t">
-                    <Button variant="ghost" asChild className="justify-start">
-                      <Link href="/login">Sign In</Link>
-                    </Button>
-                    <Button asChild className="justify-start">
-                      <Link href="/signup">Get Started</Link>
-                    </Button>
+                    <SheetClose asChild>
+                      <Button variant="ghost" asChild className="justify-start">
+                        <Link href="/login">Sign In</Link>
+                      </Button>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Button asChild className="justify-start">
+                        <Link href="/signup">Get Started</Link>
+                      </Button>
+                    </SheetClose>
                   </div>
                 </div>
               </SheetContent>
