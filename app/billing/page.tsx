@@ -245,13 +245,13 @@ export default function BillingPage() {
               {usage.length > 0 ? (
                 <div className="space-y-4">
                   {usage.map((record) => (
-                    <div key={record.month_year} className="space-y-2">
+                    <div key={record?.month_year} className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span>{record.month_year}</span>
-                        <span>{record.images_processed} images</span>
+                        <span>{record?.month_year}</span>
+                        <span>{record?.images_processed} images</span>
                       </div>
                       <Progress
-                        value={(record.images_processed / subscriptionData!.plan.limits.imagesPerMonth) * 100}
+                        value={(record?.images_processed / subscriptionData!.plan?.limits?.imagesPerMonth) * 100}
                         className="h-2"
                       />
                     </div>
