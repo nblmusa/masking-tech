@@ -735,7 +735,7 @@ export default function StudioPage() {
                           </div>
                           
                           {/* Simple Style Selection */}
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 gap-3">
                             <button
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'blur' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
@@ -755,7 +755,7 @@ export default function StudioPage() {
                               </div>
                             </button>
                             
-                            <button
+                            {/* <button
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'logo' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'logo'
@@ -772,7 +772,7 @@ export default function StudioPage() {
                                   }`}>Custom Logo</p>
                                 </div>
                               </div>
-                            </button>
+                            </button> */}
                           </div>
 
 
