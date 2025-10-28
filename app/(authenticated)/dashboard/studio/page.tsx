@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Image as ImageIcon, Download, Upload, Loader2, Shield, ShieldX } from "lucide-react"
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { useDropzone } from "react-dropzone"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { useDashboard } from "@/hooks/use-dashboard"
 
 interface EditorState {
   detectionTypes: {
@@ -92,7 +93,11 @@ export default function StudioPage() {
       showDetectionAreas: true
     }
   })
+  const [quotaExceeded, setQuotaExceeded] = useState(false)
   const { toast } = useToast()
+    const {
+      stats,
+    } = useDashboard()
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return
@@ -146,6 +151,13 @@ export default function StudioPage() {
     }
     reader.readAsDataURL(file)
   }, [toast])
+
+
+  useEffect(() => {
+    if(stats.imagesProcessed >= stats.monthlyQuota){
+      setQuotaExceeded(true)
+    }
+  }, [stats])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -755,7 +767,7 @@ export default function StudioPage() {
                               </div>
                             </button>
                             
-                            {/* <button
+                            <button
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'logo' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'logo'
@@ -772,7 +784,7 @@ export default function StudioPage() {
                                   }`}>Custom Logo</p>
                                 </div>
                               </div>
-                            </button> */}
+                            </button>
                           </div>
 
 
@@ -972,7 +984,7 @@ export default function StudioPage() {
                         <Button
                           size="lg"
                           onClick={handleProcess}
-                          disabled={!image || isProcessing || !editorState.backgroundReplacement.template}
+                          disabled={!image || isProcessing || !editorState.backgroundReplacement.template || quotaExceeded}
                           className="bg-primary hover:bg-primary/90 font-medium"
                         >
                           {isProcessing ? (
@@ -987,6 +999,13 @@ export default function StudioPage() {
                             </>
                           )}
                         </Button>
+                        
+                        {quotaExceeded && (
+                          <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm flex items-center">
+                            <ShieldX className="h-4 w-4 mr-2 flex-shrink-0" />
+                            <span>Monthly quota exceeded. Please upgrade your plan to process more images.</span>
+                          </div>
+                        )}
                         
                         {processedImage && (
                           <Button

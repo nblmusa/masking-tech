@@ -186,7 +186,10 @@ export default function DashboardPage() {
     )
   }
 
-  const usagePercentage = (stats.imagesProcessed / stats.monthlyQuota) * 100
+  let usagePercentage = (stats.imagesProcessed / stats.monthlyQuota) * 100
+  if(stats.monthlyQuota < stats.imagesProcessed){
+    usagePercentage = 100;
+  }
   const isNearLimit = usagePercentage >= 80
 
   return (
