@@ -123,9 +123,9 @@ export default function ApiDocsPage() {
                   </div>
                 </div>
 
-                <div>
+                <div className="hidden">
                   <div className="font-semibold mb-2">Developer Tools</div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 ">
                     <a 
                       href="#sdks" 
                       onClick={(e) => handleNavClick(e, 'sdks')}
@@ -220,7 +220,7 @@ export default function ApiDocsPage() {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="hidden">
                       <div className="flex items-center gap-2 mb-4">
                         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold">2</div>
                         <h3 className="text-xl font-semibold">Install the SDK (Optional)</h3>
@@ -255,6 +255,7 @@ export default function ApiDocsPage() {
                           </pre>
                         </div>
                         
+                        <div className="hidden">
                         <p className="mt-4 mb-2">Using the SDK:</p>
                         <div className="p-4 bg-muted rounded-lg">
                           <pre className="text-sm">
@@ -264,6 +265,7 @@ const client = new MaskingTech('YOUR_API_KEY');
 const result = await client.maskLicensePlate('path/to/image.jpg');`}
                           </pre>
                         </div>
+                      </div>
                       </div>
                     </div>
                   </div>
@@ -604,7 +606,7 @@ images[]: file3.jpg`}</pre>
               </section>
 
               {/* SDKs Section */}
-              <section id="sdks" className="scroll-mt-20">
+              <section id="sdks" className="scroll-mt-20 hidden">
                 <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">SDKs & Libraries</h2>
                   <p className="mb-6 text-muted-foreground">
@@ -729,7 +731,7 @@ results = client.batch_process(
               </section>
 
               {/* Recipes Section */}
-              <section id="recipes" className="scroll-mt-20">
+              <section id="recipes" className="scroll-mt-20 hidden">
                 <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">SDK Recipes</h2>
                   <p className="mb-6 text-muted-foreground">
@@ -843,7 +845,7 @@ async function processBatch(files) {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="hidden">
                       <h3 className="text-xl font-semibold mb-4">Debug Mode</h3>
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
