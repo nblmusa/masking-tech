@@ -18,6 +18,10 @@ export async function POST(request: Request) {
     const { planId, returnUrl } = await request.json();
     const plan = PLANS[planId.toUpperCase()];
 
+    
+
+    console.log('plan id: ', planId);
+    console.log('plan: ', plan);
     if (!plan || !plan.priceId || plan.priceId === 'free') {
       return NextResponse.json(
         { error: 'Invalid plan selected' },
