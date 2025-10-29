@@ -100,10 +100,20 @@ export default function AccountSettingsPage() {
         throw new Error(data.error || 'Failed to update profile')
       }
 
+      const data = await response.json()
+      
+      // Update local state with returned profile data if available
+      if (data.profile) {
+        setProfile(data.profile)
+      }
+
       toast({
         title: "Success",
         description: "Profile updated successfully",
       })
+      
+      // Reload the profile to ensure we have the latest data
+      await loadUserProfile()
     } catch (error) {
       console.error('Error updating profile:', error)
       toast({
