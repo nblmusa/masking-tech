@@ -77,7 +77,7 @@ export const PLANS: Record<string, Plan> = {
     name: 'Basic',
     description: 'Great for individuals and small projects',
     price: 29,
-    priceId: process.env.STRIPE_BASIC_PRICE_ID || '',
+    priceId: process.env.STRIPE_BASIC_PRICE_ID || 'price_1RzblsPcpoWva5n6yfomgbiq',
     features: [
       'Background replacement',
       'Number plate masking',
@@ -102,7 +102,7 @@ export const PLANS: Record<string, Plan> = {
     name: 'Starter',
     description: 'Perfect for growing businesses and professionals',
     price: 99,
-    priceId: process.env.STRIPE_STARTER_PRICE_ID || '',
+    priceId: process.env.STRIPE_STARTER_PRICE_ID || 'price_1RzbngPcpoWva5n6oONWqYsN',
     features: [
       'Everything in Basic',
       '1200 credits per month',
@@ -122,7 +122,7 @@ export const PLANS: Record<string, Plan> = {
     name: 'Advanced',
     description: 'For established businesses with high volume needs',
     price: 199,
-    priceId: process.env.STRIPE_ADVANCED_PRICE_ID || '',
+    priceId: process.env.STRIPE_ADVANCED_PRICE_ID || 'price_1RzbpMPcpoWva5n62joHnlPP',
     features: [
       'Everything in Starter',
       '2500 credits per month',
@@ -143,7 +143,7 @@ export const PLANS: Record<string, Plan> = {
     name: 'Growth',
     description: 'For large organizations with enterprise needs',
     price: 399,
-    priceId: process.env.STRIPE_GROWTH_PRICE_ID || '',
+    priceId: process.env.STRIPE_GROWTH_PRICE_ID || 'price_1RzbqWPcpoWva5n63BY9xvuj',
     features: [
       'Everything in Advanced',
       '6000 credits per month',
