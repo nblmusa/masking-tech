@@ -89,6 +89,7 @@
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.5",
-    "file-loader": "^6.2.0"
+    "file-loader": "^6.2.0",
+    "supabase": "^2.48.3"
   }
 }
