@@ -145,6 +145,7 @@ export default function PricingPage() {
         analytics.trackSubscriptionStart(plan.name.toLowerCase(), plan.price);
       }
 
+      console.log('plan id: ', planId);
       const response = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
