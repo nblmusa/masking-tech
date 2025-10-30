@@ -767,7 +767,7 @@ export default function StudioPage() {
                               </div>
                             </button>
                             
-                            <button
+                            {/* <button
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'logo' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'logo'
@@ -784,7 +784,7 @@ export default function StudioPage() {
                                   }`}>Custom Logo</p>
                                 </div>
                               </div>
-                            </button>
+                            </button> */}
                           </div>
 
 
