@@ -2,6 +2,8 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/settings
 export async function GET() {
   try {
@@ -71,9 +73,11 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { profile, preferences } = body
 
+    console.log('Updating profile:', profile)
+
     // Update user metadata
     if (profile) {
-      const { error: updateError } = await supabase.auth.updateUser({
+      const { data: updatedUser, error: updateError } = await supabase.auth.updateUser({
         data: {
           first_name: profile.firstName,
           last_name: profile.lastName,
@@ -82,7 +86,12 @@ export async function PUT(request: Request) {
         }
       })
 
-      if (updateError) throw updateError
+      if (updateError) {
+        console.error('Update user error:', updateError)
+        throw updateError
+      }
+      
+      console.log('User updated successfully:', updatedUser?.user?.user_metadata)
     }
 
     // Update preferences
@@ -95,10 +104,30 @@ export async function PUT(request: Request) {
           updated_at: new Date().toISOString()
         })
 
-      if (preferencesError) throw preferencesError
+      if (preferencesError) {
+        console.error('Update preferences error:', preferencesError)
+        throw preferencesError
+      }
     }
 
-    return NextResponse.json({ success: true })
+    // Refresh the session to get updated user metadata
+    const { data: { session: updatedSession }, error: refreshError } = await supabase.auth.refreshSession()
+    
+    if (refreshError) {
+      console.error('Session refresh error:', refreshError)
+    }
+    
+    console.log('Refreshed session metadata:', updatedSession?.user?.user_metadata)
+    
+    return NextResponse.json({ 
+      success: true,
+      profile: updatedSession ? {
+        firstName: updatedSession.user.user_metadata?.first_name || '',
+        lastName: updatedSession.user.user_metadata?.last_name || '',
+        email: updatedSession.user.email || '',
+        phone: updatedSession.user.user_metadata?.phone || ''
+      } : undefined
+    })
   } catch (error) {
     console.error('Settings Update Error:', error)
     return NextResponse.json(

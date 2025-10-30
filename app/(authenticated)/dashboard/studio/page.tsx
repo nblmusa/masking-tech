@@ -154,7 +154,7 @@ export default function StudioPage() {
 
 
   useEffect(() => {
-    if(stats.monthlyQuota > 0 && (stats.monthlyQuota <= stats.imagesProcessed)){
+    if(stats.monthlyQuota && (stats.imagesProcessed >= stats.monthlyQuota)) {
       setQuotaExceeded(true)
     }
   }, [stats])

@@ -1,4 +1,5 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
@@ -48,7 +49,19 @@ export async function POST(request: Request) {
     if (settingsError && settingsError.code === 'PGRST116') {
       console.log('Creating user settings for existing user (fallback):', data.user.id);
       
-      const { data: newSettings, error: createError } = await supabase
+      // Use service role client to bypass RLS
+      const serviceClient = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
+      
+      const { data: newSettings, error: createError } = await serviceClient
         .from('user_settings')
         .insert([{
           user_id: data.user.id,
