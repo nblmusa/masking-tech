@@ -104,7 +104,7 @@ async function processImageWithPythonServer(
   try {
       // Call the Python server
   console.log('Calling Python server with form data:', formData)
-  const response = await fetch(`https://api.maskingtech.com/api/v1/generate-v1`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
