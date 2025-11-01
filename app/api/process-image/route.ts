@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import { error } from 'console'
 
 
 export const dynamic = 'force-dynamic'
@@ -35,7 +36,7 @@ async function processImageWithPythonServer(
   logoSettings: any,
   detectionSettings: any,
   userId?: string
-): Promise<{ processedImage: Buffer; detectedPlates: number }> {
+): Promise<{ processedImage: Buffer | null; detectedPlates: number }> {
   
   // Create FormData for the Python server
   const formData = new FormData()
@@ -103,8 +104,7 @@ async function processImageWithPythonServer(
   
   try {
       // Call the Python server
-  console.log('Calling Python server with form data:', formData)
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate-v1`, {
+   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
@@ -136,7 +136,7 @@ async function processImageWithPythonServer(
     // Fallback: return original image with basic processing
     console.log('Falling back to basic processing')
     return {
-      processedImage: imageBuffer,
+      processedImage: null,
       detectedPlates: 0
     }
   }
@@ -251,6 +251,14 @@ export async function POST(request: Request) {
       detectionSettings,
       session?.user?.id
     );
+
+
+    if(!result.processedImage){
+      return NextResponse.json({
+        success: false,
+        error: "Failed to process image"
+      })
+    }
     
     console.log('Processing result:', {
       hasProcessedImage: !!result.processedImage,
