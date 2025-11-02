@@ -12,7 +12,7 @@ import  Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Masking Tech: AI Photography and Editing for Car Dealerships & Marketplaces',
+  title: 'MaskingTech - AI Photography for Car Dealerships & Marketplaces',
   description: 'Masking Tech helps car dealerships and marketplaces create stunning studio grade visuals that captures and converts every lead.',
   icons: {
     icon: [
@@ -25,18 +25,46 @@ export const metadata: Metadata = {
         type: 'image/svg+xml',
       },
     ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
   themeColor: '#020817',
   viewport: 'width=device-width, initial-scale=1.0',
+  metadataBase: new URL('https://maskingtech.com'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'Masking Tech: AI Photography and Editing for Car Dealerships & Marketplaces',
+    title: 'MaskingTech - AI Photography for Car Dealerships',
     description: 'Masking Tech helps car dealerships and marketplaces create stunning studio grade visuals that captures and converts every lead.',
     url: 'https://maskingtech.com',
-    siteName: 'Masking Tech', 
+    siteName: 'MaskingTech', 
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/images/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'MaskingTech Logo',
+      },
+    ],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  // verification: {
+  //   google: 'google-site-verification-code', // Replace with your actual Google verification code
+  // },
 }
 
 export default function RootLayout({
@@ -78,28 +106,33 @@ export default function RootLayout({
             <Toaster />
           </SettingsProvider>
         </ThemeProvider>
-        <Script id="website-schema" type="application/ld+json">{
-          JSON.stringify({
+        <Script id="website-schema" type="application/ld+json">
+          {JSON.stringify({
             "@context": "https://schema.org/",
             "@type": "WebSite",
-            "name": "Masking Tech",
+            "name": "MaskingTech",
             "url": "https://maskingtech.com",
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://maskingtech.com/catalogsearch/result?q={search_term_string}",
+              "target": "https://maskingtech.com/search?q={search_term_string}",
               "query-input": "required name=search_term_string"
             }
-          })
-        }</Script>
-        <Script id="organization-schema" type="application/ld+json">{
-          JSON.stringify({
+          })}
+        </Script>
+        <Script id="organization-schema" type="application/ld+json">
+          {JSON.stringify({
             "@context": "https://schema.org/",
             "@type": "Organization",
-            "name": "Masking Tech",
+            "name": "MaskingTech",
             "url": "https://maskingtech.com",
-            "logo": "https://maskingtech.com/logo.png",
-            "image": "https://maskingtech.com/logo.png",
-            "description": "Masking Tech: Masking Tech helps car dealerships and marketplaces create stunning studio grade visuals that captures and converts every lead.",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://maskingtech.com/images/logo.png",
+              "width": 512,
+              "height": 512
+            },
+            "image": "https://maskingtech.com/images/logo.png",
+            "description": "MaskingTech helps car dealerships and marketplaces create stunning studio grade visuals that captures and converts every lead.",
             "address": {
               "@type": "PostalAddress",
               "addressLocality": "Ras Al Khaimah",
@@ -110,13 +143,13 @@ export default function RootLayout({
             "email": "info@maskingtech.com",
             "telephone": "00971558464853",
             "areaServed": "United Arab Emirates",
-            "makesOffer": ["Turn raw car photos into showroom-ready visuals with MaskingTech’s smart AI tools."],
+            "makesOffer": ["Turn raw car photos into showroom-ready visuals with MaskingTech's smart AI tools."],
             "founder": "Maged Mostafa",
             "foundingDate": "June 13, 2025",
             "foundingLocation": "United Arab Emirates",
             "sameAs": ["https://www.linkedin.com/company/maskingtech-com/"]
-          })
-        }</Script>
+          })}
+        </Script>
       </body>
     </html>
   )
