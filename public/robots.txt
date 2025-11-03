@@ -1,0 +1,11 @@
+# MaskingTech Robots.txt
+User-agent: *
+Allow: /
+
+# Disallow authentication-required pages
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /upload/
+
+# Sitemap
+Sitemap: https://maskingtech.com/sitemap.xml
