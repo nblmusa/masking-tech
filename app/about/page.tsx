@@ -35,26 +35,6 @@ export default function AboutPage() {
     }
   ]
 
-  const team = [
-    {
-      name: "Sarah Chen",
-      role: "CEO & Co-founder",
-      image: "/team/sarah.jpg",
-      bio: "Former privacy tech executive with 15 years of experience in computer vision."
-    },
-    {
-      name: "Marcus Rodriguez",
-      role: "CTO & Co-founder",
-      image: "/team/marcus.jpg",
-      bio: "Machine learning expert specializing in computer vision and privacy-preserving AI."
-    },
-    {
-      name: "Dr. Emily Watson",
-      role: "Head of Research",
-      image: "/team/emily.jpg",
-      bio: "PhD in Computer Science, leading our R&D in advanced privacy technologies."
-    }
-  ]
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">

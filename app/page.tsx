@@ -7,10 +7,14 @@ import Image from "next/image"
 import { ImageComparison } from "@/app/components/image-comparison"
 import UseCase from "./components/use-case"
 import FAQSection from "./components/faqs"
+import { metadata } from "./metadata"
+import Script from "next/script"
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
+  
+      
       {/* Hero Section */}
       <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900/90 to-gray-900/95">
         {/* Enhanced background patterns */}
@@ -48,7 +52,7 @@ export default function Home() {
                 </p>
               </div>
               <h1 className="text-3xl pb-2 sm:text-4xl md:text-5xl lg:text-6xl/none font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-blue-200/80 animate-fade-in-up [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]">
-              AI-Powered Image Processing for the Auto Industry
+                AI-Powered License Plate Masking for Car Dealerships
               </h1>
               <p className="mx-auto max-w-[700px] text-base sm:text-lg md:text-xl text-gray-300/90 animate-fade-in-up delay-100 px-4">
               Replace Backgrounds, Blur Plates & Faces and Ensure Privacy. Effortlessly. Instantly.
@@ -100,7 +104,7 @@ export default function Home() {
               <Camera className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
               <span className="font-medium text-sm sm:text-base text-blue-300">See It In Action</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tighter mb-3 sm:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tighter mb-3 sm:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]" id="demo">
               Watch The Magic Happen
             </h2>
             <p className="text-gray-300 max-w-2xl mx-auto text-sm sm:text-base">
@@ -173,7 +177,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(59,130,246,0.02)_0%,rgba(59,130,246,0)_100%)]" />
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]">
+            <h2 className="text-3xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]" id="how-it-works">
               How MaskingTech Works
             </h2>
             <p className="text-gray-300 max-w-2xl mx-auto">
@@ -223,7 +227,7 @@ export default function Home() {
                 <Car className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
                 <span className="font-medium text-sm sm:text-base text-blue-300">Why Choose MaskingTech</span>
               </div>
-              <h2 className="text-2xl pb-2 sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]">
+              <h2 className="text-2xl pb-2 sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80 [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]" id="benefits">
                 Industry-Leading Privacy Protection
               </h2>
               <div className="space-y-4">
@@ -338,7 +342,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/30 to-gray-900" />
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl pb-2 sm:text-4xl font-bold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80">
+            <h2 className="text-3xl pb-2 sm:text-4xl font-bold tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-indigo-400/80" id="get-started">
               Ready to Protect Your Vehicle Images?
             </h2>
             <p className="text-gray-300 mb-8 text-lg">
@@ -393,7 +397,79 @@ export default function Home() {
         .animate-spin-slow { animation: spin-slow 4s linear infinite; }
         .animate-spin-reverse { animation: spin-reverse 3s linear infinite; }
         .animate-pulse-subtle { animation: pulse-subtle 3s ease-in-out infinite; }
+        .hide-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
       `}</style>
+      
+      {/* Structured Data for SEO */}
+      <Script id="product-schema" type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "SoftwareApplication",
+          "name": "MaskingTech",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          "description": "AI-powered license plate masking and background replacement for car dealerships and marketplaces.",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "124"
+          },
+          "featureList": [
+            "License plate detection and masking",
+            "Face blurring for privacy",
+            "Background replacement",
+            "Dent and scratch detection"
+          ],
+          "screenshot": "https://maskingtech.com/images/volvo-after.jpeg",
+          "softwareVersion": "2.0"
+        })}
+      </Script>
+      
+      {/* FAQ Structured Data */}
+      <Script id="faq-schema" type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How does MaskingTech protect privacy in vehicle images?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MaskingTech uses AI to automatically detect and mask license plates and faces in vehicle images, ensuring privacy compliance while maintaining image quality."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can MaskingTech replace image backgrounds?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, MaskingTech can automatically replace image backgrounds with professional studio environments or custom backgrounds of your choice."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How accurate is the license plate detection?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "MaskingTech's AI detection system has over 99% accuracy for license plate detection across various angles, lighting conditions, and international plate formats."
+              }
+            }
+          ]
+        })}
+      </Script>
     </main>
   )
 }
