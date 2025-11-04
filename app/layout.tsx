@@ -62,6 +62,23 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  keywords: [
+    'license plate masking',
+    'car dealership photography',
+    'AI image processing',
+    'vehicle photo privacy',
+    'background replacement',
+    'face blurring',
+    'automotive photography',
+    'car marketplace tools',
+    'GDPR compliant car photos',
+    'privacy protection',
+    'Car background removal',
+    'Car background replacement',
+    'Car plate masking',
+    'Number plate masking',
+    'face blur',
+  ],
   // verification: {
   //   google: 'google-site-verification-code', // Replace with your actual Google verification code
   // },
