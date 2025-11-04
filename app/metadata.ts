@@ -38,6 +38,11 @@ export const metadata: Metadata = {
     'automotive photography',
     'car marketplace tools',
     'GDPR compliant car photos',
-    'privacy protection'
+    'privacy protection',
+    'Car background removal',
+    'Car background replacement',
+    'Car plate masking',
+    'Number plate masking',
+    'face blur',
   ]
 }
