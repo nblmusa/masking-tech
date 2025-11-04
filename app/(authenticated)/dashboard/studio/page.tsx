@@ -188,7 +188,9 @@ export default function StudioPage() {
         },
         logoSettings: editorState.maskingStyle === 'logo' ? {
           url: editorState.logo.url,
-          position: editorState.logo.position
+          position: editorState.logo.position,
+          // Pass the logo image data when available
+          plate_logo: editorState.logo.url ? editorState.logo.url.split(',')[1] : null
         } : null,
         watermarkSettings: editorState.watermark.enabled ? {
           text: editorState.watermark.text,
@@ -767,7 +769,7 @@ export default function StudioPage() {
                               </div>
                             </button>
                             
-                            {/* <button
+                             <button
                               onClick={() => setEditorState(prev => ({ ...prev, maskingStyle: 'logo' }))}
                               className={`group relative p-4 rounded-xl border-2 transition-all duration-300 ${
                                 editorState.maskingStyle === 'logo'
@@ -784,7 +786,7 @@ export default function StudioPage() {
                                   }`}>Custom Logo</p>
                                 </div>
                               </div>
-                            </button> */}
+                            </button> 
                           </div>
 
 
