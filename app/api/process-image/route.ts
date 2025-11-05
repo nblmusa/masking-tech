@@ -52,11 +52,13 @@ async function processImageWithPythonServer(
     formData.append('background_label', backgroundReplacement.template)
   }
 
-  if(backgroundBuffer){
+  if(backgroundBuffer && backgroundBuffer.length > 0){
     const imageArray = new Uint8Array(backgroundBuffer)
     const imageBlob = new Blob([imageArray], { type: 'image/jpeg' })
     console.log('Background image blob:', imageBlob)
     formData.append('background_image', imageBlob, 'background_image.jpg')
+  } else {
+    console.log('No background image buffer or empty buffer - skipping background_image')
   }
   
   // Add logo settings if provided
@@ -64,13 +66,40 @@ async function processImageWithPythonServer(
   if (logoSettings && logoSettings.url) {
     console.log('Adding logo to form data:', {
       url: logoSettings.url,
-      position: logoSettings.position
+      position: logoSettings.position,
+      hasWatermarkImage: !!logoSettings.watermark_image
     })
     formData.append('logo_url', logoSettings.url)
     formData.append('logo_position', logoSettings.position)
+    
+    // Add watermark image if available
+    if (logoSettings.watermark_image) {
+      try {
+        // Convert base64 to Blob
+        const watermarkImageBuffer = Buffer.from(logoSettings.watermark_image, 'base64')
+        const watermarkImageArray = new Uint8Array(watermarkImageBuffer)
+        const watermarkImageBlob = new Blob([watermarkImageArray], { type: 'image/png' })
+        
+        console.log('Adding watermark image to form data')
+        formData.append('watermark_image', watermarkImageBlob, 'watermark_image.png')
+      } catch (error) {
+        console.error('Error processing watermark image:', error)
+      }
+    }
   } else {
     console.log('No logo settings provided')
   }
+
+  if(logoSettings && logoSettings.plate_logo){
+          // Convert base64 to Blob
+          const plateLogoBuffer = Buffer.from(logoSettings.plate_logo, 'base64')
+          const plateLogoArray = new Uint8Array(plateLogoBuffer)
+          const plateLogoBlob = new Blob([plateLogoArray], { type: 'image/png' })
+          
+          console.log('Adding plate logo to form data')
+          formData.append('plate_logo', plateLogoBlob, 'plate_logo.png')
+    }
+
   
   // Add detection settings
   console.log('Detection settings received:', detectionSettings)
@@ -101,6 +130,8 @@ async function processImageWithPythonServer(
   } else {
     console.log('No watermark settings or text provided')
   }
+
+
   
   try {
       // Call the Python server
@@ -207,6 +238,16 @@ export async function POST(request: Request) {
             const backgroundBase64Data = body.backgroundImage.split(',')[1] || body.backgroundImage;
             backgroundBuffer = Buffer.from(backgroundBase64Data, 'base64');
           }
+          
+          // If logoSettings contains watermark_image, ensure it's properly formatted
+          if (body.logoSettings?.watermark_image) {
+            // Make sure we're using the base64 data without the data URI prefix
+            if (typeof body.logoSettings.watermark_image === 'string') {
+              if (body.logoSettings.watermark_image.includes(',')) {
+                body.logoSettings.watermark_image = body.logoSettings.watermark_image.split(',')[1];
+              }
+            }
+          }
           imageMetadata = {
             name: body.filename || 'image.jpg',
             type: 'image/jpeg'
@@ -236,8 +277,8 @@ export async function POST(request: Request) {
     }
 
     if (!backgroundBuffer) {
-      console.error('No background image file found in request');
-      return new Response('No background image file provided or invalid format', { status: 400 });
+      console.warn('No background image file found in request - continuing without background image');
+      // Continue processing without background image
     }
 
     // Process the image using Python server
@@ -245,7 +286,7 @@ export async function POST(request: Request) {
     
     const result = await processImageWithPythonServer(
       imageBuffer,
-      backgroundBuffer,
+      backgroundBuffer || Buffer.alloc(0), // Pass an empty buffer if backgroundBuffer is undefined
       backgroundReplacement,
       watermarkSettings,
       logoSettings,
