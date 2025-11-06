@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         '/dashboard/',
         '/settings/',
         '/upload/',
+        '/404', // Explicitly disallow 404 page
       ],
     },
     sitemap: 'https://maskingtech.com/sitemap.xml',
