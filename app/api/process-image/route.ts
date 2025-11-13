@@ -136,9 +136,7 @@ async function processImageWithPythonServer(
   try {
       // Call the Python server
 
-      //http://209.226.130.26:23067 - old
-      //http://70.29.204.235:23067 - old v1
-  const response = await fetch(`http://209.226.130.5:23067/api/v1/generate-v1`, {
+  const response = await fetch(`http://77.104.167.149:43159/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
