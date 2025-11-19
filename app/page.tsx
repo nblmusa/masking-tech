@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
 import { Shield, Upload, Download, Key, ArrowRight, Car, Lock, Gauge, CheckCircle2, Sparkles, Camera, ImageIcon, Cog, BadgeCheck } from "lucide-react"
 import Link from "next/link"
@@ -7,8 +5,9 @@ import Image from "next/image"
 import { ImageComparison } from "@/app/components/image-comparison"
 import UseCase from "./components/use-case"
 import FAQSection from "./components/faqs"
-import { metadata } from "./metadata"
 import Script from "next/script"
+
+export { metadata } from "./metadata"
 
 export default function Home() {
   return (
@@ -364,49 +363,6 @@ export default function Home() {
       </section>
 
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0px) rotate(5deg); }
-          50% { transform: translateY(-30px) rotate(-5deg); }
-        }
-        @keyframes float-slower {
-          0%, 100% { transform: translateY(0px) rotate(-5deg); }
-          50% { transform: translateY(-40px) rotate(5deg); }
-        }
-        @keyframes scan {
-          0% { transform: translateY(-100%) translateX(-10px) rotate(-2deg); }
-          100% { transform: translateY(200%) translateX(10px) rotate(2deg); }
-        }
-        @keyframes spin-slow {
-          to { transform: rotate(360deg) scale(1.05); }
-        }
-        @keyframes spin-reverse {
-          to { transform: rotate(-360deg) scale(0.95); }
-        }
-        @keyframes pulse-subtle {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(0.95); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
-        .animate-float-slower { animation: float-slower 10s ease-in-out infinite; }
-        .animate-scan { animation: scan 2s linear infinite; }
-        .animate-spin-slow { animation: spin-slow 4s linear infinite; }
-        .animate-spin-reverse { animation: spin-reverse 3s linear infinite; }
-        .animate-pulse-subtle { animation: pulse-subtle 3s ease-in-out infinite; }
-        .hide-scrollbar {
-          -ms-overflow-style: none; /* IE and Edge */
-          scrollbar-width: none; /* Firefox */
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
-        }
-      `}</style>
-      
       {/* Structured Data for SEO */}
       <Script id="product-schema" type="application/ld+json">
         {JSON.stringify({
