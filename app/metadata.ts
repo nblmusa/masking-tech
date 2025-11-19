@@ -1,13 +1,13 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'MaskingTech - AI License Plate Masking & Background Replacement for Car Dealerships',
+  title: 'MaskingTech | AI Plate Masking & Background Replacement',
   description: 'MaskingTech helps car dealerships and marketplaces create stunning studio-grade visuals with AI-powered license plate masking, face blurring, and background replacement.',
   alternates: {
     canonical: 'https://maskingtech.com',
   },
   openGraph: {
-    title: 'MaskingTech - AI License Plate Masking & Background Replacement',
+    title: 'MaskingTech | AI Plate Masking & Background Replacement',
     description: 'Transform your vehicle photos with AI-powered license plate masking, face blurring, and background replacement. Perfect for car dealerships and marketplaces.',
     url: 'https://maskingtech.com',
     siteName: 'MaskingTech',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MaskingTech - AI License Plate Masking & Background Replacement',
+    title: 'MaskingTech | AI Plate Masking & Background Replacement',
     description: 'Transform your vehicle photos with AI-powered license plate masking, face blurring, and background replacement.',
     images: ['/images/og-image.jpg'],
   },
