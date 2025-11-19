@@ -52,7 +52,7 @@ export default function Home() {
                 </p>
               </div>
               <h1 className="text-3xl pb-2 sm:text-4xl md:text-5xl lg:text-6xl/none font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400/80 via-blue-300/80 to-blue-200/80 animate-fade-in-up [text-shadow:0_4px_8px_rgba(59,130,246,0.05)]">
-                AI-Powered License Plate Masking for Car Dealerships
+                Automated Vehicle Image Processing for Dealerships & Marketplaces
               </h1>
               <p className="mx-auto max-w-[700px] text-base sm:text-lg md:text-xl text-gray-300/90 animate-fade-in-up delay-100 px-4">
               Replace Backgrounds, Blur Plates & Faces and Ensure Privacy. Effortlessly. Instantly.
@@ -334,6 +334,7 @@ export default function Home() {
       </section> */}
 
 
+      
       <FAQSection />
 
 
@@ -420,7 +421,7 @@ export default function Home() {
             "priceCurrency": "USD",
             "availability": "https://schema.org/InStock"
           },
-          "description": "AI-powered license plate masking and background replacement for car dealerships and marketplaces.",
+          "description": "Automated Vehicle Image Processing for Dealerships & Marketplaces.",
           "aggregateRating": {
             "@type": "AggregateRating",
             "ratingValue": "4.8",
