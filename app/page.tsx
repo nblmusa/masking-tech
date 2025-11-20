@@ -6,6 +6,7 @@ import { ImageComparison } from "@/app/components/image-comparison"
 import UseCase from "./components/use-case"
 import FAQSection from "./components/faqs"
 import Script from "next/script"
+import CrispChat from "@/components/ui/crisp"
 
 export { metadata } from "./metadata"
 
@@ -427,6 +428,7 @@ export default function Home() {
           ]
         })}
       </Script>
+      <CrispChat/>
     </main>
   )
 }

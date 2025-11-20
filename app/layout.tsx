@@ -106,7 +106,7 @@ export default function RootLayout({
             `,
           }}
         />
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
               window.$crisp=[];
@@ -120,7 +120,7 @@ export default function RootLayout({
               })();
             `,
           }}
-        />
+        /> */}
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
