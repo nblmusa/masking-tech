@@ -106,11 +106,11 @@ export default function RootLayout({
             `,
           }}
         />
-        {/* <script
+        <script
           dangerouslySetInnerHTML={{
             __html: `
               window.$crisp=[];
-              window.CRISP_WEBSITE_ID="90b8a5ff-f2ac-48b2-b1a0-5b268992199f";
+              window.CRISP_WEBSITE_ID="8765563c-2e6d-4f6f-be6d-45d6f6947f2f";
               (function() {
                 d=document;
                 s=d.createElement("script");
@@ -120,7 +120,7 @@ export default function RootLayout({
               })();
             `,
           }}
-        /> */}
+        />
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
