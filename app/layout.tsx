@@ -106,10 +106,9 @@ export default function RootLayout({
             `,
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.$crisp=[];
+         <Script id="crisp-script" strategy="afterInteractive">
+            {`
+           window.$crisp=[];
               window.CRISP_WEBSITE_ID="8765563c-2e6d-4f6f-be6d-45d6f6947f2f";
               (function() {
                 d=document;
@@ -118,9 +117,8 @@ export default function RootLayout({
                 s.async=1;
                 d.getElementsByTagName("head")[0].appendChild(s);
               })();
-            `,
-          }}
-        />
+        `}
+          </Script>
       </head>
       <body className={inter.className}>
         <GoogleAnalytics />
