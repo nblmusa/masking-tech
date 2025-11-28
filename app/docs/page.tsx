@@ -109,17 +109,7 @@ export default function ApiDocsPage() {
                       <Terminal className="h-4 w-4" />
                       Endpoints
                     </a>
-                    <a 
-                      href="#advanced" 
-                      onClick={(e) => handleNavClick(e, 'advanced')}
-                      className={cn(
-                        "flex items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors",
-                        activeTab === 'advanced' && "bg-muted"
-                      )}
-                    >
-                      <Cpu className="h-4 w-4" />
-                      Advanced
-                    </a>
+                 
                   </div>
                 </div>
 
@@ -197,7 +187,7 @@ export default function ApiDocsPage() {
 
             <div className="space-y-16">
               {/* Quick Start Section */}
-              <section id="quickstart" className="scroll-mt-20">
+              <section id="quickstart" className="hidden scroll-mt-20">
                 <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Quick Start Guide</h2>
                   <p className="mb-6 text-muted-foreground">
@@ -350,7 +340,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                       <div className="space-y-4">
                         <p>Your API key should be included in the Authorization header using the Bearer scheme:</p>
                         <div className="p-4 bg-muted rounded-lg">
-                          <pre className="text-sm">Authorization: Bearer your_api_key_here</pre>
+                          <pre className="text-sm">Authorization: your_api_key_here</pre>
                         </div>
                         <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                           <AlertTriangle className="h-4 w-4" />
@@ -397,11 +387,11 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                 <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">API Endpoints</h2>
                   <p className="mb-6 text-muted-foreground">
-                    Explore our API endpoints and their capabilities. All endpoints are HTTPS-only and return JSON responses.
+                    Explore our API endpoints and their capabilities.
                   </p>
 
                   <div className="space-y-12">
-                    <div>
+                    <div className="hidden">
                       <div className="flex items-center gap-3 mb-6">
                         <Image className="h-5 w-5" />
                         <h3 className="text-xl font-semibold">Process Image</h3>
@@ -478,7 +468,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                       </div>
                     </div>
 
-                    <div>
+                    <div className="hidden">
                       <div className="flex items-center gap-3 mb-6">
                         <Cpu className="h-5 w-5" />
                         <h3 className="text-xl font-semibold">Batch Processing</h3>
@@ -520,12 +510,151 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                         </div>
                       </div>
                     </div>
+
+                    <div>
+                      <div className="flex items-center gap-3 mb-6">
+                        <Image className="h-5 w-5" />
+                        <h3 className="text-xl font-semibold">External Image Generation</h3>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge>POST</Badge>
+                            <code className="text-sm bg-muted px-2 py-1 rounded">/api/v1/generate-external</code>
+                          </div>
+                          <p className="text-muted-foreground">
+                            Generate a fully processed vehicle image (background replacement, blurring, watermarking, logo placement) in a single call.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className="font-semibold mb-2">Request Parameters (multipart/form-data)</h4>
+                          <Card className="overflow-hidden">
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm">
+                                <thead className="bg-muted">
+                                  <tr className="text-left">
+                                    <th className="p-3">Parameter</th>
+                                    <th className="p-3">Type</th>
+                                    <th className="p-3">Required</th>
+                                    <th className="p-3">Description</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y">
+                                  <tr>
+                                    <td className="p-3 font-mono">image</td>
+                                    <td className="p-3">File</td>
+                                    <td className="p-3">Yes</td>
+                                    <td className="p-3">Source vehicle image to process Max size 5MB.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">background_image</td>
+                                    <td className="p-3">File</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Custom background image to replace the original background. Max size 5MB.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">background_label</td>
+                                    <td className="p-3">String</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Optional label or preset name for background selection.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_image</td>
+                                    <td className="p-3">File</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Image to use as a watermark (e.g. your logo). Max size 5MB.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_text</td>
+                                    <td className="p-3">String</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Optional text watermark (e.g. your brand name).</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_position</td>
+                                    <td className="p-3">String</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Position for the watermark (e.g. topLeft, topRight, bottomLeft, bottomRight, center).</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_size</td>
+                                    <td className="p-3">Number</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Font size or relative size for the watermark (e.g. 14).</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_opacity</td>
+                                    <td className="p-3">Number</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Opacity for the watermark between 0 and 1 (e.g. 0.7).</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">watermark_color</td>
+                                    <td className="p-3">String</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Text color in hex format (e.g. #ffffff).</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">blur_faces</td>
+                                    <td className="p-3">Boolean</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Set to true to blur detected faces.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">blur_license_plates</td>
+                                    <td className="p-3">Boolean</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Set to true to blur or mask license plates.</td>
+                                  </tr>
+                                  <tr>
+                                    <td className="p-3 font-mono">logo_position</td>
+                                    <td className="p-3">String</td>
+                                    <td className="p-3">No</td>
+                                    <td className="p-3">Position for the logo (e.g. center, topRight, bottomRight).</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </Card>
+                        </div>
+
+                        <div>
+                          <h4 className="font-semibold mb-2">cURL Example</h4>
+                          <div className="p-4 bg-muted rounded-lg">
+                            <pre className="text-sm overflow-x-auto">
+{`curl --location 'https://77.104.167.149:43159/api/v1/generate-external' \\
+  --header 'Authorization: YOUR_API_KEY' \\
+  --header 'Accept: image/png' \\
+  --header 'X-User-ID: YOUR_USER_ID' \\                  # if using multi-tenant setup
+  --form 'image=@"/path/to/vehicle-image.webp"' \\
+  --form 'background_image=@"/path/to/background.jpg"' \\
+  --form 'background_label=""' \\
+  --form 'watermark_image=@"/path/to/watermark.png"' \\
+  --form 'watermark_text="Your Brand"' \\
+  --form 'watermark_position="bottomRight"' \\
+  --form 'watermark_size="14"' \\
+  --form 'watermark_opacity="0.7"' \\
+  --form 'watermark_color="#ffffff"' \\
+  --form 'blur_faces="true"' \\
+  --form 'blur_license_plates="true"' \\
+  --form 'logo_url=""' \\
+  --form 'logo_position="center"'`}
+                          </pre>
+                          </div>
+                          <p className="mt-3 text-xs text-muted-foreground">
+                            Note: The endpoint returns the processed image binary. Use <code className="font-mono">Accept: image/png</code> or another supported image MIME type to control the response format.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </Card>
               </section>
 
               {/* Advanced Section */}
-              <section id="advanced" className="scroll-mt-20">
+              <section id="advanced" className="hidden scroll-mt-20">
                 <Card className="p-6 border-primary/20">
                   <h2 className="text-2xl font-bold mb-4">Advanced Features</h2>
                   <p className="mb-6 text-muted-foreground">
