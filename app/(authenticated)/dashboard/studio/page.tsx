@@ -470,8 +470,9 @@ export default function StudioPage() {
                         <div className="grid grid-cols-4 gap-3">
                           {[
                             // { id: 'transparent', name: 'Transparent' },
-                            { id: 'bg-7', name: 'Background 1' },
-                            { id: 'bg-8', name: 'Background 2' },
+                            { id: 'bg-1', name: 'Background 1' },
+                            { id: 'bg-7', name: 'Background 2' },
+                            // { id: 'bg-8', name: 'Background 2' },
                             { id: 'bg-9', name: 'Background 3' }
                           ].map((template) => (
                             <div
