@@ -799,7 +799,7 @@ export default function BillingPage() {
                         }`}
                         variant={isHighlighted ? 'default' : 'outline'}
                         onClick={() => handleUpgradeSubscription(plan.id.toLowerCase())}
-                        disabled={loadingStates.billing || key === 'GROWTH' || isCurrentPlan}
+                        disabled={loadingStates.billing || isCurrentPlan}
                       >
                         {loadingStates.billing ? (
                           <>
@@ -808,8 +808,6 @@ export default function BillingPage() {
                           </>
                         ) : isCurrentPlan ? (
                           <>Current Plan</>
-                        ) : key === 'GROWTH' ? (
-                          <>Contact Sales</>
                         ) : (
                           <>
                             {subscription.tier === 'free' 
