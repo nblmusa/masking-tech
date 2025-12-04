@@ -266,8 +266,8 @@ const blogPostContents: { [key: string]: BlogPostContent } = {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const slug = params.slug
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
   const post = blogPosts.find(post => post.slug === slug)
   
   if (!post) {
@@ -303,8 +303,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default function BlogPost({ params }: { params: { slug: string } }) {
-  const slug = params.slug
+export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const post = blogPosts.find(post => post.slug === slug)
   const postContent = post ? blogPostContents[post.id] : null
 

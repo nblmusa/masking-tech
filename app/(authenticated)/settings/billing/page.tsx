@@ -734,16 +734,22 @@ export default function BillingPage() {
         </div>
 
         {/* Available Plans */}
-        <div className="pt-4">
-          <div className="flex items-center justify-between mb-6">
+        <div className="pt-8">
+          <div className="flex items-center justify-between mb-8">
             <div>
               <h3 className="text-2xl font-semibold">Available Plans</h3>
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-2">
                 Choose the plan that best fits your needs
               </p>
             </div>
+            <Button variant="outline" asChild>
+              <Link href="/pricing">
+                View Full Pricing
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8 max-w-7xl">
             {Object.entries(PLANS)
               .filter(([key, plan]) => {
                 // Show all plans except FREE if user is on free tier
@@ -755,89 +761,82 @@ export default function BillingPage() {
                 const planPrice = plan.price;
                 return planPrice > currentPlanPrice;
               })
-              .map(([key, plan]) => (
-                  <Card 
-                    key={key} 
-                    className={`relative group transition-all duration-300 hover:scale-[1.01] ${
-                      key === 'ADVANCED' 
-                        ? 'border-primary/50 shadow-lg bg-gradient-to-br from-blue-50/50 via-white to-blue-50/30 from-blue-900/50 via-gray-900 to-blue-900/30' 
-                        : 'bg-background/60 backdrop-blur-sm hover:shadow-lg'
+              .map(([key, plan]) => {
+                const isHighlighted = key === 'ADVANCED';
+                const isCurrentPlan = subscription.tier.toLowerCase() === plan.id.toLowerCase();
+                
+                return (
+                  <div
+                    key={key}
+                    className={`flex-1 flex flex-col bg-background rounded-3xl shadow-xl p-8 min-w-[280px] max-w-[340px] mx-auto lg:mx-0 border-2 ${
+                      isHighlighted 
+                        ? 'border-yellow-400 ring-2 ring-yellow-300 relative z-10 scale-105 shadow-2xl' 
+                        : 'border-transparent'
                     }`}
+                    style={{ position: 'relative' }}
                   >
-                    {key === 'ADVANCED' && (
-                      <div className="absolute -top-2 right-4 bg-gradient-to-r from-blue-600 to-indigo-600 px-2 py-0.5 rounded-full">
-                        <div className="flex items-center gap-1">
-                          <Zap className="h-3.5 w-3.5 text-white animate-pulse" />
-                          <span className="text-xs font-semibold text-white">Best Value</span>
-                        </div>
+                    {isHighlighted && (
+                      <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow -rotate-6">
+                        <Zap className="h-3 w-3" />
+                        Best Value
                       </div>
                     )}
-                    <div className="p-6">
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className={`text-lg font-semibold ${
-                            key === 'ADVANCED' 
-                              ? 'bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 from-blue-400 to-indigo-400'
-                              : ''
-                          }`}>{plan.name}</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-2xl font-bold">${plan.price}</span>
-                            <span className="text-sm text-muted-foreground">/month</span>
-                          </div>
-                        </div>
-                        <Separator />
-                        <ul className="space-y-2 min-h-[180px]">
-                          {plan.features.map((feature, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <div className={`mt-1 h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${
-                                key === 'ADVANCED'
-                                  ? 'text-blue-700 text-blue-400'
-                                  : 'text-primary'
-                              }`}>
-                                <Check className="h-3 w-3" />
-                              </div>
-                              {feature}
-                            </li>
-                          ))}
-                        </ul>
-                        <Button 
-                          className={`w-full ${
-                            key === 'ADVANCED' 
-                              ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700' 
-                              : 'border-blue-200/50 dark:border-blue-800/50'
-                          }`}
-                          variant={key === 'ADVANCED' ? 'default' : 'outline'}
-                          onClick={() => handleUpgradeSubscription(plan.id.toLowerCase())}
-                          disabled={loadingStates.billing || key === 'GROWTH'}
-                        >
-                          {loadingStates.billing ? (
-                            <>
-                              <Settings className="mr-2 h-4 w-4 animate-spin" />
-                              Loading...
-                            </>
-                          ) : (
-                            <>
-                              {key === 'GROWTH' ? (
-                                <>Contact Sales</>
-                              ) : (
-                                <>
-                                  {subscription.tier === 'free' 
-                                    ? `Upgrade to ${plan.name}`
-                                    : plan.price > (PLANS[subscription.tier.toUpperCase()]?.price || 0)
-                                    ? `Upgrade to ${plan.name}`
-                                    : `Switch to ${plan.name}`}
-                                  {key !== 'GROWTH' && <Zap className="ml-2 h-4 w-4" />}
-                                </>
-                              )}
-                            </>
-                          )}
-                        </Button>
+                    <div className="flex flex-col items-center mb-6">
+                      <div className="text-2xl font-bold mb-2 text-center">{plan.name}</div>
+                      <div className="text-base text-muted-foreground mb-3 font-semibold text-center">
+                        {plan.limits.imagesPerMonth} credits/month
                       </div>
+                      <div className="text-4xl font-extrabold mb-4">
+                        ${plan.price}
+                        <span className="text-base font-normal text-muted-foreground">/month</span>
+                      </div>
+                      
+                      <Button 
+                        className={`w-full group ${
+                          isHighlighted 
+                            ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700 shadow-lg hover:shadow-xl' 
+                            : ''
+                        }`}
+                        variant={isHighlighted ? 'default' : 'outline'}
+                        onClick={() => handleUpgradeSubscription(plan.id.toLowerCase())}
+                        disabled={loadingStates.billing || key === 'GROWTH' || isCurrentPlan}
+                      >
+                        {loadingStates.billing ? (
+                          <>
+                            <Settings className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : isCurrentPlan ? (
+                          <>Current Plan</>
+                        ) : key === 'GROWTH' ? (
+                          <>Contact Sales</>
+                        ) : (
+                          <>
+                            {subscription.tier === 'free' 
+                              ? `Upgrade`
+                              : plan.price > (PLANS[subscription.tier.toUpperCase()]?.price || 0)
+                              ? `Upgrade`
+                              : `Switch`}
+                            <Zap className="ml-2 h-4 w-4 transition-transform group-hover:scale-110" />
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  </Card>
-                ))}
-            </div>
+                    <ul className="flex-1 flex flex-col gap-3 text-sm text-muted-foreground">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          <span className={feature.includes('Everything') ? 'font-bold text-foreground' : ''}>
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
           </div>
+        </div>
       </div>
     </div>
   )
