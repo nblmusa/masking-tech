@@ -37,6 +37,8 @@ export async function POST(request: Request) {
         signature,
         webhookSecret
       );
+
+      console.log('event.type', event.type);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return NextResponse.json(
@@ -111,7 +113,8 @@ export async function POST(request: Request) {
           });
 
           // Update subscription in database
-          // Use stripe_subscription_id as conflict key since it uniquely identifies the subscription
+          // Use stripe_customer_id as conflict key since it has a unique constraint
+          // This ensures we update the existing subscription record for the customer
           const { error: updateError } = await supabase
             .from('subscriptions')
             .upsert({
@@ -128,7 +131,7 @@ export async function POST(request: Request) {
               quantity: subscription.items.data[0].quantity || 1,
               updated_at: new Date().toISOString()
             }, {
-              onConflict: 'stripe_subscription_id',
+              onConflict: 'stripe_customer_id',
               ignoreDuplicates: false
             });
 
