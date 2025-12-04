@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createServiceClient } from '@/lib/supabase'
 import { cookies } from 'next/headers'
 import { error } from 'console'
 
@@ -366,6 +367,42 @@ export async function POST(request: Request) {
         if (dbError) {
           console.error('Database insert error:', dbError)
           throw dbError
+        }
+
+        // Deduct credits (1 credit per image)
+        // Use service client to bypass RLS for credit deduction
+        const serviceSupabase = createServiceClient();
+        const { data: currentCredits } = await serviceSupabase
+          .from('user_credits')
+          .select('credits_balance')
+          .eq('user_id', userId)
+          .single();
+
+        if (currentCredits && currentCredits.credits_balance > 0) {
+          const { error: creditsError } = await serviceSupabase
+            .from('user_credits')
+            .update({ 
+              credits_balance: Math.max(0, currentCredits.credits_balance - 1),
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', userId);
+
+          if (creditsError) {
+            console.error('Credits deduction error:', creditsError);
+            // Don't throw - image is already processed, just log the error
+          } else {
+            // Record usage
+            await serviceSupabase
+              .from('usage_records')
+              .insert({
+                user_id: userId,
+                service: 'web',
+                credits_used: 1,
+                month_year: new Date().toISOString().slice(0, 7) // YYYY-MM format
+              });
+          }
+        } else {
+          console.warn('User has no credits or credits record not found');
         }
 
         // Update user stats

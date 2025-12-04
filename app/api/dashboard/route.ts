@@ -59,18 +59,30 @@ export async function GET() {
       periodStart.setHours(0, 0, 0, 0);
     }
 
-    // Count processed images in current period
+    // Count processed images in current period - this is the source of truth
     const { count: processedCount } = await supabase
       .from('processed_images')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .gte('processed_at', periodStart.toISOString());
 
-    // Calculate images processed: use actual count if available, otherwise use credits calculation
+    // Use processed images count as the primary source of truth
+    // Credits balance is used for quota enforcement, but display should use actual count
+    const imagesProcessed = processedCount || 0;
+    
+    // Verify credits balance matches (for debugging/monitoring)
     const creditsBalance = credits?.credits_balance ?? monthlyQuota;
-    const imagesProcessedFromCredits = Math.max(0, monthlyQuota - creditsBalance);
-    // Use the higher of the two to ensure we show accurate usage
-    const imagesProcessed = Math.max(imagesProcessedFromCredits, processedCount || 0);
+    const expectedCreditsBalance = Math.max(0, monthlyQuota - imagesProcessed);
+    
+    // If there's a mismatch, log it (but don't fail - credits might be adjusted elsewhere)
+    if (Math.abs(creditsBalance - expectedCreditsBalance) > 1) {
+      console.warn(`Credits balance mismatch for user ${userId}:`, {
+        actual: creditsBalance,
+        expected: expectedCreditsBalance,
+        imagesProcessed,
+        monthlyQuota
+      });
+    }
 
     // Get or create user stats (for detected_plates and other stats)
     let { data: stats, error: statsError } = await supabase
