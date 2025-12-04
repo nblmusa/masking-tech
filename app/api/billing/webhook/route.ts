@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { stripe } from '@/lib/stripe';
+import { stripe, PLANS } from '@/lib/stripe';
 import Stripe from 'stripe';
 
 // This is your Stripe webhook secret for testing your endpoint locally.
@@ -157,14 +157,9 @@ export async function POST(request: Request) {
               }
 
               // Upsert user_credits with plan allowance
-              const planCredits: Record<string, number> = {
-                free: 20,
-                basic: 300,
-                starter: 1200,
-                advanced: 2500,
-                growth: 6000,
-              };
-              const credits = planCredits[tier] ?? 20;
+              // Get credits from PLANS definition to ensure single source of truth
+              const plan = PLANS[tier.toUpperCase()];
+              const credits = plan?.limits.imagesPerMonth ?? 20;
 
               const { error: creditsError } = await supabase
                 .from('user_credits')
