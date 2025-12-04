@@ -222,16 +222,24 @@ export async function POST(request: Request) {
         let userId: string | undefined;
 
         // Try to get userId from subscription metadata
-        if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          userId = subscription.metadata?.user_id;
+        if (invoice.subscription && typeof invoice.subscription === 'string') {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+            userId = subscription.metadata?.user_id;
+          } catch (error) {
+            console.error('Error retrieving subscription for invoice:', error);
+          }
         }
 
         // If not found, try to get from customer metadata
         if (!userId) {
-          const customer = await stripe.customers.retrieve(customerId);
-          if ('metadata' in customer && customer.metadata?.user_id) {
-            userId = customer.metadata.user_id;
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if ('metadata' in customer && customer.metadata?.user_id) {
+              userId = customer.metadata.user_id;
+            }
+          } catch (error) {
+            console.error('Error retrieving customer for invoice:', error);
           }
         }
 
@@ -264,8 +272,29 @@ export async function POST(request: Request) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
-        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-        const userId = subscription.metadata?.user_id;
+        let userId: string | undefined;
+
+        // Try to get userId from subscription metadata
+        if (invoice.subscription && typeof invoice.subscription === 'string') {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+            userId = subscription.metadata?.user_id;
+          } catch (error) {
+            console.error('Error retrieving subscription for failed invoice:', error);
+          }
+        }
+
+        // If not found, try to get from customer metadata
+        if (!userId && customerId) {
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if ('metadata' in customer && customer.metadata?.user_id) {
+              userId = customer.metadata.user_id;
+            }
+          } catch (error) {
+            console.error('Error retrieving customer for failed invoice:', error);
+          }
+        }
 
         // Update subscription status to past_due
         const { error: updateError } = await supabase
