@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import supabaseServer from "@/lib/supabase-server"; 
+import supabaseServer from "@/lib/supabase-server";
+import { PLANS } from "@/lib/stripe";
 
 function generateApiKey() {
   return `lpm_${crypto.randomBytes(32).toString('hex')}`;
@@ -18,35 +19,69 @@ export async function GET() {
 
     const userId = session.user.id;
 
-    // Get or create user stats
-    let { data: stats, error: statsError } = await supabase
-      .from('user_stats')
-      .select('*')
+    // Get user's subscription tier from profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('subscription_tier')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      throw profileError;
+    }
+
+    const tier = profile?.subscription_tier || 'free';
+    const plan = PLANS[tier.toUpperCase()];
+    const monthlyQuota = plan?.limits.imagesPerMonth || 20;
+
+    // Get user credits balance
+    const { data: credits, error: creditsError } = await supabase
+      .from('user_credits')
+      .select('credits_balance')
       .eq('user_id', userId)
       .single();
 
-    if (statsError) {
-      if (statsError.code === 'PGRST116') {
-        // Create default stats if they don't exist
-        const { data: newStats, error: createStatsError } = await supabase
-          .from('user_stats')
-          .insert([{
-            user_id: userId,
-            images_processed: 0,
-            monthly_quota: 20,
-            detected_plates: 0
-          }])
-          .select()
-          .single();
+    // Calculate images processed (quota - remaining credits)
+    const creditsBalance = credits?.credits_balance ?? monthlyQuota;
+    const imagesProcessed = Math.max(0, monthlyQuota - creditsBalance);
 
-        if (createStatsError) {
-          throw createStatsError;
-        }
-        stats = newStats;
-      } else {
-        throw statsError;
-      }
+    // Get or create user stats (for detected_plates and other stats)
+    let { data: stats, error: statsError } = await supabase
+      .from('user_stats')
+      .select('detected_plates, last_upload_time')
+      .eq('user_id', userId)
+      .single();
+
+    if (statsError && statsError.code !== 'PGRST116') {
+      throw statsError;
     }
+
+    // Update user_stats with correct monthly_quota and images_processed
+    const { error: updateStatsError } = await supabase
+      .from('user_stats')
+      .upsert({
+        user_id: userId,
+        images_processed: imagesProcessed,
+        monthly_quota: monthlyQuota,
+        detected_plates: stats?.detected_plates || 0,
+        last_upload_time: stats?.last_upload_time || null,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id',
+        ignoreDuplicates: false
+      });
+
+    if (updateStatsError) {
+      console.error('Error updating user_stats:', updateStatsError);
+    }
+
+    // Return stats with correct values
+    const statsData = {
+      images_processed: imagesProcessed,
+      monthly_quota: monthlyQuota,
+      detected_plates: stats?.detected_plates || 0,
+      last_upload_time: stats?.last_upload_time || null
+    };
 
     // Get recent activity
     const { data: recentActivity, error: activityError } = await supabase
@@ -91,7 +126,7 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      stats,
+      stats: statsData,
       recentActivity: recentActivity || [],
       apiKey: apiKeys[0]
     });

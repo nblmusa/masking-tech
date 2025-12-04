@@ -38,7 +38,6 @@ export async function POST(request: Request) {
         webhookSecret
       );
 
-      console.log('event.type', event.type);
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return NextResponse.json(
@@ -46,6 +45,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    console.log('event.type', event.type);
 
     const supabase = createServiceClient();
 
@@ -97,6 +98,13 @@ export async function POST(request: Request) {
         }
 
         if (userId) {
+          // Get stored subscription BEFORE updating to detect renewals
+          const { data: storedSubscription } = await supabase
+            .from('subscriptions')
+            .select('current_period_start, plan_id')
+            .eq('user_id', userId)
+            .single();
+
           // Calculate tier based on new plan structure
           let tier = 'basic';
           if (priceId === process.env.STRIPE_STARTER_PRICE_ID) {
@@ -111,6 +119,15 @@ export async function POST(request: Request) {
             tier,
             priceId
           });
+
+          // Detect if this is a renewal (same tier, new billing period)
+          const previousPeriodStart = storedSubscription?.current_period_start 
+            ? new Date(storedSubscription.current_period_start).getTime() 
+            : null;
+          const newPeriodStart = currentPeriodStart.getTime();
+          const isRenewal = previousPeriodStart !== null && 
+            previousPeriodStart !== newPeriodStart &&
+            storedSubscription?.plan_id === tier;
 
           // Update subscription in database
           // Use stripe_customer_id as conflict key since it has a unique constraint
@@ -144,6 +161,16 @@ export async function POST(request: Request) {
             if (status === 'active' || status === 'trialing') {
               console.log(`Updating profile tier to: ${event.type}`, tier);
               
+              // Get previous tier BEFORE updating profile to detect upgrades
+              const { data: previousProfile } = await supabase
+                .from('profiles')
+                .select('subscription_tier')
+                .eq('id', userId)
+                .single();
+
+              const previousTier = previousProfile?.subscription_tier || 'free';
+              
+              // Update profile tier
               const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .update({
@@ -160,23 +187,69 @@ export async function POST(request: Request) {
                 console.log(`Successfully updated profile: ${event.type}`, profile);
               }
 
-              // Upsert user_credits with plan allowance
-              // Get credits from PLANS definition to ensure single source of truth
+              // Handle credits based on subscription update type
               const plan = PLANS[tier.toUpperCase()];
-              const credits = plan?.limits.imagesPerMonth ?? 20;
+              const newPlanCredits = plan?.limits.imagesPerMonth ?? 20;
+              const previousPlan = PLANS[previousTier.toUpperCase()];
+              const previousPlanCredits = previousPlan?.limits.imagesPerMonth ?? 20;
+
+              // Get current credits balance
+              const { data: currentCredits } = await supabase
+                .from('user_credits')
+                .select('credits_balance')
+                .eq('user_id', userId)
+                .single();
+
+              const currentBalance = currentCredits?.credits_balance ?? previousPlanCredits;
+              let newCreditsBalance: number;
+
+              if (event.type === 'customer.subscription.created') {
+                // New subscription: set to full plan credits
+                newCreditsBalance = newPlanCredits;
+                console.log(`New subscription: Setting credits to ${newCreditsBalance}`);
+              } else if (tier !== previousTier) {
+                // Tier changed (upgrade or downgrade)
+                if (newPlanCredits > previousPlanCredits) {
+                  // Upgrade: preserve remaining credits and add the difference
+                  const creditDifference = newPlanCredits - previousPlanCredits;
+                  newCreditsBalance = currentBalance + creditDifference;
+                  console.log(`Upgrade detected: Preserving ${currentBalance} credits, adding ${creditDifference}, new balance: ${newCreditsBalance}`);
+                } else {
+                  // Downgrade: keep existing credits but cap at new plan limit
+                  newCreditsBalance = Math.min(currentBalance, newPlanCredits);
+                  console.log(`Downgrade detected: Capping credits at ${newCreditsBalance} (was ${currentBalance})`);
+                }
+              } else {
+                // Same tier: Check if this is a renewal
+                if (isRenewal) {
+                  // Renewal: Reset to full plan credits (no carryover)
+                  newCreditsBalance = newPlanCredits;
+                  console.log(`Renewal detected: Resetting credits to full plan amount ${newPlanCredits}`);
+                } else {
+                  // Same tier, same period: Preserve existing credits
+                  newCreditsBalance = currentBalance;
+                  console.log(`Same tier, same period: Preserving existing credits ${currentBalance}`);
+                }
+              }
 
               const { error: creditsError } = await supabase
                 .from('user_credits')
                 .upsert({
                   user_id: userId,
-                  credits_balance: credits,
+                  credits_balance: newCreditsBalance,
                   updated_at: new Date().toISOString(),
                 }, { onConflict: 'user_id', ignoreDuplicates: false });
 
               if (creditsError) {
                 console.error('Failed to upsert user credits:', creditsError);
               } else {
-                console.log(`Credits upserted for user: ${event.type}`, userId);
+                console.log(`Credits updated for user: ${event.type}`, {
+                  userId,
+                  previousTier,
+                  newTier: tier,
+                  previousBalance: currentBalance,
+                  newBalance: newCreditsBalance
+                });
               }
             } else {
               console.log(`Skipping profile update, subscription status: ${event.type}`, status);
