@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const signature = headers().get('stripe-signature');
+    const signature = (await headers()).get('stripe-signature');
     if (!signature) {
       console.error('Missing stripe signature');
       return NextResponse.json(
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        console.log('customer.subscription.updated');
+        console.log(`webhook: ${event.type}`);
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const status = subscription.status;
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
         let userId = subscription.metadata?.user_id;
 
-        console.log('Processing subscription update:', {
+        console.log(`Processing subscription update: ${event.type}`, {
           customerId,
           status,
           priceId,
@@ -87,10 +87,10 @@ export async function POST(request: Request) {
         if (!userId) {
           // Try to find userId from customer metadata
           const customer = await stripe.customers.retrieve(customerId);
-          console.log('Retrieved customer:', customer);
+          console.log(`Retrieved customer: ${event.type}`, customer);
           if ('metadata' in customer && customer.metadata?.user_id) {
             userId = customer.metadata.user_id;
-            console.log('Found userId in customer metadata:', userId);
+            console.log(`Found userId in customer metadata: ${event.type}`, userId);
           }
         }
 
@@ -105,12 +105,13 @@ export async function POST(request: Request) {
             tier = 'growth';
           }
           
-          console.log('Calculated tier:', {
+          console.log(`Calculated tier: ${event.type}`, {
             tier,
             priceId
           });
 
           // Update subscription in database
+          // Use stripe_subscription_id as conflict key since it uniquely identifies the subscription
           const { error: updateError } = await supabase
             .from('subscriptions')
             .upsert({
@@ -127,18 +128,18 @@ export async function POST(request: Request) {
               quantity: subscription.items.data[0].quantity || 1,
               updated_at: new Date().toISOString()
             }, {
-              onConflict: 'stripe_customer_id',
+              onConflict: 'stripe_subscription_id',
               ignoreDuplicates: false
             });
 
           if (updateError) {
             console.error('Failed to update subscription:', updateError);
           } else {
-            console.log('Successfully updated subscription');
+            console.log(`Successfully updated subscription: ${event.type}`);
             
             // Only update the profile tier if the subscription is active
             if (status === 'active' || status === 'trialing') {
-              console.log('Updating profile tier to:', tier);
+              console.log(`Updating profile tier to: ${event.type}`, tier);
               
               const { data: profile, error: profileError } = await supabase
                 .from('profiles')
@@ -153,7 +154,7 @@ export async function POST(request: Request) {
               if (profileError) {
                 console.error('Failed to update profile tier:', profileError);
               } else {
-                console.log('Successfully updated profile:', profile);
+                console.log(`Successfully updated profile: ${event.type}`, profile);
               }
 
               // Upsert user_credits with plan allowance
@@ -172,14 +173,14 @@ export async function POST(request: Request) {
               if (creditsError) {
                 console.error('Failed to upsert user credits:', creditsError);
               } else {
-                console.log('Credits upserted for user:', userId);
+                console.log(`Credits upserted for user: ${event.type}`, userId);
               }
             } else {
-              console.log('Skipping profile update, subscription status:', status);
+              console.log(`Skipping profile update, subscription status: ${event.type}`, status);
             }
           }
         } else {
-          console.error('No userId found for subscription');
+          console.error(`No userId found for subscription: ${event.type}`);
         }
         break;
       }
@@ -200,7 +201,7 @@ export async function POST(request: Request) {
             .match({ user_id: userId, stripe_customer_id: customerId });
 
           if (updateError) {
-            console.error('Failed to cancel subscription:', updateError);
+            console.error(`Failed to cancel subscription: ${event.type}`, updateError);
           }
 
           // Reset user's subscription tier
@@ -227,7 +228,7 @@ export async function POST(request: Request) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
             userId = subscription.metadata?.user_id;
           } catch (error) {
-            console.error('Error retrieving subscription for invoice:', error);
+            console.error(`Error retrieving subscription for invoice: ${event.type}`, error);
           }
         }
 
@@ -239,7 +240,7 @@ export async function POST(request: Request) {
               userId = customer.metadata.user_id;
             }
           } catch (error) {
-            console.error('Error retrieving customer for invoice:', error);
+            console.error(`Error retrieving customer for invoice: ${event.type}`, error);
           }
         }
 
@@ -263,7 +264,7 @@ export async function POST(request: Request) {
             });
 
           if (insertError) {
-            console.error('Failed to record invoice:', insertError);
+            console.error(`Failed to record invoice: ${event.type}`, insertError);
           }
         }
         break;
@@ -280,7 +281,7 @@ export async function POST(request: Request) {
             const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
             userId = subscription.metadata?.user_id;
           } catch (error) {
-            console.error('Error retrieving subscription for failed invoice:', error);
+            console.error(`Error retrieving subscription for failed invoice: ${event.type}`, error);
           }
         }
 
@@ -292,7 +293,7 @@ export async function POST(request: Request) {
               userId = customer.metadata.user_id;
             }
           } catch (error) {
-            console.error('Error retrieving customer for failed invoice:', error);
+            console.error(`Error retrieving customer for failed invoice: ${event.type}`, error);
           }
         }
 
@@ -306,7 +307,7 @@ export async function POST(request: Request) {
           .eq('stripe_customer_id', customerId);
 
         if (updateError) {
-          console.error('Failed to update subscription status:', updateError);
+          console.error(`Failed to update subscription status: ${event.type}`, updateError);
           return NextResponse.json(
             { error: 'Failed to update subscription status' },
             { status: 500 }

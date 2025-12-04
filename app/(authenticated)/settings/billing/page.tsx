@@ -424,25 +424,38 @@ export default function BillingPage() {
           <Card className="md:col-span-2">
             <div className="p-6 space-y-4">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
+                <div className="space-y-2">
                   <h3 className="text-lg font-medium">Current Plan</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      subscription.tier === 'basic' 
-                        ? 'bg-blue-100 text-blue-800 bg-blue-900/30 text-blue-400'
-                        : subscription.tier === 'starter'
-                        ? 'bg-green-100 text-green-800 bg-green-900/30 text-green-400'
-                        : subscription.tier === 'advanced'
-                        ? 'bg-purple-100 text-purple-800 bg-purple-900/30 text-purple-400'
-                        : subscription.tier === 'growth'
-                        ? 'bg-indigo-100 text-indigo-800 bg-indigo-900/30 text-indigo-400'
-                        : 'bg-gray-100 text-gray-800 bg-gray-800 text-gray-300'
-                    }`}>
-                      {subscription.tier === 'free' ? 'Free Plan' : `${subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} Plan`}
-                    </span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                        subscription.tier === 'basic' 
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                          : subscription.tier === 'starter'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                          : subscription.tier === 'advanced'
+                          ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+                          : subscription.tier === 'growth'
+                          ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+                      }`}>
+                        {subscription.tier === 'free' 
+                          ? 'Free Plan' 
+                          : `${PLANS[subscription.tier.toUpperCase()]?.name || subscription.tier.charAt(0).toUpperCase() + subscription.tier.slice(1)} Plan`}
+                      </span>
+                      {subscription.tier !== 'free' && (
+                        <span className="text-sm font-medium text-foreground">
+                          ${PLANS[subscription.tier.toUpperCase()]?.price || 0}/month
+                        </span>
+                      )}
+                    </div>
                     {subscription.tier !== 'free' && subscription.currentPeriodEnd && (
                       <span className="text-sm text-muted-foreground">
-                        Next billing date: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                        Next billing date: {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
                       </span>
                     )}
                   </div>
@@ -483,12 +496,16 @@ export default function BillingPage() {
                 )}
               </div>
 
-              {subscription.cancelAtPeriodEnd && (
+              {subscription.cancelAtPeriodEnd && subscription.currentPeriodEnd && (
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Subscription Canceling</AlertTitle>
                   <AlertDescription>
-                    Your subscription will be canceled on {new Date(subscription.currentPeriodEnd!).toLocaleDateString()}. 
+                    Your subscription will be canceled on {new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}. 
                     You can resume your subscription anytime before this date.
                   </AlertDescription>
                 </Alert>
@@ -706,7 +723,7 @@ export default function BillingPage() {
                     ) : (
                       <>
                         <Zap className="mr-2 h-4 w-4" />
-                        Upgrade to Pro
+                        Upgrade to Basic
                       </>
                     )}
                   </Button>
@@ -717,20 +734,28 @@ export default function BillingPage() {
         </div>
 
         {/* Available Plans */}
-        {subscription.tier !== 'growth' && (
-          <div className="pt-4">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-medium">Available Plans</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Choose the plan that best fits your needs
-                </p>
-              </div>
+        <div className="pt-4">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-semibold">Available Plans</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Choose the plan that best fits your needs
+              </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-3">
-              {Object.entries(PLANS)
-                .filter(([key]) => key !== subscription.tier.toUpperCase())
-                .map(([key, plan]) => (
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(PLANS)
+              .filter(([key]) => {
+                // Show all plans except FREE if user is on free tier
+                // If user is on a paid plan, show only higher tier plans
+                if (subscription.tier === 'free') {
+                  return key !== 'FREE';
+                }
+                const currentPlanPrice = PLANS[subscription.tier.toUpperCase()]?.price || 0;
+                const planPrice = plan.price;
+                return planPrice > currentPlanPrice;
+              })
+              .map(([key, plan]) => (
                   <Card 
                     key={key} 
                     className={`relative group transition-all duration-300 hover:scale-[1.01] ${
@@ -779,11 +804,11 @@ export default function BillingPage() {
                           className={`w-full ${
                             key === 'ADVANCED' 
                               ? 'bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 hover:from-blue-700 hover:via-blue-800 hover:to-indigo-700' 
-                              : 'border-blue-200/50 border-blue-800/50'
+                              : 'border-blue-200/50 dark:border-blue-800/50'
                           }`}
-                          variant="default"
+                          variant={key === 'ADVANCED' ? 'default' : 'outline'}
                           onClick={() => handleUpgradeSubscription(plan.id.toLowerCase())}
-                          disabled={loadingStates.billing}
+                          disabled={loadingStates.billing || key === 'GROWTH'}
                         >
                           {loadingStates.billing ? (
                             <>
@@ -796,9 +821,12 @@ export default function BillingPage() {
                                 <>Contact Sales</>
                               ) : (
                                 <>
-                                  {plan.price > PLANS[subscription.tier.toUpperCase()].price ? 'Upgrade to ' : 'Switch to '}
-                                  {plan.name}
-                                  <Zap className="ml-2 h-4 w-4" />
+                                  {subscription.tier === 'free' 
+                                    ? `Upgrade to ${plan.name}`
+                                    : plan.price > (PLANS[subscription.tier.toUpperCase()]?.price || 0)
+                                    ? `Upgrade to ${plan.name}`
+                                    : `Switch to ${plan.name}`}
+                                  {key !== 'GROWTH' && <Zap className="ml-2 h-4 w-4" />}
                                 </>
                               )}
                             </>
