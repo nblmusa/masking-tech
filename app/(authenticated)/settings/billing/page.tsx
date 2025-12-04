@@ -745,7 +745,7 @@ export default function BillingPage() {
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {Object.entries(PLANS)
-              .filter(([key]) => {
+              .filter(([key, plan]) => {
                 // Show all plans except FREE if user is on free tier
                 // If user is on a paid plan, show only higher tier plans
                 if (subscription.tier === 'free') {
@@ -838,7 +838,6 @@ export default function BillingPage() {
                 ))}
             </div>
           </div>
-        )}
       </div>
     </div>
   )
