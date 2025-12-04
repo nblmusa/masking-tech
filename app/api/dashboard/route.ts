@@ -35,15 +35,42 @@ export async function GET() {
     const monthlyQuota = plan?.limits.imagesPerMonth || 20;
 
     // Get user credits balance
-    const { data: credits, error: creditsError } = await supabase
+    const { data: credits } = await supabase
       .from('user_credits')
       .select('credits_balance')
       .eq('user_id', userId)
       .single();
 
-    // Calculate images processed (quota - remaining credits)
+    // Get count of processed images for current billing period
+    // Use subscription period if available, otherwise use current month
+    const { data: subscription } = await supabase
+      .from('subscriptions')
+      .select('current_period_start, current_period_end')
+      .eq('user_id', userId)
+      .single();
+
+    let periodStart: Date;
+    if (subscription?.current_period_start) {
+      periodStart = new Date(subscription.current_period_start);
+    } else {
+      // Fallback to start of current month
+      periodStart = new Date();
+      periodStart.setDate(1);
+      periodStart.setHours(0, 0, 0, 0);
+    }
+
+    // Count processed images in current period
+    const { count: processedCount } = await supabase
+      .from('processed_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('processed_at', periodStart.toISOString());
+
+    // Calculate images processed: use actual count if available, otherwise use credits calculation
     const creditsBalance = credits?.credits_balance ?? monthlyQuota;
-    const imagesProcessed = Math.max(0, monthlyQuota - creditsBalance);
+    const imagesProcessedFromCredits = Math.max(0, monthlyQuota - creditsBalance);
+    // Use the higher of the two to ensure we show accurate usage
+    const imagesProcessed = Math.max(imagesProcessedFromCredits, processedCount || 0);
 
     // Get or create user stats (for detected_plates and other stats)
     let { data: stats, error: statsError } = await supabase
@@ -128,7 +155,8 @@ export async function GET() {
     return NextResponse.json({
       stats: statsData,
       recentActivity: recentActivity || [],
-      apiKey: apiKeys[0]
+      apiKey: apiKeys[0],
+      subscriptionTier: tier // Include tier for frontend display
     });
   } catch (error) {
     console.error('Dashboard API Error:', error);

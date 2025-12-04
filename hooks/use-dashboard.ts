@@ -51,6 +51,7 @@ export function useDashboard() {
     lastUploadTime: null,
     detectedPlates: 0
   })
+  const [subscriptionTier, setSubscriptionTier] = useState<string>('free')
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -74,6 +75,8 @@ export function useDashboard() {
         lastUploadTime: data.stats?.last_upload_time,
         detectedPlates: data.stats?.detected_plates || 0
       })
+
+      setSubscriptionTier(data.subscriptionTier || 'free')
 
       setRecentActivity((data.recentActivity || []).map((item: ProcessedImage): RecentActivity => ({
         id: item.id,
@@ -252,6 +255,7 @@ export function useDashboard() {
   return {
     isLoading,
     stats,
+    subscriptionTier,
     recentActivity,
     apiKey,
     isAuthenticated,
