@@ -281,6 +281,35 @@ export async function POST(request: Request) {
               watermarkEnabled: !!settings.watermarkSettings?.enabled
             }
           }])
+
+        // Deduct credits (1 credit per image)
+        const { data: currentCredits } = await supabase
+          .from('user_credits')
+          .select('credits_balance')
+          .eq('user_id', processingData.user_id)
+          .single();
+
+        if (currentCredits && currentCredits.credits_balance > 0) {
+          const { error: creditsError } = await supabase
+            .from('user_credits')
+            .update({ 
+              credits_balance: Math.max(0, currentCredits.credits_balance - 1),
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', processingData.user_id);
+
+          if (!creditsError) {
+            // Record usage
+            await supabase
+              .from('usage_records')
+              .insert({
+                user_id: processingData.user_id,
+                service: 'async',
+                credits_used: 1,
+                month_year: new Date().toISOString().slice(0, 7) // YYYY-MM format
+              });
+          }
+        }
       }
       
       return NextResponse.json({

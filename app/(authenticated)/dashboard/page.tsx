@@ -32,12 +32,14 @@ import Image from "next/image"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { PLANS } from "@/lib/stripe"
 
 export default function DashboardPage() {
   const [showApiKey, setShowApiKey] = useState(false)
   const {
     isLoading,
     stats,
+    subscriptionTier,
     recentActivity,
     apiKey,
     isAuthenticated,
@@ -48,6 +50,9 @@ export default function DashboardPage() {
   } = useDashboard()
   const router = useRouter()
   const { toast } = useToast()
+  
+  const plan = PLANS[subscriptionTier.toUpperCase()] || PLANS.FREE
+  const planName = plan.name
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -195,6 +200,16 @@ export default function DashboardPage() {
   return (
     <div className="h-full overflow-auto p-6">
       <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Section */}
+        <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:space-y-0">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <p className="text-muted-foreground mt-2">
+              Overview of your account activity and usage statistics
+            </p>
+          </div>
+        </div>
+
         {/* Usage Alert */}
         {isNearLimit && (
           <Alert className="bg-yellow-50/50 bg-yellow-950/50 border-yellow-200/50 border-yellow-800/50">
@@ -427,15 +442,17 @@ export default function DashboardPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="font-medium">Free Plan</p>
+                      <p className="font-medium">{planName} Plan</p>
                       <p className="text-sm text-muted-foreground">{stats.monthlyQuota} images per month</p>
                     </div>
-                    <Button variant="outline" size="sm" className="gap-2 flex-shrink-0" asChild>
-                      <Link href="/settings/billing">
-                        <Sparkles className="h-4 w-4" />
-                        Upgrade
-                      </Link>
-                    </Button>
+                    {subscriptionTier === 'free' && (
+                      <Button variant="outline" size="sm" className="gap-2 flex-shrink-0" asChild>
+                        <Link href="/settings/billing">
+                          <Sparkles className="h-4 w-4" />
+                          Upgrade
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <div className="p-6">

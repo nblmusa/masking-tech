@@ -1,7 +1,7 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase';
-import { stripe } from '@/lib/stripe';
+import { stripe, PLANS } from '@/lib/stripe';
 import Stripe from 'stripe';
 
 // This is your Stripe webhook secret for testing your endpoint locally.
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const signature = headers().get('stripe-signature');
+    const signature = (await headers()).get('stripe-signature');
     if (!signature) {
       console.error('Missing stripe signature');
       return NextResponse.json(
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
         signature,
         webhookSecret
       );
+
     } catch (err) {
       console.error('Webhook signature verification failed:', err);
       return NextResponse.json(
@@ -44,6 +45,8 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    console.log('event.type', event.type);
 
     const supabase = createServiceClient();
 
@@ -68,7 +71,7 @@ export async function POST(request: Request) {
 
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        console.log('customer.subscription.updated');
+        console.log(`webhook: ${event.type}`);
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const status = subscription.status;
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
         const currentPeriodEnd = new Date(subscription.current_period_end * 1000);
         let userId = subscription.metadata?.user_id;
 
-        console.log('Processing subscription update:', {
+        console.log(`Processing subscription update: ${event.type}`, {
           customerId,
           status,
           priceId,
@@ -87,14 +90,21 @@ export async function POST(request: Request) {
         if (!userId) {
           // Try to find userId from customer metadata
           const customer = await stripe.customers.retrieve(customerId);
-          console.log('Retrieved customer:', customer);
+          console.log(`Retrieved customer: ${event.type}`, customer);
           if ('metadata' in customer && customer.metadata?.user_id) {
             userId = customer.metadata.user_id;
-            console.log('Found userId in customer metadata:', userId);
+            console.log(`Found userId in customer metadata: ${event.type}`, userId);
           }
         }
 
         if (userId) {
+          // Get stored subscription BEFORE updating to detect renewals
+          const { data: storedSubscription } = await supabase
+            .from('subscriptions')
+            .select('current_period_start, plan_id')
+            .eq('user_id', userId)
+            .single();
+
           // Calculate tier based on new plan structure
           let tier = 'basic';
           if (priceId === process.env.STRIPE_STARTER_PRICE_ID) {
@@ -105,12 +115,23 @@ export async function POST(request: Request) {
             tier = 'growth';
           }
           
-          console.log('Calculated tier:', {
+          console.log(`Calculated tier: ${event.type}`, {
             tier,
             priceId
           });
 
+          // Detect if this is a renewal (same tier, new billing period)
+          const previousPeriodStart = storedSubscription?.current_period_start 
+            ? new Date(storedSubscription.current_period_start).getTime() 
+            : null;
+          const newPeriodStart = currentPeriodStart.getTime();
+          const isRenewal = previousPeriodStart !== null && 
+            previousPeriodStart !== newPeriodStart &&
+            storedSubscription?.plan_id === tier;
+
           // Update subscription in database
+          // Use stripe_customer_id as conflict key since it has a unique constraint
+          // This ensures we update the existing subscription record for the customer
           const { error: updateError } = await supabase
             .from('subscriptions')
             .upsert({
@@ -134,12 +155,22 @@ export async function POST(request: Request) {
           if (updateError) {
             console.error('Failed to update subscription:', updateError);
           } else {
-            console.log('Successfully updated subscription');
+            console.log(`Successfully updated subscription: ${event.type}`);
             
             // Only update the profile tier if the subscription is active
             if (status === 'active' || status === 'trialing') {
-              console.log('Updating profile tier to:', tier);
+              console.log(`Updating profile tier to: ${event.type}`, tier);
               
+              // Get previous tier BEFORE updating profile to detect upgrades
+              const { data: previousProfile } = await supabase
+                .from('profiles')
+                .select('subscription_tier')
+                .eq('id', userId)
+                .single();
+
+              const previousTier = previousProfile?.subscription_tier || 'free';
+              
+              // Update profile tier
               const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .update({
@@ -153,38 +184,79 @@ export async function POST(request: Request) {
               if (profileError) {
                 console.error('Failed to update profile tier:', profileError);
               } else {
-                console.log('Successfully updated profile:', profile);
+                console.log(`Successfully updated profile: ${event.type}`, profile);
               }
 
-              // Upsert user_credits with plan allowance
-              const planCredits: Record<string, number> = {
-                free: 20,
-                basic: 300,
-                starter: 1200,
-                advanced: 2500,
-                growth: 6000,
-              };
-              const credits = planCredits[tier] ?? 20;
+              // Handle credits based on subscription update type
+              const plan = PLANS[tier.toUpperCase()];
+              const newPlanCredits = plan?.limits.imagesPerMonth ?? 20;
+              const previousPlan = PLANS[previousTier.toUpperCase()];
+              const previousPlanCredits = previousPlan?.limits.imagesPerMonth ?? 20;
+
+              // Get current credits balance
+              const { data: currentCredits } = await supabase
+                .from('user_credits')
+                .select('credits_balance')
+                .eq('user_id', userId)
+                .single();
+
+              const currentBalance = currentCredits?.credits_balance ?? previousPlanCredits;
+              let newCreditsBalance: number;
+
+              if (event.type === 'customer.subscription.created') {
+                // New subscription: set to full plan credits
+                newCreditsBalance = newPlanCredits;
+                console.log(`New subscription: Setting credits to ${newCreditsBalance}`);
+              } else if (tier !== previousTier) {
+                // Tier changed (upgrade or downgrade)
+                if (newPlanCredits > previousPlanCredits) {
+                  // Upgrade: preserve remaining credits and add the difference
+                  const creditDifference = newPlanCredits - previousPlanCredits;
+                  newCreditsBalance = currentBalance + creditDifference;
+                  console.log(`Upgrade detected: Preserving ${currentBalance} credits, adding ${creditDifference}, new balance: ${newCreditsBalance}`);
+                } else {
+                  // Downgrade: keep existing credits but cap at new plan limit
+                  newCreditsBalance = Math.min(currentBalance, newPlanCredits);
+                  console.log(`Downgrade detected: Capping credits at ${newCreditsBalance} (was ${currentBalance})`);
+                }
+              } else {
+                // Same tier: Check if this is a renewal
+                if (isRenewal) {
+                  // Renewal: Reset to full plan credits (no carryover)
+                  newCreditsBalance = newPlanCredits;
+                  console.log(`Renewal detected: Resetting credits to full plan amount ${newPlanCredits}`);
+                } else {
+                  // Same tier, same period: Preserve existing credits
+                  newCreditsBalance = currentBalance;
+                  console.log(`Same tier, same period: Preserving existing credits ${currentBalance}`);
+                }
+              }
 
               const { error: creditsError } = await supabase
                 .from('user_credits')
                 .upsert({
                   user_id: userId,
-                  credits_balance: credits,
+                  credits_balance: newCreditsBalance,
                   updated_at: new Date().toISOString(),
                 }, { onConflict: 'user_id', ignoreDuplicates: false });
 
               if (creditsError) {
                 console.error('Failed to upsert user credits:', creditsError);
               } else {
-                console.log('Credits upserted for user:', userId);
+                console.log(`Credits updated for user: ${event.type}`, {
+                  userId,
+                  previousTier,
+                  newTier: tier,
+                  previousBalance: currentBalance,
+                  newBalance: newCreditsBalance
+                });
               }
             } else {
-              console.log('Skipping profile update, subscription status:', status);
+              console.log(`Skipping profile update, subscription status: ${event.type}`, status);
             }
           }
         } else {
-          console.error('No userId found for subscription');
+          console.error(`No userId found for subscription: ${event.type}`);
         }
         break;
       }
@@ -205,7 +277,7 @@ export async function POST(request: Request) {
             .match({ user_id: userId, stripe_customer_id: customerId });
 
           if (updateError) {
-            console.error('Failed to cancel subscription:', updateError);
+            console.error(`Failed to cancel subscription: ${event.type}`, updateError);
           }
 
           // Reset user's subscription tier
@@ -227,16 +299,24 @@ export async function POST(request: Request) {
         let userId: string | undefined;
 
         // Try to get userId from subscription metadata
-        if (invoice.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-          userId = subscription.metadata?.user_id;
+        if (invoice.subscription && typeof invoice.subscription === 'string') {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+            userId = subscription.metadata?.user_id;
+          } catch (error) {
+            console.error(`Error retrieving subscription for invoice: ${event.type}`, error);
+          }
         }
 
         // If not found, try to get from customer metadata
         if (!userId) {
-          const customer = await stripe.customers.retrieve(customerId);
-          if ('metadata' in customer && customer.metadata?.user_id) {
-            userId = customer.metadata.user_id;
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if ('metadata' in customer && customer.metadata?.user_id) {
+              userId = customer.metadata.user_id;
+            }
+          } catch (error) {
+            console.error(`Error retrieving customer for invoice: ${event.type}`, error);
           }
         }
 
@@ -260,7 +340,7 @@ export async function POST(request: Request) {
             });
 
           if (insertError) {
-            console.error('Failed to record invoice:', insertError);
+            console.error(`Failed to record invoice: ${event.type}`, insertError);
           }
         }
         break;
@@ -269,8 +349,29 @@ export async function POST(request: Request) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
-        const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-        const userId = subscription.metadata?.user_id;
+        let userId: string | undefined;
+
+        // Try to get userId from subscription metadata
+        if (invoice.subscription && typeof invoice.subscription === 'string') {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
+            userId = subscription.metadata?.user_id;
+          } catch (error) {
+            console.error(`Error retrieving subscription for failed invoice: ${event.type}`, error);
+          }
+        }
+
+        // If not found, try to get from customer metadata
+        if (!userId && customerId) {
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if ('metadata' in customer && customer.metadata?.user_id) {
+              userId = customer.metadata.user_id;
+            }
+          } catch (error) {
+            console.error(`Error retrieving customer for failed invoice: ${event.type}`, error);
+          }
+        }
 
         // Update subscription status to past_due
         const { error: updateError } = await supabase
@@ -282,7 +383,7 @@ export async function POST(request: Request) {
           .eq('stripe_customer_id', customerId);
 
         if (updateError) {
-          console.error('Failed to update subscription status:', updateError);
+          console.error(`Failed to update subscription status: ${event.type}`, updateError);
           return NextResponse.json(
             { error: 'Failed to update subscription status' },
             { status: 500 }
