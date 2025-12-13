@@ -25,30 +25,36 @@ export async function GET() {
       .eq('user_id', userId)
       .single();
 
-    if (statsError) {
-      if (statsError.code === 'PGRST116') {
-        // Create default stats if they don't exist
-        const { data: newStats, error: createStatsError } = await supabase
-          .from('user_stats')
-          .insert([{
-            user_id: userId,
-            images_processed: 0,
-            monthly_quota: 20,
-            detected_plates: 0
-          }])
-          .select()
-          .single();
 
-        if (createStatsError) {
-          throw createStatsError;
-        }
-        stats = newStats;
-      } else {
-        throw statsError;
-      }
-    }
+    // if (statsError) {
+    //   console.log('statsError-----', statsError);
+    //   if (statsError.code === 'PGRST116') {
+    //     // Create default stats if they don't exist
+    //     const { data: newStats, error: createStatsError } = await supabase
+    //       .from('user_stats')
+    //       .insert([{
+    //         user_id: userId,
+    //         images_processed: 0,
+    //         monthly_quota: 20,
+    //         detected_plates: 0
+    //       }])
+    //       .select()
+    //       .single();
+
+    //       console.log('newStats', newStats);
+
+    //     if (createStatsError) {
+    //       throw createStatsError;
+    //     }
+    //     stats = newStats;
+    //   } else {
+    //     throw statsError;
+    //   }
+    // }
 
     // Get recent activity
+   
+   
     const { data: recentActivity, error: activityError } = await supabase
       .from('processed_images')
       .select('*')
