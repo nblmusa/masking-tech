@@ -624,7 +624,7 @@ const result = await client.maskLicensePlate('path/to/image.jpg');`}
                           <h4 className="font-semibold mb-2">cURL Example</h4>
                           <div className="p-4 bg-muted rounded-lg">
                             <pre className="text-sm overflow-x-auto">
-{`curl --location 'https://77.104.167.149:43159/api/v1/generate-external' \\
+{`curl --location 'https://142.170.89.112:23487/api/v1/generate-external' \\
   --header 'Authorization: YOUR_API_KEY' \\
   --header 'Accept: image/png' \\
   --header 'X-User-ID: YOUR_USER_ID' \\                  # if using multi-tenant setup

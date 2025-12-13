@@ -132,11 +132,15 @@ async function processImageWithPythonServer(
   }
 
 
+    console.log('hereeeeee',process.env.INTERNAL_API_SECRET,userId);
+
   
   try {
       // Call the Python server
 
-  const response = await fetch(`http://77.104.167.149:43159/api/v1/generate-v1`, {
+      //77.104.167.149:43159
+      //142.170.89.112:23487 - new server
+  const response = await fetch(`http://142.170.89.112:23487/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
@@ -145,6 +149,8 @@ async function processImageWithPythonServer(
       body: formData
     })
     
+
+  
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`Python server error: ${response.status} - ${errorText}`)
