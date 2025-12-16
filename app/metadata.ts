@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: 'MaskingTech | Car Plate Masking & Car Background Replacement',
     description: 'MaskingTech helps car dealerships and marketplaces create stunning studio-grade visuals with AI-powered license plate masking, face blurring, and background replacement.',
     url: 'https://maskingtech.com',
-    siteName: 'MaskingTech',
+    siteName: 'Masking Tech',
     locale: 'en_US',
     type: 'website',
     images: [

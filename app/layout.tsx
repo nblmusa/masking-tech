@@ -140,7 +140,7 @@ export default function RootLayout({
           {JSON.stringify({
             "@context": "https://schema.org/",
             "@type": "WebSite",
-            "name": "MaskingTech",
+            "name": "Masking Tech",
             "url": "https://maskingtech.com",
             "potentialAction": {
               "@type": "SearchAction",
