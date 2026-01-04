@@ -38,9 +38,6 @@ export async function GET(request: NextRequest) {
       }
 
       if (data.user) {
-        // Send notification email about new Google OAuth registration
-        const userName = data.user.user_metadata?.full_name || data.user.user_metadata?.name
-        await sendNewUserNotification(data.user.email!, userName)
         // Check if this is a new user (Google OAuth signup)
         const isNewUser = !data.user.created_at || 
           new Date(data.user.created_at).getTime() > Date.now() - 10000 // Created within last 10 seconds
@@ -91,6 +88,9 @@ export async function GET(request: NextRequest) {
             // Continue with authentication even if settings creation fails
           }
 
+          // Send notification email about new Google OAuth registration
+          const userName = data.user.user_metadata?.full_name || data.user.user_metadata?.name
+          await sendNewUserNotification(data.user.email!, userName)
         }
 
         // Check if this is an email confirmation
