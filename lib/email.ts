@@ -2,6 +2,7 @@ const RESEND_API_KEY = 're_MRttuCAj_JS8zYMip7wYz1Uv6JYn4Vh7H';
 
 export async function sendNewUserNotification(userEmail: string, userName?: string) {
   try {
+    console.log('Sending new user notification for:', userEmail, userName);
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -10,8 +11,7 @@ export async function sendNewUserNotification(userEmail: string, userName?: stri
       },
       body: JSON.stringify({
         from: 'onboarding@resend.dev',
-        to: 'maged@maskingtech.com',
-        cc: 'mujtaba@maskingtech.com',
+        to: 'mujtaba@maskingtech.com',
         subject: 'New User Registration - MaskingTech',
         html: `
           <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
