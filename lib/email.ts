@@ -36,7 +36,6 @@ export async function sendNewUserNotification(userEmail: string, userName?: stri
   // } catch (error) {
   //   console.error('Failed to send new user notification email:', error);
   // }
-  
   console.log('New user notification skipped for:', userEmail, userName);
   // In production, you would uncomment the above block and use the actual email sending logic
   // to notify admins about new user registrations
