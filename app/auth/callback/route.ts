@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { sendNewUserNotification } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
@@ -86,6 +87,10 @@ export async function GET(request: NextRequest) {
             console.error('Error creating user settings for Google OAuth user:', settingsError)
             // Continue with authentication even if settings creation fails
           }
+
+          // Send notification email about new Google OAuth registration
+          const userName = data.user.user_metadata?.full_name || data.user.user_metadata?.name
+          await sendNewUserNotification(data.user.email!, userName)
         }
 
         // Check if this is an email confirmation

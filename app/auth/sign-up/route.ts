@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { sendNewUserNotification } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -122,6 +123,9 @@ console.log(user.id, user);
         console.error('Error creating user settings:', settingsError);
         // Continue with signup even if settings creation fails
       }
+
+      // Send notification email about new registration
+      await sendNewUserNotification(email, `${firstName} ${lastName}`);
     }
 
     if (user && !user.email_confirmed_at) {
