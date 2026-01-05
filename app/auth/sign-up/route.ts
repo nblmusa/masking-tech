@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { sendNewUserNotification } from '@/lib/email';
 
+
 export async function POST(request: Request) {
   try {
     const requestUrl = new URL(request.url);
@@ -123,12 +124,12 @@ console.log(user.id, user);
         console.error('Error creating user settings:', settingsError);
         // Continue with signup even if settings creation fails
       }
-
-      // Send notification email about new registration
-      await sendNewUserNotification(email, `${firstName} ${lastName}`);
     }
 
     if (user && !user.email_confirmed_at) {
+      if (user) {
+        sendNewUserNotification(user.email!, user.user_metadata.first_name + ' ' + user.user_metadata.last_name);
+      }
       return NextResponse.json({
         success: true,
         requiresEmailConfirmation: true,
