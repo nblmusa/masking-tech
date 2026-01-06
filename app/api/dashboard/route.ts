@@ -96,6 +96,7 @@ export async function GET() {
     }
 
     // Update user_stats with correct monthly_quota and images_processed
+    console.log('updateStatsError', imagesProcessed);
     const { error: updateStatsError } = await supabase
       .from('user_stats')
       .upsert({

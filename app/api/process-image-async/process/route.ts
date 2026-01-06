@@ -82,7 +82,7 @@ async function processImageWithPythonServer(
   
   try {
     // Call the Python server
-    const response = await fetch(`http://localhost:8080/api/v1/generate-v1`, {
+    const response = await fetch(`https://142.170.89.112:23487/api/v1/generate-v1`, {
       method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
