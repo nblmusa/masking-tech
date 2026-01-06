@@ -38,16 +38,16 @@ async function processImageWithPythonServer(
   detectionSettings: any,
   userId?: string
 ): Promise<{ processedImage: Buffer | null; detectedPlates: number }> {
-  
+
   // Create FormData for the Python server
   const formData = new FormData()
-  
+
   // Add the image - convert Buffer to Uint8Array for Blob compatibility
   const imageArray = new Uint8Array(imageBuffer)
   const imageBlob = new Blob([imageArray], { type: 'image/jpeg' })
   formData.append('image', imageBlob, 'image.jpg')
-  
-  
+
+
   // Add background label if using preset backgrounds
   if (backgroundReplacement?.template && backgroundReplacement.template !== 'transparent') {
     formData.append('background_label', backgroundReplacement.template)
@@ -61,7 +61,7 @@ async function processImageWithPythonServer(
   } else {
     console.log('No background image buffer or empty buffer - skipping background_image')
   }
-  
+
   // Add logo settings if provided
   console.log('Logo settings received:', logoSettings)
   if (logoSettings && logoSettings.url) {
@@ -72,7 +72,7 @@ async function processImageWithPythonServer(
     })
     formData.append('logo_url', logoSettings.url)
     formData.append('logo_position', logoSettings.position)
-    
+
     // Add watermark image if available
     if (logoSettings.watermark_image) {
       try {
@@ -80,7 +80,7 @@ async function processImageWithPythonServer(
         const watermarkImageBuffer = Buffer.from(logoSettings.watermark_image, 'base64')
         const watermarkImageArray = new Uint8Array(watermarkImageBuffer)
         const watermarkImageBlob = new Blob([watermarkImageArray], { type: 'image/png' })
-        
+
         console.log('Adding watermark image to form data')
         formData.append('watermark_image', watermarkImageBlob, 'watermark_image.png')
       } catch (error) {
@@ -96,12 +96,12 @@ async function processImageWithPythonServer(
           const plateLogoBuffer = Buffer.from(logoSettings.plate_logo, 'base64')
           const plateLogoArray = new Uint8Array(plateLogoBuffer)
           const plateLogoBlob = new Blob([plateLogoArray], { type: 'image/png' })
-          
+
           console.log('Adding plate logo to form data')
           formData.append('plate_logo', plateLogoBlob, 'plate_logo.png')
     }
 
-  
+
   // Add detection settings
   console.log('Detection settings received:', detectionSettings)
   if (detectionSettings) {
@@ -112,7 +112,7 @@ async function processImageWithPythonServer(
       blurLicensePlates: detectionSettings.blurLicensePlates
     })
   }
-  
+
   // Add watermark settings if provided
   console.log('Watermark settings received:', watermarkSettings)
   if (watermarkSettings && watermarkSettings.text) {
@@ -135,43 +135,43 @@ async function processImageWithPythonServer(
 
     console.log('hereeeeee',process.env.INTERNAL_API_SECRET,userId);
 
-  
+
   try {
       // Call the Python server
 
       //77.104.167.149:43159
       //142.170.89.112:23487 - new server
   const response = await fetch(`https://142.170.89.112:23487/api/v1/generate-v1`, {
-      method: 'POST',
+     method: 'POST',
       headers: {
         'X-Internal-Secret': process.env.INTERNAL_API_SECRET || '',
         ...(userId && { 'X-User-ID': userId })
       },
       body: formData
     })
-    
 
-  
+
+
     if (!response.ok) {
       const errorText = await response.text()
       throw new Error(`Python server error: ${response.status} - ${errorText}`)
     }
-    
+
     // Get the processed image as buffer
     const processedImageBuffer = Buffer.from(await response.arrayBuffer())
-    
+
     // For now, we'll assume 1 license plate detected (you can enhance this later)
     // The Python server already handles license plate blurring
     const detectedPlates = 1
-    
+
     return {
       processedImage: processedImageBuffer,
       detectedPlates
     }
-    
+
   } catch (error) {
     console.error('Python server processing error:', error)
-    
+
     // Fallback: return original image with basic processing
     console.log('Falling back to basic processing')
     return {
@@ -198,7 +198,7 @@ export async function POST(request: Request) {
 
     if (contentType?.includes('multipart/form-data')) {
       const formData = await request.formData();
-      
+
       // Get image file
       const imageFile = formData.get('image') as File;
       if (!imageFile) {
@@ -215,20 +215,20 @@ export async function POST(request: Request) {
         backgroundBuffer = Buffer.from(await backgroundFile.arrayBuffer());
       }
 
-  
+
       // Parse settings
       try {
-        backgroundReplacement = formData.get('backgroundReplacement') ? 
-          JSON.parse(formData.get('backgroundReplacement') as string) : 
+        backgroundReplacement = formData.get('backgroundReplacement') ?
+          JSON.parse(formData.get('backgroundReplacement') as string) :
           null;
-        watermarkSettings = formData.get('watermarkSettings') ? 
-          JSON.parse(formData.get('watermarkSettings') as string) : 
+        watermarkSettings = formData.get('watermarkSettings') ?
+          JSON.parse(formData.get('watermarkSettings') as string) :
           null;
-        logoSettings = formData.get('logoSettings') ? 
-          JSON.parse(formData.get('logoSettings') as string) : 
+        logoSettings = formData.get('logoSettings') ?
+          JSON.parse(formData.get('logoSettings') as string) :
           null;
-        detectionSettings = formData.get('detectionSettings') ? 
-          JSON.parse(formData.get('detectionSettings') as string) : 
+        detectionSettings = formData.get('detectionSettings') ?
+          JSON.parse(formData.get('detectionSettings') as string) :
           null;
       } catch (error) {
         console.error('Settings parsing error:', error);
@@ -237,7 +237,7 @@ export async function POST(request: Request) {
     } else if (contentType?.includes('application/json')) {
       try {
         const body = await request.json();
-        
+
         if (body.image) {
           const base64Data = body.image.split(',')[1] || body.image;
           imageBuffer = Buffer.from(base64Data, 'base64');
@@ -245,7 +245,7 @@ export async function POST(request: Request) {
             const backgroundBase64Data = body.backgroundImage.split(',')[1] || body.backgroundImage;
             backgroundBuffer = Buffer.from(backgroundBase64Data, 'base64');
           }
-          
+
           // If logoSettings contains watermark_image, ensure it's properly formatted
           if (body.logoSettings?.watermark_image) {
             // Make sure we're using the base64 data without the data URI prefix
@@ -260,7 +260,7 @@ export async function POST(request: Request) {
             type: 'image/jpeg'
           };
         }
-        
+
         backgroundReplacement = body.backgroundReplacement;
         watermarkSettings = body.watermarkSettings;
         logoSettings = body.logoSettings;
@@ -290,7 +290,7 @@ export async function POST(request: Request) {
 
     // Process the image using Python server
     console.log('Starting image processing with Python server, buffer size:', imageBuffer.length);
-    
+
     const result = await processImageWithPythonServer(
       imageBuffer,
       backgroundBuffer || Buffer.alloc(0), // Pass an empty buffer if backgroundBuffer is undefined
@@ -308,7 +308,7 @@ export async function POST(request: Request) {
         error: "Failed to process image"
       })
     }
-    
+
     console.log('Processing result:', {
       hasProcessedImage: !!result.processedImage,
       processedImageSize: result.processedImage?.length,
@@ -320,7 +320,7 @@ export async function POST(request: Request) {
     // Create thumbnail from the processed image
     console.log('Creating thumbnail from processed image')
     const thumbnail = await sharp(processedImage)
-      .resize(320, 240, { 
+      .resize(320, 240, {
         fit: 'contain',
         background: { r: 0, g: 0, b: 0, alpha: 0 }
       })
@@ -335,7 +335,7 @@ export async function POST(request: Request) {
       const userId = session.user.id
       const timestamp = Date.now()
       const filename = imageMetadata.name.replace(/\.[^/.]+$/, '')
-      
+
       try {
         // Upload processed image
         processedImageUrl = await uploadToStorage(
@@ -387,7 +387,7 @@ export async function POST(request: Request) {
         if (currentCredits && currentCredits.credits_balance > 0) {
           const { error: creditsError } = await serviceSupabase
             .from('user_credits')
-            .update({ 
+            .update({
               credits_balance: Math.max(0, currentCredits.credits_balance - 1),
               updated_at: new Date().toISOString()
             })
@@ -414,7 +414,7 @@ export async function POST(request: Request) {
         // Update user stats
         const { error: statsError } = await supabase.rpc(
           'update_user_stats',
-          { 
+          {
             p_user_id: userId,
             p_plates_detected: result.detectedPlates
           }
