@@ -6,7 +6,7 @@ export async function sendNewUserNotification(userEmail: string, userName?: stri
   try {
     await resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: 'mujtaba@maskingtech.com',
+      to: 'maged@maskingtech.com',
       subject: 'New User Registration - MaskingTech',
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px;">
