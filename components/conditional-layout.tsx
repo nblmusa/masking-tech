@@ -23,7 +23,8 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
     '/terms',
     '/login',
     '/signup',
-    '/billing'
+    '/billing',
+    '/guest/studio'
   ]
   
   // Check if current route is public
