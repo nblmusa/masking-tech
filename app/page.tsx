@@ -61,8 +61,8 @@ export default function Home() {
             {/* Replace the old image grid with the new comparison component */}
             <div className="w-full max-w-3xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
               <ImageComparison
-                beforeImage="/images/volvo-before.webp"
-                afterImage="/images/volvo-after.jpeg"
+                beforeImage="/images/volvo-before.jpg"
+                afterImage="/images/volvo-after.jpg"
                 beforeLabel="Original Image"
                 afterLabel="Protected Image"
                 className="hover:scale-[1.02] transition-transform duration-500"
