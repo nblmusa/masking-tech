@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import LoginPage from "@/app/login/page"
+import SignupPage from "@/app/signup/page"
 
 interface EditorState {
   detectionTypes: {
@@ -910,7 +910,7 @@ export default function StudioPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogContent>
-            <LoginPage/>
+            <SignupPage/>
           </DialogContent>
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button
