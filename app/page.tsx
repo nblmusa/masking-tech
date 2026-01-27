@@ -12,8 +12,8 @@ export { metadata } from "./metadata"
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
-  
-      
+
+
       {/* Hero Section */}
       <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900/90 to-gray-900/95">
         {/* Enhanced background patterns */}
@@ -21,7 +21,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.05),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(99,102,241,0.05),transparent_50%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(60deg,rgba(59,130,246,0.02)_0%,rgba(59,130,246,0)_100%)]" />
-        
+
         {/* Enhanced floating elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
           <div className="absolute top-1/4 left-10 animate-float-slow">
@@ -58,17 +58,37 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Replace the old image grid with the new comparison component */}
-            <div className="w-full max-w-3xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
-              <ImageComparison
+  
+            {/* Image comparison section with responsive layout */}
+            <div className="w-full max-w-5xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                {/* First comparison */}
+                <div className="flex flex-col">
+                  <ImageComparison
                 beforeImage="/images/volvo-before.jpg"
                 afterImage="/images/volvo-after.jpg"
-                beforeLabel="Original Image"
-                afterLabel="Protected Image"
-                className="hover:scale-[1.02] transition-transform duration-500"
-              />
-              <div className="mt-4 text-center text-sm text-muted-foreground">
-                Drag the slider to compare before and after • AI-powered license plate detection and masking
+                    beforeLabel="Original Image"
+                    afterLabel="Protected Image"
+                    className="hover:scale-[1.02] transition-transform duration-500"
+                  />
+                  <div className="mt-3 text-center text-sm text-muted-foreground">
+                    Drag the slider to compare - AI-powered background replacement and Licence plate masking 
+                  </div>
+                </div>
+
+                {/* Second comparison */}
+                <div className="flex flex-col">
+                  <ImageComparison
+                    beforeImage="/images/listing-before.jpeg"
+                    afterImage="/images/listing-after.jpeg"
+                    beforeLabel="Original Image"
+                    afterLabel="Protected Image"
+                    className="hover:scale-[1.02] transition-transform duration-500"
+                  />
+                  <div className="mt-3 text-center text-sm text-muted-foreground">
+                    Drag the slider to compare - Uniform, privacy-masked listings
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -278,7 +298,7 @@ export default function Home() {
         </div>
       </section>
 
- 
+
       {/* Testimonials Section (New) */}
       {/* <section className="relative w-full py-12 sm:py-16 bg-gradient-to-b from-gray-800/90 via-gray-900/95 to-gray-900/90">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(59,130,246,0.05),transparent_50%)]" />
@@ -333,7 +353,7 @@ export default function Home() {
       </section> */}
 
 
-      
+
       <FAQSection />
 
 
@@ -393,7 +413,7 @@ export default function Home() {
           "softwareVersion": "2.0"
         })}
       </Script>
-      
+
       {/* FAQ Structured Data */}
       <Script id="faq-schema" type="application/ld+json">
         {JSON.stringify({
