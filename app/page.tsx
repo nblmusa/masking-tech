@@ -58,17 +58,36 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Replace the old image grid with the new comparison component */}
-            <div className="w-full max-w-3xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
-              <ImageComparison
-                beforeImage="/images/volvo-before.webp"
-                afterImage="/images/volvo-after.jpeg"
-                beforeLabel="Original Image"
-                afterLabel="Protected Image"
-                className="hover:scale-[1.02] transition-transform duration-500"
-              />
-              <div className="mt-4 text-center text-sm text-muted-foreground">
-                Drag the slider to compare before and after • AI-powered license plate detection and masking
+            {/* Image comparison section with responsive layout */}
+            <div className="w-full max-w-5xl mt-8 sm:mt-12 animate-fade-in-up delay-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                {/* First comparison */}
+                <div className="flex flex-col">
+                  <ImageComparison
+                    beforeImage="/images/volvo-before.webp"
+                    afterImage="/images/volvo-after.jpeg"
+                    beforeLabel="Original Image"
+                    afterLabel="Protected Image"
+                    className="hover:scale-[1.02] transition-transform duration-500"
+                  />
+                  <div className="mt-3 text-center text-sm text-muted-foreground">
+                    Drag the slider to compare • License plate detection
+                  </div>
+                </div>
+                
+                {/* Second comparison */}
+                <div className="flex flex-col">
+                  <ImageComparison
+                    beforeImage="/images/listing-before.jpeg"
+                    afterImage="/images/listing-after.jpeg"
+                    beforeLabel="Original Image"
+                    afterLabel="Protected Image"
+                    className="hover:scale-[1.02] transition-transform duration-500"
+                  />
+                  <div className="mt-3 text-center text-sm text-muted-foreground">
+                    Drag the slider to compare • AI-powered masking
+                  </div>
+                </div>
               </div>
             </div>
 
