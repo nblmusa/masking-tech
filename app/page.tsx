@@ -72,7 +72,7 @@ export default function Home() {
                     className="hover:scale-[1.02] transition-transform duration-500"
                   />
                   <div className="mt-3 text-center text-sm text-muted-foreground">
-                    Drag the slider to compare - AI-powered background replacement and Licence plate masking 
+                    AI-powered background replacement and Licence plate masking 
                   </div>
                 </div>
 
@@ -86,7 +86,7 @@ export default function Home() {
                     className="hover:scale-[1.02] transition-transform duration-500"
                   />
                   <div className="mt-3 text-center text-sm text-muted-foreground">
-                    Drag the slider to compare - Uniform, privacy-masked listings
+                    Uniform, privacy-masked listings
                   </div>
                 </div>
               </div>
