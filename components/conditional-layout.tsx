@@ -15,7 +15,9 @@ export default function ConditionalLayout({ children }: ConditionalLayoutProps) 
   const publicRoutes = [
     '/',
     '/about',
+    '/demo',
     '/pricing',
+    '/enterprise',
     '/contact',
     '/blog',
     '/docs',
