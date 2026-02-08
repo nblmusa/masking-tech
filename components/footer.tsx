@@ -34,6 +34,16 @@ export default function Footer() {
               <h3 className="font-semibold text-foreground/90">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li>
+                  <Link href="/signup" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
+                    Get 50 Free Credits
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/demo" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
+                    View Studio Demo
+                  </Link>
+                </li>
+                <li>
                   <Link href="/pricing" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
                     Pricing
                   </Link>
@@ -44,13 +54,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/dashboard" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/upload" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
-                    Upload
+                  <Link href="/enterprise" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
+                    Enterprise Solutions
                   </Link>
                 </li>
               </ul>
