@@ -35,7 +35,7 @@ export default function Footer() {
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link href="/signup" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
-                    Get 50 Free Credits
+                    Get 20 Free Credits
                   </Link>
                 </li>
                 <li>
