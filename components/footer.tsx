@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 py-8 max-w-7xl mx-auto">
           {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
             {/* Brand */}
             <div className="space-y-4">
               <div className="flex items-center gap-2.5">
@@ -60,6 +60,24 @@ export default function Footer() {
                 </li>
               </ul>
             </div>
+
+            {/* Analytics */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-foreground/90">Analytics</h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/dashboard" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/upload" className="text-muted-foreground/80 hover:text-foreground/90 transition-colors">
+                    Upload
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
 
             {/* Company */}
             <div className="space-y-4">
